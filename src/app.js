@@ -5,20 +5,20 @@
   const $ = id => document.getElementById(id);
   const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const APP_VERSION = P.version;
-  const NEWS = ''; // one line per release, shown once to returning users; empty = nothing new to announce
+  const NEWS = 'A Salad tab: build a bowl from what’s growing and see its balance, texture and dressing, plus house salads, island plates, a taste test and the microgreens. The map has a Flavor view with heads-ups on bristly and stringy plants, and there’s a picking round and a cat check.'; // shown once to returning users
 
   /* ----- Storage (this phone only) ----- */
   const store = {
     get(k, d) { try { const v = localStorage.getItem('pb:' + k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } },
     set(k, v) { try { localStorage.setItem('pb:' + k, JSON.stringify(v)); } catch (e) { /* storage off: the page still works */ } }
   };
-  const KEYS = ['done', 'care', 'camp', 'notes', 'trail', 'ui', 'seenVersion', 'installLater'];
+  const KEYS = ['done', 'care', 'camp', 'notes', 'trail', 'ui', 'seenVersion', 'installLater', 'bowl', 'bowls', 'mgsel', 'pick', 'verdict'];
   let DONE = store.get('done', {});
   let CARE = store.get('care', {});
   let CAMP = store.get('camp', {});
   let NOTES = store.get('notes', {});
   let TRAIL = store.get('trail', {});
-  const UI = Object.assign({ tower: 'S', mode: 'now', filter: 'tower' }, store.get('ui', {}));
+  const UI = Object.assign({ tower: 'S', mode: 'now', filter: 'tower', lens: 'light' }, store.get('ui', {}));
   const saveUI = () => store.set('ui', UI);
 
   /* ----- Dates (Maine time) ----- */
@@ -55,7 +55,7 @@
   function occupants(slot, except) { return P.pods.filter(p => p.id !== except && cur(p) === slot); }
   function capOnNow(slot) {
     const capMove = P.moves.find(m => m.kind === 'cap' && m.at === slot);
-    if (capMove && isDone(capMove)) return P.holds.plan[slot] || { cap: true, note: 'Cap' };
+    if (capMove && isDone(capMove)) return (P.holds.plan || P.holds.now)[slot] || { cap: true, note: 'Cap' };
     const h = P.holds.now[slot]; return h || null;
   }
   function readiness(m) {
@@ -72,7 +72,7 @@
     for (let r = 1; r <= 10; r++) for (const c of ['L', 'C', 'R']) L[t + r + c] = { pods: [], hold: null, next: [] };
     if (mode === 'plan') {
       P.pods.forEach(p => { if (L[p.plan]) L[p.plan].pods.push(p); });
-      Object.keys(P.holds.plan).forEach(s => { if (L[s]) L[s].hold = P.holds.plan[s]; });
+      const H = P.holds.plan || P.holds.now; Object.keys(H).forEach(s => { if (L[s]) L[s].hold = H[s]; });
     } else {
       P.pods.forEach(p => { const s = cur(p); if (L[s]) L[s].pods.push(p); });
       Object.keys(L).forEach(s => { L[s].hold = capOnNow(s); });
@@ -110,6 +110,7 @@
     sunflower: '<path class="s" d="M16 21v9M16 26l4-2"/><g class="f">' + petals + '</g><circle class="s0b" cx="16" cy="13" r="4.2"/>',
     blades: '<path class="k" d="M16 29 10 6M16 29 14 4M16 29l3-24M16 29l7-21"/><path class="fw" d="M19 1.5l.9 1.9 2 .3-1.5 1.4.4 2-1.8-1-1.8 1 .4-2-1.5-1.4 2-.3Z"/>',
     sprig: '<path class="s" d="M7 29C11 21 17 12 25 5"/><g class="f"><ellipse cx="8.2" cy="23.5" rx="2" ry="1.2" transform="rotate(-30 8.2 23.5)"/><ellipse cx="12.4" cy="24" rx="2" ry="1.2" transform="rotate(30 12.4 24)"/><ellipse cx="11.6" cy="18" rx="2" ry="1.2" transform="rotate(-30 11.6 18)"/><ellipse cx="15.8" cy="18.6" rx="2" ry="1.2" transform="rotate(30 15.8 18.6)"/><ellipse cx="15.3" cy="12.6" rx="2" ry="1.2" transform="rotate(-30 15.3 12.6)"/><ellipse cx="19.6" cy="13.2" rx="2" ry="1.2" transform="rotate(30 19.6 13.2)"/><ellipse cx="19.4" cy="7.6" rx="2" ry="1.2" transform="rotate(-30 19.4 7.6)"/><ellipse cx="23.4" cy="8.6" rx="2" ry="1.2" transform="rotate(30 23.4 8.6)"/></g>',
+    micro: '<path class="s" d="M4.5 28.5h23"/><path class="s" d="M8.5 28.5V19.6M16 28.5V13.4M23.5 28.5V19.6"/><g class="f"><ellipse cx="5.9" cy="18.3" rx="3" ry="1.65" transform="rotate(32 5.9 18.3)"/><ellipse cx="11.1" cy="18.3" rx="3" ry="1.65" transform="rotate(-32 11.1 18.3)"/><ellipse cx="13.4" cy="12.1" rx="3" ry="1.65" transform="rotate(32 13.4 12.1)"/><ellipse cx="18.6" cy="12.1" rx="3" ry="1.65" transform="rotate(-32 18.6 12.1)"/><ellipse cx="20.9" cy="18.3" rx="3" ry="1.65" transform="rotate(32 20.9 18.3)"/><ellipse cx="26.1" cy="18.3" rx="3" ry="1.65" transform="rotate(-32 26.1 18.3)"/></g>',
     cap: '<circle class="cap1" cx="16" cy="16" r="9.5"/><path class="cap2" d="M10.5 13.5a6.5 6.5 0 0 1 6.5-5"/>'
   };
   const SPECKLE = '<g class="dots"><circle cx="14.2" cy="13" r=".95"/><circle cx="17.6" cy="17" r=".95"/><circle cx="14.6" cy="21.2" r=".95"/><circle cx="10" cy="18.4" r=".85"/><circle cx="22" cy="19.4" r=".85"/><circle cx="17" cy="9.5" r=".8"/></g>';
@@ -123,7 +124,11 @@
 
   /* ----- Towers ----- */
   function renderTower() {
-    const t = UI.tower, mode = UI.mode;
+    const t = UI.tower;
+    const pending = P.pods.some(p => { const m = MOVE_BY_POD[p.id]; return m && !isDone(m) && [p.now, p.plan].some(x => parse(x) && parse(x).t === t); });
+    if (!pending && UI.mode === 'plan') UI.mode = 'now';
+    const mode = UI.mode;
+    document.querySelector('[data-mode]').parentElement.hidden = !pending;
     document.querySelectorAll('[data-tower]').forEach(b => b.setAttribute('aria-pressed', b.dataset.tower === t ? 'true' : 'false'));
     document.querySelectorAll('[data-mode]').forEach(b => b.setAttribute('aria-pressed', b.dataset.mode === mode ? 'true' : 'false'));
     const L = layout(t, mode);
@@ -132,8 +137,9 @@
     $('towerName').textContent = P.towers[t].name;
     $('towerCount').textContent = planted + ' planted' + (caps ? ' · ' + caps + (caps === 1 ? ' Cap' : ' Caps') : '') + ' · ' + (30 - planted - caps) + ' open';
     $('towerSub').textContent = mode === 'plan'
-      ? (t === 'S' ? 'The Nov 2 re-seating by light and space. The dots show plants that moved here; "new" ones come from the dome.' : 'The Nov 2 re-seating: strawberries out of dim row 10, a bean lane up the center, the TAM with headroom.')
-      : 'Where everything sat on Oct 27, plus any moves you’ve ticked off. A pink arrow means the plant has a move waiting.';
+      ? 'After the steps still to come: the cucumbers out and a bean lane up the center column.'
+      : (pending ? 'The tower as it stands: the Nov 2 map, in place as of Nov 5. A pink mark means a step is still to come.' : 'The tower as it stands: the Nov 2 map, in place as of Nov 5. Tap any pod.');
+    if (UI.lens === 'flavor') $('towerSub').textContent = 'Colored by what each plant brings to a salad. The word on each pod is its taste, or a heads-up marked ! before you eat it. Tap a pod for texture and pairings.';
     let pods = '';
     for (let r = 1; r <= 10; r++) for (const c of ['L', 'C', 'R']) pods += podHTML(t + r + c, L[t + r + c], mode);
     let bars = ''; for (let r = 1; r <= 10; r++) bars += '<span>' + r + '</span>';
@@ -141,8 +147,13 @@
     $('towerWrap').innerHTML =
       '<div class="colhead" aria-hidden="true"><span></span><span>Left</span><span>Center</span><span>Right</span><span></span></div>' +
       '<div class="tower"><div class="bar" aria-hidden="true">' + bars + '</div><div class="cols">' + pods + '</div><div class="bar r" aria-hidden="true">' + barsR + '</div>' +
-      '<div class="tank"><b>Tank</b><span>' + (t === 'S' ? 'Salad Tank · lighter feeding' : 'Fruiting Tank · Refresh every two weeks') + '</span></div></div>';
-    $('legendMove').innerHTML = mode === 'plan' ? '<i class="chip" style="background:var(--band);color:var(--band-ink)">↥</i>&nbsp;moved here' : '<i class="chip acc">→</i>&nbsp;move waiting';
+      '<div class="tank"><b>Tank</b><span>' + (t === 'S' ? 'Salad Tank · Refresh monthly' : 'Fruiting Tank · Refresh every two weeks') + '</span></div></div>';
+    document.querySelectorAll('[data-lens]').forEach(b => b.setAttribute('aria-pressed', b.dataset.lens === (UI.lens || 'light') ? 'true' : 'false'));
+    $('legendLight').hidden = UI.lens === 'flavor'; $('legendFlavor').hidden = UI.lens !== 'flavor';
+    if (UI.lens === 'flavor') $('legendFlavor').innerHTML = P.roleOrder.filter(r => r !== 'topper').map(r => '<span><i class="sw ax-' + r + '"></i>' + esc(P.roles[r].name) + '</span>').join('') + '<span><b class="flagk" aria-hidden="true">!</b>a heads-up before you eat it</span>';
+    const pendKind = k => P.pods.some(p => { const m = MOVE_BY_POD[p.id]; return m && m.kind === k && !isDone(m) && parse(cur(p)) && parse(cur(p)).t === t; });
+    const outs = pendKind('out'), mvs = pendKind('move');
+    $('legendMove').innerHTML = !pending ? '' : mode === 'plan' ? '<span><i class="chip" style="background:var(--band);color:var(--band-ink)">new</i>&nbsp;planted next</span>' : (mvs ? '<span><i class="chip acc">→</i>&nbsp;moves next</span>' : '') + (outs ? '<span><i class="chip" style="background:var(--ink-2);color:var(--surface)">✕</i>&nbsp;comes out</span>' : '');
     renderDome();
   }
 
@@ -157,9 +168,12 @@
       let badge = '';
       if (mode === 'now' && m && !isDone(m)) { badge = m.kind === 'out' ? '<span class="mv out" aria-hidden="true">✕</span>' : '<span class="mv" aria-hidden="true">→</span>'; cls.push('moving'); }
       if (mode === 'plan' && pod.now !== pod.plan) badge = '<span class="mv from" aria-hidden="true">' + (parse(pod.now) ? '↥' : 'new') + '</span>';
+      if (badge) cls.push(/>new</.test(badge) ? 'hasnew' : 'hasmv');
       if (cell.pods.length > 1) cls.push('clash');
-      const tg = tagStr(pl);
-      inner = '<span class="top">' + plantGlyph(pl) + '<span class="t">' + tg + (cell.pods.length > 1 ? ' +' + (cell.pods.length - 1) : '') + '</span></span><span class="n">' + esc(pod.label) + '</span>' + badge;
+      const lens = UI.lens === 'flavor' && pl.flav;
+      if (lens) cls.push('r-' + pl.flav.roles[0]);
+      const tg = lens ? esc(pl.flav.flag || (pl.flav.flavor.find(x => x !== 'mild' && x.length <= 9) || pl.flav.flavor.find(x => x !== 'mild') || pl.flav.flavor[0]).replace(/ \(.*\)/, '')) : tagStr(pl);
+      inner = '<span class="top">' + plantGlyph(pl) + '<span class="t' + (lens ? ' fwt' + (pl.flav.flag ? ' flagged' : '') : '') + '">' + tg + (cell.pods.length > 1 ? ' +' + (cell.pods.length - 1) : '') + '</span></span><span class="n">' + esc(pod.label) + '</span>' + badge;
       label = where + ': ' + cell.pods.map(x => x.label).join(' and ') + (badge ? (mode === 'now' ? ', move waiting' : ', moved here') : '');
       return '<button class="' + cls.join(' ') + '" data-slot="' + slot + '" data-pod="' + pod.id + '" aria-label="' + esc(label) + '">' + inner + '</button>';
     }
@@ -172,7 +186,7 @@
       let txt = 'open';
       if (cell.next && cell.next.length) txt = 'next: <i>' + esc(cell.next[0].label) + '</i>';
       else if (cell.capNext) txt = 'open · <i>Cap next</i>';
-      else if (cell.hold && cell.hold.note) txt = esc(cell.hold.note.split(':')[0].toLowerCase());
+      else if (cell.hold && (cell.hold.tag || cell.hold.note)) { txt = esc(cell.hold.tag || cell.hold.note.split(':')[0].toLowerCase()); if (cell.hold.free) cls.push('free'); }
       inner = '<span class="n">' + txt + '</span>';
       label = where + ': ' + txt.replace(/<[^>]+>/g, '');
     }
@@ -183,7 +197,7 @@
     const t = UI.tower;
     const list = P.pods.filter(p => (p.now === 'dome' || p.now === 'sow') && parse(p.plan) && parse(p.plan).t === t && !(MOVE_BY_POD[p.id] && isDone(MOVE_BY_POD[p.id])));
     $('domeSec').hidden = !list.length;
-    $('domeTitle').textContent = t === 'S' ? 'In the dome, headed here' : 'In the dome or still to sow';
+    $('domeTitle').textContent = list.some(p => p.now === 'dome') ? 'In the dome, headed here' : 'Still to sow';
     $('dome').innerHTML = list.map(p => { const pl = P.plants[p.p]; return '<button data-pod="' + p.id + '" data-open="plant">' + plantGlyph(pl) + esc(p.label) + ' <small>' + (p.now === 'sow' ? 'to sow · ' : '') + '→ ' + esc(seatName(p.plan)) + '</small></button>'; }).join('');
   }
 
@@ -202,13 +216,18 @@
     const ready = P.moves.filter(m => !isDone(m) && readiness(m).ready && !(P.phases[m.phase] || {}).gate).length;
     const done = P.moves.filter(isDone).length;
     $('today').innerHTML =
-      '<button data-go="care" data-anchor="rhythm" class="' + (due.length ? 'hot' : '') + '"><span class="big">' + due.length + '</span><span class="lbl">care jobs due</span><span class="sub">' + (due.length ? esc(due.slice(0, 2).map(c => c.title).join(', ')) : unlogged ? unlogged + ' not logged yet' : 'All caught up') + '</span></button>' +
-      '<button data-go="care" data-anchor="moves"><span class="big">' + ready + '</span><span class="lbl">moves ready now</span><span class="sub">' + done + ' of ' + P.moves.length + ' done</span></button>';
+      '<button data-go="care" data-anchor="rhythm" class="' + (due.length ? 'hot' : '') + '"><span class="big">' + due.length + '</span><span class="lbl">' + (due.length === 1 ? 'care job due' : 'care jobs due') + '</span><span class="sub">' + (due.length ? esc(due.slice(0, 2).map(c => c.title).join(', ')) : unlogged ? unlogged + ' not logged' : 'All caught up') + '</span></button>' +
+      '<button data-go="care" data-anchor="moves"><span class="big">' + ready + '</span><span class="lbl">' + (ready === 1 ? 'step ready now' : 'steps ready now') + '</span><span class="sub">' + done + ' of ' + P.moves.length + ' done</span></button>' +
+      (() => { const pk = pickList(), n = pk.filter(x => x.due).length; return '<button data-act="pickRound" class="' + (n && pk.some(x => x.last) ? 'hot' : '') + '"><span class="big">' + n + '</span><span class="lbl">to pick</span><span class="sub">' + (!pk.length ? 'nothing leafy' : pk.some(x => x.last) ? (n ? 'a week or more' : 'all picked') : 'start a round') + '</span></button>'; })();
   }
 
   /* ----- Plant sheet ----- */
   function statTiles(pl) {
     const g = pl.gb || {};
+    if (g.micro) {
+      const mt = [['Sprouts in', g.sprout + ' <small>days</small>'], ['Harvest at', g.mature + ' <small>days</small>'], ['Grown in', 'Sprout Nursery'], ['Grows on', 'Seed pad'], ['Care level', 'Beginner'], ['Plant Food', 'None']];
+      return '<div class="stats">' + mt.map(([k, v]) => '<div><span class="k">' + k + '</span><span class="v">' + v + '</span></div>').join('') + '</div>';
+    }
     const tiles = [
       ['Sprouts in', g.sprout && /\d/.test(g.sprout) ? g.sprout + ' <small>days</small>' : esc(g.sprout || '—')],
       ['Matures in', g.mature && /^[\d≈–]+$/.test(g.mature) ? g.mature + ' <small>days</small>' : esc(g.mature || '—')],
@@ -249,19 +268,21 @@
     const here = UI.mode === 'plan' ? pod.plan : cur(pod);
     const onTower = parse(here);
     let h = '<div class="seat' + (m && !isDone(m) ? ' acc' : '') + '">';
-    h += '<div class="eyebrow">' + esc(pod.label) + (UI.mode === 'plan' ? ' · Nov 2 plan' : ' · now') + '</div>';
+    h += '<div class="eyebrow">' + esc(pod.label) + (UI.mode === 'plan' ? ' · next' : ' · now') + '</div>';
     if (onTower) {
       const z = zoneOf(here);
       h += '<h3>' + esc(seatTitle(here)) + '</h3><div class="btnrow"><span class="chip z-' + z + '">' + ZONE[z] + '</span><span class="chip">Faces ' + facing(here) + ' ' + (facing(here) === 'right' ? '►' : '◄') + '</span></div>';
       const lines = [seatCheck(pl, here), leanText(here), twoUp(here, UI.mode)];
       const partner = partnerOf(pod); if (partner) { const ps = UI.mode === 'plan' ? partner.plan : cur(partner); lines.push('Its pair, ' + partner.label + ', is ' + (parse(ps) ? 'at ' + seatName(ps, parse(ps).t !== parse(here).t) : 'in ' + seatName(ps)) + '.'); }
       if (pod.seat) lines.push(pod.seat);
+      if (pod.was && UI.mode === 'now') lines.push(pod.was === 'dome' ? 'Planted from the dome in the Nov 2 re-seating.' : 'Moved here from ' + seatName(pod.was, parse(pod.was).t !== parse(here).t) + ' in the Nov 2 re-seating.');
       h += '<ul>' + lines.filter(Boolean).map(x => '<li>' + esc(x) + '</li>').join('') + '</ul>';
     } else {
       h += '<h3>' + (here === 'dome' ? 'In the dome' : here === 'sow' ? 'Not sown yet' : 'Out') + '</h3>';
     }
     if (pod.unsure) h += '<p class="small" style="margin:0"><b>To confirm:</b> ' + esc(pod.unsure) + '</p>';
     if (pod.note) h += '<p class="small" style="margin:0">' + esc(pod.note) + '</p>';
+    if (onTower && UI.mode !== 'plan') { const pk = pickable(pod), last = PICK[pod.id], td = last === todayISO(); h += '<div class="pickrow">' + (pk ? '<span class="small">' + (td ? 'Picked today' : last ? 'Last picked ' + fmtDate(last) : 'No picking logged yet') + '</span>' : '<span></span>') + '<span class="btnrow">' + (pk ? '<button class="btn small' + (td ? ' ghost' : '') + '" data-act="pickToggle" data-pod="' + pod.id + '">' + (td ? 'Undo' : 'Picked today') + '</button>' : '') + '<button class="btn small ghost" data-act="copyLink" data-slot="' + here + '">Copy link</button></span></div>'; }
     if (m) {
       const done = isDone(m);
       const dest = m.kind === 'out' ? 'Comes out' : 'Moves to ' + seatName(pod.plan, true);
@@ -276,10 +297,16 @@
   function plantSheet(pid, podId) {
     const pl = P.plants[pid]; if (!pl) return;
     const pods = P.pods.filter(p => p.p === pid);
-    let h = '<div class="ph"><div class="gwrap">' + plantGlyph(pl) + '</div><div><div class="eyebrow">' + esc(P.groups[pl.group]) + (pl.notGardyn ? ' · not in Gardyn’s catalog' : ' · Gardyn Plant Book') + statusWord(pl) + '</div><h2 id="sheetTitle">' + esc(pl.name) + (tagStr(pl) ? ' <span class="muted" style="font-size:18px">' + tagStr(pl) + '</span>' : '') + '</h2><div class="latin">' + esc(pl.latin) + '</div></div></div>';
+    let h = '<div class="ph"><div class="gwrap">' + plantGlyph(pl) + '</div><div><div class="eyebrow">' + esc(P.groups[pl.group]) + (pl.notGardyn ? ' · not in Gardyn’s catalog' : ' · Gardyn Plant Book') + statusWord(pl) + '</div><h2 id="sheetTitle">' + esc(pl.name) + (tagStr(pl) ? ' <span class="muted" style="font-size:18px">' + tagStr(pl) + '</span>' : '') + '</h2><div class="latin">' + esc(pl.latin) + '</div>' + (pl.flav ? '<div class="tnote">' + esc(pl.flav.flavor.join(', ').replace(/^./, c => c.toUpperCase())) + (pl.flav.texture && pl.flav.texture[0] ? ' · ' + esc(pl.flav.texture[0]) : '') + '</div>' : '') + '</div></div>';
+    const fv = pl.flav;
+    if (fv && fv.warn && fv.warn.length) h += '<div class="warn"><b>Before you eat it</b><ul>' + fv.warn.map(x => '<li>' + esc(x) + '</li>').join('') + '</ul></div>';
+    const pet = P.pets[pid]; if (pet && pet.toxic) h += '<div class="petnote"><b>For the cat.</b> ' + esc(pet.text) + ' <a href="' + esc(pet.src) + '" target="_blank" rel="noopener">Source</a></div>';
     if (podId && POD[podId]) h += seatCard(POD[podId]);
     if (pl.why) h += '<div class="callout"><b>Why it’s on the list.</b> ' + esc(pl.why) + '</div>';
+    if (P.audition[pid] && P.plants[P.audition[pid]]) h += '<div class="callout"><b>Taste it first.</b> Gardyn’s ' + esc(P.plants[P.audition[pid]].name) + ' pad is the same plant, ready in ' + esc(P.plants[P.audition[pid]].gb.mature) + ' days in the Sprout Nursery. If you love it, it earns a yPod. <button class="btn small" style="margin-top:6px" data-open="plant" data-pid="' + P.audition[pid] + '">Open the pad</button></div>';
+    const aud = Object.keys(P.audition).find(k => P.audition[k] === pid); if (aud && P.plants[aud]) h += '<div class="callout"><b>An audition.</b> ' + esc(P.plants[aud].name) + ' is on your Ideas list for a yPod. This pad lets you taste it first, in under two weeks.</div>';
     if (pl.gone) h += '<div class="callout"><b>Why it’s retired.</b> ' + esc(pl.gone) + '</div>';
+    if (fv) h += tasteBlock(pid, pl);
     h += '<div class="block"><h3>Growing basics</h3>' + statTiles(pl) + (pl.gb && pl.gb.zoneNote ? '<p class="small">' + esc(pl.gb.zoneNote) + '</p>' : '') + (pl.gb && pl.gb.note ? '<p class="small">' + esc(pl.gb.note) + '</p>' : '') + '</div>';
     if (pods.length) {
       h += '<div class="block"><h3>On your towers</h3><ul>' + pods.map(p => { const c = cur(p), m = MOVE_BY_POD[p.id]; const now = parse(c) ? seatName(c, true) : seatName(c); const plan = p.plan === 'out' ? 'comes out' : seatName(p.plan, true); return '<li><button class="btn small ghost" data-open="pod" data-pod="' + p.id + '">' + esc(p.label) + '</button> ' + esc(now) + (m && !isDone(m) ? ' → ' + esc(plan) : '') + '</li>'; }).join('') + '</ul></div>';
@@ -287,13 +314,25 @@
     if (pl.yours && pl.yours.length) h += '<div class="block"><h3>Your notes</h3><ul>' + pl.yours.map(x => '<li>' + esc(x) + '</li>').join('') + '</ul></div>';
     if (pl.harvest) h += '<div class="block"><h3>Harvest</h3><ul>' + pl.harvest.map(x => '<li>' + esc(x) + '</li>').join('') + '</ul></div>';
     if (pl.care || pl.pests) h += '<div class="block"><h3>Care</h3><ul>' + (pl.care || []).map(x => '<li>' + esc(x) + '</li>').join('') + (pl.pests ? '<li><b>Common pests:</b> ' + esc(pl.pests) + '</li>' : '') + '</ul></div>';
-    if (pl.taste) h += '<div class="block"><h3>Taste and use</h3><p>' + esc(pl.taste) + '</p></div>';
+    if (pl.taste && typeof pl.taste === 'string') h += '<div class="block"><h3>Taste and use</h3><p>' + esc(pl.taste) + '</p></div>';
     if (pl.about || pl.origin) h += '<div class="block"><h3>Qualities and origin</h3>' + (pl.about ? '<p>' + esc(pl.about) + '</p>' : '') + (pl.origin ? '<p class="small" style="margin-top:6px">' + esc(pl.origin) + '</p>' : '') + '</div>';
     h += journalHTML(pid);
     h += '<p class="src">Sources: ' + (pl.src || []).map(s => '<a href="' + esc(s[1]) + '" target="_blank" rel="noopener">' + esc(s[0]) + '</a>').join(' · ') + '</p>';
     showSheet(h, { kind: 'plant', pid, podId });
   }
-  function statusWord(pl) { return { dome: ' · in the dome', planned: ' · planned', idea: ' · an idea', retired: ' · retired' }[pl.status] || ''; }
+  function statusWord(pl) { return { dome: ' · in the dome', planned: ' · planned', idea: ' · an idea', retired: ' · retired', micro: ' · Microgreens Kit' }[pl.status] || ''; }
+  function tasteBlock(pid, pl) {
+    const fv = pl.flav, pet = P.pets[pid];
+    let h = '<div class="block"><h3>Taste and texture</h3><div class="tchips">' + fv.flavor.map(x => '<span class="fl">' + esc(x) + '</span>').join('') + (fv.texture || []).map(x => '<span class="tx' + (/bristly|downy|stringy|tough/.test(x) ? ' bad' : '') + '">' + esc(x) + '</span>').join('') + '</div>';
+    h += '<p class="small" style="margin:6px 0 0"><b>In a bowl:</b> ' + esc(fv.roles.map(r => P.roles[r].name.toLowerCase()).join(', ')) + '. <b>Best eaten:</b> ' + esc(fv.eat) + '</p>';
+    const pairs = (fv.pairs || []).filter(x => P.plants[x]);
+    if (pairs.length) h += '<p class="small" style="margin:6px 0 0"><b>Pairs with, on your towers:</b></p><div class="dome" style="margin-top:4px">' + pairs.map(x => '<button data-open="plant" data-pid="' + x + '">' + plantGlyph(P.plants[x]) + esc(P.plants[x].name) + '</button>').join('') + '</div>';
+    if (fv.kitchen) h += '<p class="small" style="margin:6px 0 0"><b>From the kitchen:</b> ' + esc(fv.kitchen) + '</p>';
+    if (bowlable(pid)) { const inB = BOWL.includes(pid); h += '<div class="btnrow" style="margin-top:8px"><button class="btn small ' + (inB ? 'ghost' : 'primary') + '" data-act="bowlToggle" data-pid="' + pid + '">' + (inB ? 'In tonight\u2019s bowl · remove' : 'Add to tonight\u2019s bowl') + '</button></div>'; }
+    if (pet && !pet.toxic) h += '<p class="small" style="margin:6px 0 0">' + esc(pet.text) + '</p>';
+    h += '<div class="verdict"><span class="small"><b>Your verdict</b></span>' + verdictSeg(pid) + '</div>';
+    return h + '</div>';
+  }
   function journalHTML(pid) {
     const list = NOTES[pid] || [];
     return '<div class="block journal"><h3>Your journal</h3><textarea id="jText" placeholder="First harvest, a root trim, a pest sighting…" aria-label="Add a note"></textarea><div class="btnrow"><button class="btn small primary" data-act="addNote" data-pid="' + pid + '">Add note</button></div>' +
@@ -301,32 +340,35 @@
   }
   function seatSheet(slot) {
     const mode = UI.mode, L = layout(parse(slot).t, mode), cell = L[slot], z = zoneOf(slot);
-    let h = '<div><div class="eyebrow">' + (mode === 'plan' ? 'Nov 2 plan' : 'Now') + '</div><h2 id="sheetTitle">' + esc(seatTitle(slot)) + '</h2></div>';
+    let h = '<div><div class="eyebrow">' + (mode === 'plan' ? 'Next' : 'Now') + '</div><h2 id="sheetTitle">' + esc(seatTitle(slot)) + '</h2></div>';
     h += '<div class="seat"><div class="btnrow"><span class="chip z-' + z + '">' + ZONE[z] + '</span><span class="chip">Faces ' + facing(slot) + '</span></div><ul>';
     if (cell.hold && cell.hold.note) h += '<li>' + esc(cell.hold.note) + '.</li>';
     else if (cell.hold && cell.hold.cap) h += '<li>A Cap keeps this pod clear.</li>';
     else h += '<li>Open.</li>';
     if (cell.next && cell.next.length) h += '<li>Next in: ' + esc(cell.next.map(p => p.label).join(', ')) + ' (from ' + esc(seatName(cell.next[0].now, true)) + ').</li>';
-    if (cell.capNext) h += '<li>A Cap goes on here in the Nov 2 plan.</li>';
+    if (cell.capNext) h += '<li>A Cap goes on here next.</li>';
     h += '<li>' + esc(leanText(slot)) + '</li><li>' + esc(twoUp(slot, mode)) + '</li></ul></div>';
-    const fits = Object.entries(P.plants).filter(([id, pl]) => pl.status === 'idea' && pl.gb && pl.gb.zone && Math.abs(ZRANK[pl.gb.zone] - ZRANK[z]) <= (z === 'low' ? 0 : 1)).slice(0, 4);
+    const fits = Object.entries(P.plants).filter(([id, pl]) => pl.status === 'idea' && pl.gb && pl.gb.zone && (pl.group === 'fruit') === (parse(slot).t === 'F') && Math.abs(ZRANK[pl.gb.zone] - ZRANK[z]) <= (z === 'low' ? 0 : 1)).slice(0, 4);
     if (fits.length && !cell.hold?.cap) h += '<div class="block"><h3>Ideas that suit this light</h3><div class="dome">' + fits.map(([id, pl]) => '<button data-open="plant" data-pid="' + id + '">' + plantGlyph(pl) + esc(pl.name) + '</button>').join('') + '</div></div>';
+    h += '<div class="btnrow"><button class="btn small ghost" data-act="copyLink" data-slot="' + slot + '">Copy a link to this seat</button></div>';
     showSheet(h, { kind: 'seat', slot });
   }
 
   /* ----- Plant list ----- */
-  const FILTERS = [['tower', 'On the towers'], ['dome', 'Dome and planned'], ['idea', 'Ideas'], ['retired', 'Retired'], ['all', 'All']];
+  const FILTERS = [['tower', 'On the towers'], ['micro', 'Microgreens'], ['dome', 'Planned'], ['idea', 'Ideas'], ['retired', 'Retired'], ['all', 'All']];
   const inFilter = (pl, f) => f === 'all' || (f === 'dome' ? (pl.status === 'dome' || pl.status === 'planned') : pl.status === f);
   function plantWhere(pid) {
     const pods = P.pods.filter(p => p.p === pid); if (!pods.length) return '';
     const onS = pods.filter(p => parse(cur(p)) && parse(cur(p)).t === 'S').length, onF = pods.filter(p => parse(cur(p)) && parse(cur(p)).t === 'F').length;
     const waiting = pods.filter(p => !parse(cur(p))).length;
-    const moving = pods.filter(p => { const m = MOVE_BY_POD[p.id]; return m && !isDone(m) && parse(cur(p)); }).length;
+    const pend = pods.filter(p => { const m = MOVE_BY_POD[p.id]; return m && !isDone(m) && parse(cur(p)); });
+    const outN = pend.filter(p => MOVE_BY_POD[p.id].kind === 'out').length, moving = pend.length - outN;
     const bits = [];
     if (onS) bits.push(onS + ' on the salad tower');
     if (onF) bits.push(onF + ' on the fruiting tower');
     if (waiting) bits.push(pods.length === 1 ? (pods[0].now === 'sow' ? 'to sow' : 'in the dome') + ' → ' + seatName(pods[0].plan, true) : waiting + ' to sow or in the dome');
     if (moving) bits.push(moving + ' moving');
+    if (outN) bits.push(outN + ' coming out');
     return bits.join(' · ');
   }
   function renderPlants() {
@@ -334,11 +376,11 @@
     const ids = Object.keys(P.plants);
     const counts = {}; FILTERS.forEach(([f]) => { counts[f] = ids.filter(id => inFilter(P.plants[id], f)).length; });
     $('filters').innerHTML = FILTERS.map(([f, l]) => '<button data-filter="' + f + '" aria-pressed="' + (UI.filter === f) + '">' + l + '<span class="n">' + counts[f] + '</span></button>').join('');
-    const match = id => { if (!q) return true; const pl = P.plants[id]; const hay = [pl.name, pl.latin, pl.pests, pl.about, pl.taste, (pl.gb && pl.gb.zone) + ' light', P.groups[pl.group], (pl.yours || []).join(' '), pl.why, pl.gone].join(' ').toLowerCase(); return q.split(/\s+/).every(w => hay.includes(w)); };
+    const match = id => { if (!q) return true; const pl = P.plants[id]; const fv = pl.flav || {}; const hay = [pl.name, pl.latin, pl.pests, pl.about, typeof pl.taste === 'string' ? pl.taste : '', (pl.gb && pl.gb.zone) + ' light', P.groups[pl.group], (pl.yours || []).join(' '), pl.why, pl.gone, (fv.flavor || []).join(' '), (fv.texture || []).join(' '), (fv.roles || []).map(r => P.roles[r].name).join(' '), fv.kitchen, (fv.warn || []).join(' '), fv.flag, /bristly|downy/.test(fv.flag || '') ? 'fuzzy hairy prickly' : '', P.pets[id] && P.pets[id].toxic ? 'cat pet toxic' : '', (VERD[id] || {}).v].join(' ').toLowerCase(); return q.split(/\s+/).every(w => hay.includes(w)); };
     const list = ids.filter(id => (q ? true : inFilter(P.plants[id], UI.filter)) && match(id));
-    const order = { tower: 0, dome: 1, planned: 1, idea: 2, retired: 3 };
+    const order = { tower: 0, micro: 1, dome: 2, planned: 2, idea: 3, retired: 4 };
     list.sort((a, b) => (order[P.plants[a].status] - order[P.plants[b].status]) || P.plants[a].name.localeCompare(P.plants[b].name));
-    $('plist').innerHTML = list.length ? list.map(id => { const pl = P.plants[id]; const g = pl.gb || {}; const where = plantWhere(id); return '<button class="prow" data-open="plant" data-pid="' + id + '"><span class="gwrap">' + plantGlyph(pl) + '</span><span style="min-width:0"><span class="nm">' + esc(pl.name) + (tagStr(pl) ? ' <span class="muted" style="font-size:13px">' + tagStr(pl) + '</span>' : '') + '</span><span class="lt" style="display:block">' + esc(pl.latin) + '</span>' + (where ? '<span class="wh" style="display:block">' + esc(where) + '</span>' : pl.why ? '<span class="wh" style="display:block">An idea to try</span>' : pl.gone ? '<span class="wh" style="display:block">Retired</span>' : '') + '</span><span class="rt">' + (g.zone ? '<span class="chip z-' + g.zone + '">' + g.zone + '</span>' : '') + (/\d/.test(g.mature || '') ? '<span class="days">' + esc(g.mature) + ' days</span>' : '') + '</span></button>'; }).join('') : '<div class="card small">No plant matches “' + esc(q) + '”. Try a pest, a light zone, or part of a name.</div>';
+    $('plist').innerHTML = list.length ? list.map(id => { const pl = P.plants[id]; const g = pl.gb || {}; const where = plantWhere(id); return '<button class="prow" data-open="plant" data-pid="' + id + '"><span class="gwrap">' + plantGlyph(pl) + '</span><span style="min-width:0"><span class="nm">' + esc(pl.name) + (tagStr(pl) ? ' <span class="muted" style="font-size:13px">' + tagStr(pl) + '</span>' : '') + '</span>' + (pl.flav ? '<span class="fw" style="display:block">' + esc(pl.flav.flavor.join(', ')) + (pl.flav.texture && pl.flav.texture[0] ? ' · ' + esc(pl.flav.texture[0]) : '') + '</span>' : '<span class="lt" style="display:block">' + esc(pl.latin) + '</span>') + (where ? '<span class="wh" style="display:block">' + esc(where) + '</span>' : pl.status === 'micro' ? '<span class="wh" style="display:block">Microgreens Kit · Sprout Nursery</span>' : pl.why ? '<span class="wh" style="display:block">An idea to try</span>' : pl.gone ? '<span class="wh" style="display:block">Retired</span>' : '') + '</span><span class="rt">' + (g.zone ? '<span class="chip z-' + g.zone + '">' + g.zone + '</span>' : '') + (/\d/.test(g.mature || '') ? '<span class="days">' + esc(g.mature) + ' days</span>' : '') + (pl.flav && pl.flav.flag ? '<span class="flag">' + esc(pl.flav.flag) + '</span>' : '') + (VERD[id] ? '<span class="vd vd-' + VERD[id].v + '">' + VNAME[VERD[id].v] + '</span>' : '') + '</span></button>'; }).join('') : '<div class="card small">No plant matches “' + esc(q) + '”. Try a pest, a light zone, or part of a name.</div>';
   }
 
   /* ----- Care ----- */
@@ -348,7 +390,8 @@
     rows.sort((a, b) => (rank[a.s.state] - rank[b.s.state]) || (a.c.every - b.c.every));
     const dueN = rows.filter(r => r.s.state === 'over' || r.s.state === 'due').length;
     $('dueCount').textContent = dueN ? dueN + ' due' : '';
-    $('rhythm').innerHTML = rows.map(({ c, s }) => {
+    const unN = rows.filter(r => r.s.state === 'none').length;
+    $('rhythm').innerHTML = (unN ? '<div class="card catch"><div class="rowtop"><b>' + unN + (unN === 1 ? ' job has' : ' jobs have') + ' no date yet</b><button class="btn small primary" data-act="catchUp">Catch up</button></div><p class="small">Say roughly when you last did each one, a tap apiece, and the app works out what’s due.</p></div>' : '') + rows.map(({ c, s }) => {
       const chip = s.state === 'over' ? 'due' : s.state === 'due' ? 'due' : s.state === 'ok' ? 'ok' : '';
       const doneToday = CARE[c.id] === todayISO();
       return '<div class="task"><div><h4>' + esc(c.title) + '</h4><div class="where">' + esc(c.where) + ' · every ' + everyText(c.every) + '</div></div><div class="st"><span class="chip ' + chip + '">' + esc(s.text) + '</span>' +
@@ -382,7 +425,7 @@
     const total = P.moves.length, done = P.moves.filter(isDone).length;
     $('moveCount').textContent = done + ' of ' + total + ' done';
     $('moveBar').style.width = Math.round(done / total * 100) + '%';
-    $('moves').innerHTML = P.phaseOrder.map(ph => {
+    $('moves').innerHTML = (P.done ? '<div class="card small" style="padding:10px 14px"><b style="font-family:var(--font-display)">Done ' + esc(P.done.date) + ':</b> ' + esc(P.done.text) + '</div>' : '') + P.phaseOrder.map(ph => {
       const items = P.moves.filter(m => m.phase === ph); if (!items.length) return '';
       const meta = P.phases[ph];
       return '<div class="phase"><h4>' + esc(meta.title) + '</h4><p>' + esc(meta.sub) + '</p>' + items.map(m => {
@@ -466,6 +509,183 @@
   }
   function fixSheet(id) { const f = P.fixes.find(x => x.id === id); showSheet('<div><div class="eyebrow">Fixes</div><h2 id="sheetTitle">' + esc(f.title) + '</h2><div class="small">' + esc(f.sub) + '</div></div><div class="card prose">' + f.body + '</div>', { kind: 'fix', id }); }
 
+  /* ----- Salad: build a bowl ----- */
+  const BOWL = store.get('bowl', []).filter(id => P.plants[id]);
+  const SAVED = store.get('bowls', []);
+  const MGSEL = store.get('mgsel', ['mg-spicy', 'mg-sango', 'mg-lemonbasil']);
+  const saveBowl = () => store.set('bowl', BOWL);
+  const bowlable = id => { const pl = P.plants[id]; return !!(pl && pl.flav && (pl.status === 'tower' || pl.status === 'micro')); };
+  const AX = () => P.axes;
+  function bowlTotals() { const t = {}; P.axes.forEach(([k]) => { t[k] = 0; }); BOWL.forEach(id => { const w = P.plants[id].flav.w || {}; Object.keys(w).forEach(k => { t[k] += w[k]; }); }); return t; }
+  function dressingFor(t) {
+    const has = id => BOWL.includes(id), D = P.dressings;
+    const sourGreen = BOWL.some(id => (P.plants[id].flav.w.tang || 0) >= 2);
+    if (t.sweet >= 4 && (has('ground-cherry') || has('yellow-cherry-tomato')) && t.pepper >= 1) return D.lime;
+    if (t.tang >= 3 && sourGreen) return D.oil;
+    if (t.sweet >= 4) return D.balsamic;
+    if (t.earthy >= 3) return D.sherry;
+    if ((has('green-tatsoi') || has('red-tatsoi')) && t.pepper + t.earthy >= 3) return D.sesame;
+    if (t.pepper >= 3) return D.honeyLemon;
+    if (t.cool >= 3 && (has('cucumber') || has('cucamelon') || has('dill'))) return D.yogurt;
+    if (t.herbal >= 1 && (has('butterhead') || has('buttercrunch'))) return D.buttermilk;
+    return D.dijon;
+  }
+  const TEXC = [['soft', /soft|tender|buttery|smooth|delicate|glossy/], ['crunch', /crunch|crisp|snappy|firm/], ['juicy', /juic|watery|succulent/], ['airy', /lacy|feather|frill/]];
+  function textureLine() {
+    const by = { soft: [], crunch: [], juicy: [], airy: [] };
+    BOWL.forEach(id => { const pl = P.plants[id]; (pl.flav.texture || []).filter(x => !/bristly|stringy|tough|downy|sticky/.test(x)).forEach(x => TEXC.forEach(([k, re]) => { if (re.test(x) && !by[k].includes(pl.name)) by[k].push(pl.name); })); });
+    const nm = a => a.length > 3 ? a.slice(0, 2).join(', ') + ' and ' + (a.length - 2) + ' more' : a.length === 3 ? a[0] + ', ' + a[1] + ' and ' + a[2] : a.join(' and ');
+    const parts = [];
+    if (by.soft.length) parts.push('soft from ' + nm(by.soft));
+    if (by.crunch.length) parts.push('crunch from ' + nm(by.crunch));
+    if (by.juicy.length) parts.push('juicy from ' + nm(by.juicy));
+    if (by.airy.length) parts.push('airy from ' + nm(by.airy));
+    return { text: parts.join('; '), crunch: by.crunch.length > 0 };
+  }
+  const ROLE_FILL = { base: ['butterhead', 'buttercrunch', 'green-salanova', 'romaine', 'perpetual-spinach'], crunch: ['romaine', 'purslane', 'green-salanova', 'cucumber', 'cucamelon'], pepper: ['nasturtium', 'red-tatsoi', 'green-tatsoi', 'mg-sango', 'mg-spicy'], tang: ['red-sorrel', 'purslane', 'cucamelon'], herb: ['dill', 'salad-burnet', 'mint', 'chocolate-mint'], color: ['lollo-rossa', 'bulls-blood', 'borage', 'nasturtium', 'red-tatsoi'] };
+  function suggestions() {
+    if (!BOWL.length) return [];
+    const have = new Set(); BOWL.forEach(id => P.plants[id].flav.roles.forEach(r => have.add(r)));
+    const out = [];
+    ['base', 'crunch', 'tang', 'pepper', 'herb', 'color'].forEach(r => {
+      if (have.has(r) || out.length >= 3) return;
+      const cands = (ROLE_FILL[r] || []).filter(id => bowlable(id) && !BOWL.includes(id));
+      if (!cands.length) return;
+      const score = id => BOWL.reduce((n, b) => n + ((P.plants[b].flav.pairs || []).includes(id) ? 2 : 0) + ((P.plants[id].flav.pairs || []).includes(b) ? 2 : 0), 0);
+      cands.sort((a, b) => score(b) - score(a));
+      out.push([r, cands[0]]);
+    });
+    return out;
+  }
+  function pairHits() {
+    const hits = [];
+    for (let i = 0; i < BOWL.length; i++) for (let j = i + 1; j < BOWL.length; j++) {
+      const a = P.plants[BOWL[i]], b = P.plants[BOWL[j]];
+      if ((a.flav.pairs || []).includes(BOWL[j]) || (b.flav.pairs || []).includes(BOWL[i])) hits.push(a.name + ' + ' + b.name);
+    }
+    return hits;
+  }
+  const amount = v => v <= 0 ? 'none' : v < 1.5 ? 'a hint' : v < 3 ? 'some' : v < 5 ? 'plenty' : 'a lot';
+  function renderBowl() {
+    const t = bowlTotals();
+    let h = '<div class="bowl-head"><div><div class="eyebrow">Tonight’s bowl</div><h4>' + (BOWL.length ? BOWL.length + (BOWL.length === 1 ? ' plant' : ' plants') : 'Empty') + '</h4></div>' + (BOWL.length ? '<button class="btn small ghost" data-act="bowlClear">Clear</button>' : '') + '</div>';
+    if (!BOWL.length) h += '<p class="small" style="margin:0">Tap plants below, or make one of the house salads. The bowl shows its balance, its texture, any heads-ups and a dressing to match.</p>';
+    else {
+      h += '<div class="dome">' + BOWL.map(id => '<button data-act="bowlToggle" data-pid="' + id + '" aria-label="Remove ' + esc(P.plants[id].name) + '">' + plantGlyph(P.plants[id]) + esc(P.plants[id].name) + ' <small>✕</small></button>').join('') + '</div>';
+      h += '<div class="balance">' + P.axes.map(([k, l]) => '<div class="ax"><span class="axl">' + l + '</span><span class="axt"><i class="ax-' + k + '" style="width:' + Math.min(100, t[k] / 6 * 100).toFixed(0) + '%"></i></span><span class="axv">' + amount(t[k]) + '</span></div>').join('') + '</div>';
+      const tx = textureLine();
+      h += '<p class="small" style="margin:8px 0 0"><b>Texture:</b> ' + esc(tx.text ? tx.text.replace(/^./, c => c.toUpperCase()) : 'Mixed') + '.' + (tx.crunch ? '' : ' <span class="nudge">Nothing crunchy yet.</span>') + '</p>';
+      const hits = pairHits(); if (hits.length) h += '<p class="small" style="margin:4px 0 0"><b>Good together:</b> ' + esc(hits.slice(0, 3).join(' · ')) + (hits.length > 3 ? ' · and ' + (hits.length - 3) + ' more' : '') + '</p>';
+      const flagged = BOWL.filter(id => P.plants[id].flav.flag);
+      if (flagged.length) h += '<div class="warn" style="margin-top:8px"><b>Before you eat it</b><ul>' + flagged.map(id => { const fv = P.plants[id].flav; return '<li><b>' + esc(P.plants[id].name) + ', ' + esc(fv.flag) + ':</b> ' + esc((fv.warn || [''])[0]) + '</li>'; }).join('') + '</ul></div>';
+      const d = dressingFor(t);
+      h += '<div class="callout" style="margin-top:8px"><b>' + esc(d.name) + '.</b> ' + esc(d.how) + ' <span class="muted">' + esc(d.why) + '</span></div>';
+      const sug = suggestions(); if (sug.length) h += '<div class="sug"><span class="small"><b>It could use:</b></span>' + sug.map(([r, id]) => '<button class="btn small" data-act="bowlToggle" data-pid="' + id + '">' + plantGlyph(P.plants[id]) + '+ ' + esc(P.plants[id].name) + ' <span class="muted">(' + esc(P.roles[r].name.toLowerCase()) + ')</span></button>').join('') + '</div>';
+      h += '<div class="btnrow" style="margin-top:2px"><button class="btn small" data-act="bowlAte">We ate this: log it as picked</button></div>';
+      h += '<div class="saverow"><input id="bowlName" class="search" placeholder="Name it to save it" aria-label="Bowl name" maxlength="60"><button class="btn small primary" data-act="bowlSave">Save</button></div>';
+    }
+    $('bowl').innerHTML = h;
+    renderPickers();
+  }
+  function renderPickers() {
+    const ids = Object.keys(P.plants).filter(bowlable);
+    $('pickers').innerHTML = P.roleOrder.map(r => {
+      const list = ids.filter(id => P.plants[id].flav.roles[0] === r);
+      if (!list.length) return '';
+      return '<div class="pick"><div class="pick-h"><span class="sw2 ax-' + r + '"></span><b>' + esc(P.roles[r].name) + '</b> <span class="muted small">' + esc(P.roles[r].hint) + '</span></div><div class="dome">' + list.map(id => '<button data-act="bowlToggle" data-pid="' + id + '" aria-pressed="' + BOWL.includes(id) + '">' + plantGlyph(P.plants[id]) + esc(P.plants[id].name) + '</button>').join('') + '</div></div>';
+    }).join('');
+  }
+  function renderSaved() {
+    $('saved').hidden = !SAVED.length;
+    $('savedList').innerHTML = SAVED.map((b, i) => '<div><div class="rowtop"><b>' + esc(b.name) + '</b><span class="btnrow"><button class="btn small" data-act="bowlLoad" data-i="' + i + '">Load</button><button class="btn small ghost" data-act="bowlDel" data-i="' + i + '" aria-label="Delete ' + esc(b.name) + '">Delete</button></span></div><p>' + esc(b.plants.filter(id => P.plants[id]).map(id => P.plants[id].name).join(', ')) + '</p></div>').join('');
+  }
+  function renderHouse() {
+    $('house').innerHTML = P.house.map(hs => '<div class="card house"><div class="rowtop"><h4>' + esc(hs.name) + '</h4><button class="btn small primary" data-act="bowlLoad" data-house="' + hs.id + '">Make this</button></div><div class="glyphs">' + hs.plants.map(id => P.plants[id] ? '<button data-open="plant" data-pid="' + id + '" title="' + esc(P.plants[id].name) + '" aria-label="' + esc(P.plants[id].name) + '">' + plantGlyph(P.plants[id]) + '</button>' : '').join('') + '</div><p class="small">' + esc(hs.plants.filter(id => P.plants[id]).map(id => P.plants[id].name).join(', ')) + '</p><p class="small"><b>Dressing:</b> ' + esc(hs.dressing) + '</p><p class="small muted">' + esc(hs.note) + '</p></div>').join('');
+  }
+  const VNAME = { keep: 'Keep', retry: 'Retry', retire: 'Retire' };
+  function verdictSeg(pid) { const vd = (VERD[pid] || {}).v; return '<div class="seg sm" role="group" aria-label="Verdict on ' + esc(P.plants[pid].name) + '">' + Object.keys(VNAME).map(k => '<button data-act="verdict" data-pid="' + pid + '" data-v="' + k + '" aria-pressed="' + (vd === k) + '">' + VNAME[k] + '</button>').join('') + '</div>'; }
+  function renderFlights() {
+    $('flights').innerHTML = P.flights.map(f => {
+      const ids = f.plants.filter(id => P.plants[id] && P.plants[id].status === 'tower'); if (ids.length < 2) return '';
+      const rated = ids.filter(id => VERD[id]).length;
+      return '<div class="card flight"><div class="rowtop"><h4>' + esc(f.name) + '</h4><span class="small muted">' + rated + ' of ' + ids.length + ' rated</span></div><p class="small">' + esc(f.note) + '</p><div class="list">' + ids.map(id => '<div class="fl-row"><button class="fl-name" data-open="plant" data-pid="' + id + '">' + plantGlyph(P.plants[id]) + '<span><b>' + esc(P.plants[id].name) + '</b><span class="small">' + esc(P.plants[id].flav.flavor.join(', ')) + '</span></span></button>' + verdictSeg(id) + '</div>').join('') + '</div></div>';
+    }).join('');
+  }
+  function renderIsland() {
+    $('island').innerHTML = P.island.map(x => '<div><div class="rowtop"><b>' + esc(x.name) + '</b><span class="glyphs sm">' + x.plants.filter(id => P.plants[id]).map(id => '<button data-open="plant" data-pid="' + id + '" title="' + esc(P.plants[id].name) + '" aria-label="' + esc(P.plants[id].name) + '">' + plantGlyph(P.plants[id]) + '</button>').join('') + '</span></div><p>' + esc(x.how) + '</p></div>').join('');
+  }
+  function nurseryNote() {
+    const sow = P.moves.find(m => m.id === 'sow-beans'), b1 = P.moves.find(m => m.pod === 'bean-1');
+    if (!sow || !b1 || isDone(b1)) return '';
+    return (isDone(sow) ? 'The beans are sprouting in the Nursery now' : 'The beans are next in the Nursery') + ', by the Soak Method, which drains the base and leaves microgreen wicks dry. Pick a date after they move up to the tower, or use a second Nursery.';
+  }
+  function midDays(range) { const m = String(range).match(/(\d+)\D+(\d+)/); return m ? Math.round((+m[1] + +m[2]) / 2) : +range; }
+  function renderPlanner() {
+    const mgs = Object.keys(P.plants).filter(id => P.plants[id].status === 'micro');
+    const el = $('mgPlan');
+    if (!el.dataset.ready) { el.dataset.ready = '1'; $('mgDate').value = addDays(todayISO(), Math.max(14, ...MGSEL.filter(id => P.plants[id]).map(id => midDays(P.plants[id].gb.mature)))); $('mgDate').min = todayISO(); $('mgDate').addEventListener('change', renderPlanner); }
+    $('mgChips').innerHTML = mgs.map(id => '<button data-act="mgPick" data-pid="' + id + '" aria-pressed="' + MGSEL.includes(id) + '">' + plantGlyph(P.plants[id]) + esc(P.plants[id].name.replace(' Microgreens', '')) + '</button>').join('');
+    const target = $('mgDate').value || addDays(todayISO(), 14);
+    const rows = MGSEL.filter(id => P.plants[id]).map(id => { const d = midDays(P.plants[id].gb.mature); return { id, d, start: addDays(target, -d) }; }).sort((a, b) => a.start < b.start ? -1 : 1);
+    const today = todayISO();
+    const nn = nurseryNote();
+    el.innerHTML = (nn ? '<p class="small nudge" style="margin:0 0 8px">' + esc(nn) + '</p>' : '') + (rows.length ? '<div class="list">' + rows.map(r => '<div><div class="rowtop"><b>' + esc(P.plants[r.id].name) + '</b><span class="chip' + (r.start < today ? ' wait' : r.start === today ? ' due' : '') + '">' + (r.start < today ? 'Too late for this date' : r.start === today ? 'Start today' : 'Start ' + fmtDate(r.start)) + '</span></div><p>Harvests ' + esc(P.plants[r.id].gb.mature) + ' days after starting; planned at day ' + r.d + '.</p></div>').join('') + '</div><p class="small" style="margin:6px 0 0">' + rows.length + ' of the Nursery’s 10 squares.</p>' : '<p class="small">Pick a variety or two.</p>');
+  }
+  function renderMicroHow() {
+    $('mgHow').innerHTML = P.microHow.map(([k, v]) => '<div><b>' + esc(k) + '</b><p>' + esc(v) + '</p></div>').join('');
+    const mgs = Object.keys(P.plants).filter(id => P.plants[id].status === 'micro');
+    const heat = id => { const w = P.plants[id].flav.w || {}; return (w.pepper || 0) >= 2 ? 'hot' : (w.herbal || 0) >= 1 && !w.pepper ? 'aroma' : 'mild'; };
+    const auditionOf = id => Object.keys(P.audition).find(k => P.audition[k] === id);
+    const row = id => { const pl = P.plants[id], au = auditionOf(id); return '<button class="prow" data-open="plant" data-pid="' + id + '"><span class="gwrap">' + plantGlyph(pl) + '</span><span style="min-width:0"><span class="nm">' + esc(pl.name) + '</span><span class="fw" style="display:block">' + esc(pl.flav.flavor.join(', ')) + '</span><span class="wh" style="display:block">' + esc(pl.flav.kitchen) + (au && P.plants[au] ? ' <b class="aud">Audition for ' + esc(P.plants[au].name) + '</b>' : '') + '</span></span><span class="rt"><span class="days">' + esc(pl.gb.mature) + ' days</span></span></button>'; };
+    $('mgList').innerHTML = [['hot', 'Hot and peppery'], ['mild', 'Mild'], ['aroma', 'Aromatic']].map(([g, l]) => { const ids = mgs.filter(id => heat(id) === g); return ids.length ? '<h4 class="mg-h">' + l + '</h4>' + ids.map(row).join('') : ''; }).join('');
+  }
+  function renderCautions() {
+    $('cautions').innerHTML = P.cautions.map(([k, v]) => '<div><b>' + esc(k) + '</b><p>' + esc(v) + '</p></div>').join('') + '<div><p class="src" style="margin:0">Sources: ' + P.cautionSources.map(s => '<a href="' + esc(s[1]) + '" target="_blank" rel="noopener">' + esc(s[0]) + '</a>').join(' · ') + '</p></div>';
+  }
+  let saladReady = false;
+  function renderSalad() {
+    renderBowl(); renderSaved(); renderPlanner();
+    renderFlights();
+    if (!saladReady) { saladReady = true; renderHouse(); renderIsland(); renderMicroHow(); renderCautions(); }
+  }
+
+  /* ----- Picking round ----- */
+  let PICK = store.get('pick', {});
+  let VERD = store.get('verdict', {});
+  const PICK_EVERY = 7;
+  const pickable = p => { if (!parse(cur(p))) return false; const pl = P.plants[p.p]; return !!pl && ['greens', 'herbs', 'flowers'].includes(pl.group); };
+  function pickList() { const today = dayNum(todayISO()); return P.pods.filter(pickable).map(p => { const last = PICK[p.id] || null; const days = last ? today - dayNum(last) : null; return { p, last, days, due: days === null || days >= PICK_EVERY }; }); }
+  function setPicked(ids, on) { ids.forEach(id => { if (on) PICK[id] = todayISO(); else delete PICK[id]; }); store.set('pick', PICK); }
+  function pickSheet() {
+    const L = pickList(), today = todayISO();
+    const order = x => { const q = parse(cur(x.p)); return (q.t === 'S' ? 0 : 100) + q.r * 3 + 'LCR'.indexOf(q.c); };
+    L.sort((a, b) => order(a) - order(b));
+    let h = '<div><div class="eyebrow">Picking round</div><h2 id="sheetTitle">What to pick</h2><p class="small" style="margin:4px 0 0">A pick about once a week keeps leafy plants from bolting or crowding the pod two rows up. Walk the tower top to bottom and tick each one as you go. Fruit isn’t on this list: pick it when it’s ripe.</p></div>';
+    ['S', 'F'].forEach(t => {
+      const rows = L.filter(x => parse(cur(x.p)).t === t); if (!rows.length) return;
+      h += '<div class="block"><h3>' + esc(P.towers[t].name) + '</h3><div class="list picks">' + rows.map(x => { const pl = P.plants[x.p.p], done = x.last === today; return '<div class="pk' + (x.days !== null && x.days >= PICK_EVERY ? ' due' : '') + '"><span class="gwrap">' + plantGlyph(pl) + '</span><span class="pk-t"><b>' + esc(x.p.label) + '</b><span class="small">' + esc(seatName(cur(x.p))) + ' · ' + (done ? 'picked today' : x.last ? 'picked ' + (x.days === 1 ? 'yesterday' : x.days + ' days ago') : 'not logged') + '</span></span><button class="tick" data-act="pickToggle" data-pod="' + x.p.id + '" aria-pressed="' + done + '" aria-label="Picked ' + esc(x.p.label) + ' today"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></button></div>'; }).join('') + '</div></div>';
+    });
+    h += L.length ? '<div class="btnrow"><button class="btn primary" data-act="pickAll">Picked them all today</button></div>' : '<div class="card small">Nothing leafy on the towers right now.</div>';
+    showSheet(h, { kind: 'pick' });
+  }
+  const AGO = [[0, 'Today'], [3, 'A few days ago'], [7, 'A week ago'], [14, 'Two weeks ago'], [30, 'A month or more']];
+  function catchSheet() {
+    const un = P.care.filter(c => careStatus(c).state === 'none');
+    let h = '<div><div class="eyebrow">Care</div><h2 id="sheetTitle">When did you last…</h2><p class="small" style="margin:4px 0 0">Rough is fine: the app only needs a starting point. You can fix any date later on the Care tab.</p></div>';
+    h += un.length ? '<div class="stack">' + un.map(c => '<div class="card"><h4>' + esc(c.title) + '</h4><div class="small muted">' + esc(c.where) + ' · every ' + everyText(c.every) + '</div><div class="dome" style="margin-top:8px">' + AGO.map(([d, l]) => '<button data-act="catchSet" data-id="' + c.id + '" data-d="' + d + '">' + l + '</button>').join('') + '</div></div>').join('') + '</div>' : '<div class="card"><b>All caught up.</b><p class="small">Every job has a date now.</p></div>';
+    showSheet(h, { kind: 'catch' });
+  }
+  function copyLink(slot) {
+    const url = SITE + '#seat-' + slot;
+    const shown = () => toast(url.replace('https://', ''));
+    try { navigator.clipboard.writeText(url).then(() => toast('Link copied: #seat-' + slot), shown); } catch (e) { shown(); }
+  }
+  function openSeat(slot) {
+    UI.tower = slot[0]; UI.mode = 'now'; saveUI(); showView('towers');
+    const cell = layout(slot[0], 'now')[slot]; if (!cell) return;
+    if (cell.pods.length) openPod(cell.pods[0].id); else seatSheet(slot);
+  }
+
   /* ----- Sheet ----- */
   let SHEET = null;
   const sheetOpen = () => !$('sheet').hidden;
@@ -487,6 +707,8 @@
     if (!SHEET) return; const top = $('sheet').scrollTop;
     if (SHEET.kind === 'plant') plantSheet(SHEET.pid, SHEET.podId);
     else if (SHEET.kind === 'stop') stopSheet(SHEET.id);
+    else if (SHEET.kind === 'pick') pickSheet();
+    else if (SHEET.kind === 'catch') catchSheet();
     $('sheet').scrollTop = top;
   }
 
@@ -494,7 +716,7 @@
   let toastT; function toast(msg) { const t = $('toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('show'), 2000); }
 
   /* ----- Views ----- */
-  const VIEWS = ['towers', 'plants', 'care', 'ideas', 'diy'];
+  const VIEWS = ['towers', 'plants', 'salad', 'care', 'ideas', 'diy'];
   function showView(v, anchor) {
     if (!VIEWS.includes(v)) v = 'towers';
     VIEWS.forEach(k => { $('view-' + k).hidden = (k !== v); });
@@ -503,6 +725,7 @@
     if (v === 'care') renderCare();
     if (v === 'ideas') renderIdeas();
     if (v === 'diy') renderDIY();
+    if (v === 'salad') renderSalad();
     if (v === 'towers') { renderToday(); renderTower(); }
     if (location.hash !== '#' + v) { try { history.replaceState(history.state, '', '#' + v); } catch (e) {} }
     const el = anchor ? $(anchor) : null;
@@ -580,6 +803,8 @@
       const o = JSON.parse($('restoreText').value); if (!o || o.app !== 'plant-book' || !o.data) throw new Error('not a backup');
       KEYS.forEach(k => { if (o.data[k] != null) store.set(k, o.data[k]); });
       DONE = store.get('done', {}); CARE = store.get('care', {}); CAMP = store.get('camp', {}); NOTES = store.get('notes', {}); TRAIL = store.get('trail', {});
+      PICK = store.get('pick', {}); VERD = store.get('verdict', {});
+      BOWL.splice(0, BOWL.length, ...store.get('bowl', []).filter(id => P.plants[id])); SAVED.splice(0, SAVED.length, ...store.get('bowls', [])); MGSEL.splice(0, MGSEL.length, ...store.get('mgsel', []));
       $('restoreBox').hidden = true; renderAll(); renderCare(); toast('Restored.');
     } catch (e) { toast('That doesn’t look like a Plant Book backup. Paste the whole thing.'); }
   }
@@ -591,8 +816,9 @@
     const start = (location.hash || '').slice(1);
     showView(VIEWS.includes(start) ? start : 'towers');
     if (/^p-/.test(start) && P.plants[start.slice(2)]) { showView('plants'); plantSheet(start.slice(2)); }
+    const sm = /^seat-([SF](?:10|[1-9])[LCR])$/.exec(start); if (sm) openSeat(sm[1]);
     setupWorker();
-    window.addEventListener('hashchange', () => { const h = location.hash.slice(1); if (VIEWS.includes(h)) { if (sheetOpen()) hideSheet(true); showView(h); } });
+    window.addEventListener('hashchange', () => { const h = location.hash.slice(1); if (VIEWS.includes(h)) { if (sheetOpen()) hideSheet(true); showView(h); } else { const sm2 = /^seat-([SF](?:10|[1-9])[LCR])$/.exec(h); if (sm2) { if (sheetOpen()) hideSheet(true); openSeat(sm2[1]); } } });
     window.addEventListener('popstate', () => { if (sheetOpen()) hideSheet(true); });
     document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => { if (sheetOpen()) hideSheet(); showView(t.dataset.view); }));
     $('sheetBack').addEventListener('click', () => hideSheet());
@@ -612,6 +838,8 @@
     document.addEventListener('click', e => {
       const t = e.target;
       const tw = t.closest('[data-tower]'); if (tw) { UI.tower = tw.dataset.tower; saveUI(); renderTower(); return; }
+      const ln = t.closest('[data-lens]'); if (ln) { UI.lens = ln.dataset.lens; saveUI(); renderTower(); return; }
+      const jump = t.closest('[data-jump]'); if (jump) { const el = $(jump.dataset.jump); if (el) window.scrollTo({ top: Math.max(0, el.getBoundingClientRect().top + window.scrollY - 70), behavior: 'smooth' }); return; }
       const md = t.closest('[data-mode]'); if (md) { UI.mode = md.dataset.mode; saveUI(); renderTower(); return; }
       const fl = t.closest('[data-filter]'); if (fl) { UI.filter = fl.dataset.filter; saveUI(); $('q').value = ''; renderPlants(); return; }
       const go = t.closest('[data-go]'); if (go) { showView(go.dataset.go, go.dataset.anchor); return; }
@@ -635,6 +863,20 @@
       else if (act === 'stop') { TRAIL[a.dataset.id] = a.dataset.st; store.set('trail', TRAIL); renderTrail(); stopSheet(a.dataset.id); }
       else if (act === 'addNote') { const txt = ($('jText').value || '').trim(); if (!txt) { $('jText').focus(); return; } const pid = a.dataset.pid; (NOTES[pid] = NOTES[pid] || []).push({ d: todayISO(), t: txt.slice(0, 600) }); store.set('notes', NOTES); refreshSheet(); toast('Note saved on this phone.'); }
       else if (act === 'delNote') { const pid = a.dataset.pid; (NOTES[pid] || []).splice(+a.dataset.i, 1); store.set('notes', NOTES); refreshSheet(); }
+      else if (act === 'bowlToggle') { const id = a.dataset.pid; const i = BOWL.indexOf(id); if (i >= 0) BOWL.splice(i, 1); else BOWL.push(id); saveBowl(); if (!$('view-salad').hidden) renderBowl(); if (SHEET) refreshSheet(); else if (i < 0 && $('view-salad').hidden) toast('Added to tonight\u2019s bowl.'); }
+      else if (act === 'bowlClear') { BOWL.length = 0; saveBowl(); renderBowl(); }
+      else if (act === 'bowlLoad') { const src = a.dataset.house ? P.house.find(x => x.id === a.dataset.house).plants : SAVED[+a.dataset.i].plants; BOWL.length = 0; src.filter(bowlable).forEach(x => BOWL.push(x)); saveBowl(); renderBowl(); const el = $('bowlSec'); window.scrollTo({ top: Math.max(0, el.getBoundingClientRect().top + window.scrollY - 70), behavior: 'smooth' }); toast('Loaded into the bowl.'); }
+      else if (act === 'bowlSave') { if (!BOWL.length) return; const nm = ($('bowlName').value || '').trim() || 'Bowl of ' + fmtDate(todayISO()); SAVED.unshift({ name: nm.slice(0, 60), plants: BOWL.slice(), d: todayISO() }); store.set('bowls', SAVED.slice(0, 30)); $('bowlName').value = ''; renderSaved(); toast('Saved.'); }
+      else if (act === 'bowlDel') { SAVED.splice(+a.dataset.i, 1); store.set('bowls', SAVED); renderSaved(); }
+      else if (act === 'mgPick') { const id = a.dataset.pid; const i = MGSEL.indexOf(id); if (i >= 0) MGSEL.splice(i, 1); else MGSEL.push(id); store.set('mgsel', MGSEL); renderPlanner(); }
+      else if (act === 'bowlAte') { const ids = P.pods.filter(p => BOWL.includes(p.p) && pickable(p)).map(p => p.id); setPicked(ids, true); renderToday(); toast(ids.length ? 'Logged: ' + ids.length + (ids.length === 1 ? ' pod' : ' pods') + ' picked today.' : 'Nothing leafy in this bowl to log.'); }
+      else if (act === 'pickRound') pickSheet();
+      else if (act === 'pickToggle') { const id = a.dataset.pod; setPicked([id], PICK[id] !== todayISO()); renderToday(); refreshSheet(); }
+      else if (act === 'pickAll') { setPicked(pickList().map(x => x.p.id), true); renderToday(); refreshSheet(); toast('Picking round logged.'); }
+      else if (act === 'catchUp') catchSheet();
+      else if (act === 'catchSet') { CARE[a.dataset.id] = addDays(todayISO(), -(+a.dataset.d)); store.set('care', CARE); renderCare(); renderToday(); refreshSheet(); }
+      else if (act === 'copyLink') copyLink(a.dataset.slot);
+      else if (act === 'verdict') { const id = a.dataset.pid, v = a.dataset.v; if ((VERD[id] || {}).v === v) delete VERD[id]; else VERD[id] = { v, d: todayISO() }; store.set('verdict', VERD); if (!$('view-salad').hidden) renderFlights(); if (!$('view-plants').hidden) renderPlants(); if (SHEET) refreshSheet(); }
       else if (act === 'newsOk') { store.set('seenVersion', APP_VERSION); $('newsBox').hidden = true; }
     });
   }

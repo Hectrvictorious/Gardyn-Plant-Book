@@ -1,6 +1,6 @@
 <title>Swan's Island Plant Book</title>
 <meta name="claude:viewport-fit-sides" content="cover">
-<meta name="description" content="Josh's Gardyn plant book: tap any pod on the salad and fruiting towers, Gardyn-style plant pages, care rhythm, moves, fixes, and the trail to printed pods.">
+<meta name="description" content="Josh's Gardyn plant book: tap any pod on the salad and fruiting towers, Gardyn-style plant pages, a salad builder with taste and pairings, microgreens, care rhythm, fixes, and the trail to printed pods.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:ital,wght@0,500;0,600;0,700;1,500&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,600;1,7..72,400&display=swap">
@@ -30,14 +30,16 @@
     </div>
     <div class="switches">
       <div class="seg" role="group" aria-label="Tower"><button data-tower="S" aria-pressed="true">Salad</button><button data-tower="F" aria-pressed="false">Fruiting</button></div>
-      <div class="seg" role="group" aria-label="Layout"><button data-mode="now" aria-pressed="true">Now</button><button data-mode="plan" aria-pressed="false">Nov 2 plan</button></div>
+      <div class="seg" role="group" aria-label="Layout"><button data-mode="now" aria-pressed="true">Now</button><button data-mode="plan" aria-pressed="false">Next</button></div>
+      <div class="seg" role="group" aria-label="Color the map by"><button data-lens="light" aria-pressed="true">Light</button><button data-lens="flavor" aria-pressed="false">Flavor</button></div>
     </div>
     <div class="tower-head"><h3 id="towerName">Salad tower</h3><span class="small muted" id="towerCount"></span></div>
     <p class="small" id="towerSub" style="margin:-8px 0 0"></p>
     <div id="towerWrap"></div>
     <div class="legend" aria-label="Legend">
-      <span><i class="sw z-high"></i>High light</span><span><i class="sw z-medium"></i>Medium</span><span><i class="sw z-low"></i>Low</span>
-      <span><i class="sw" style="background:var(--surface);box-shadow:inset -3px 0 0 color-mix(in srgb,var(--ink) 26%,transparent)"></i>dark edge: the way the pod faces (► ◄ on the right bar)</span><span>★ salad favorite</span><span>▲ giant</span><span>✿ blooms</span>
+      <span class="lgset" id="legendLight"><span><i class="sw z-high"></i>High light</span><span><i class="sw z-medium"></i>Medium</span><span><i class="sw z-low"></i>Low</span>
+      <span><i class="sw" style="background:var(--surface);box-shadow:inset -3px 0 0 color-mix(in srgb,var(--ink) 26%,transparent)"></i>dark edge: the way the pod faces (► ◄ on the right bar)</span><span>★ salad favorite</span><span>▲ giant</span><span>✿ blooms</span></span>
+      <span class="lgset" id="legendFlavor" hidden></span>
       <span id="legendMove"></span>
     </div>
     <div class="sec" id="domeSec"><h3 id="domeTitle">In the dome</h3><div class="dome" id="dome"></div></div>
@@ -48,10 +50,10 @@
         <li><b>Facing:</b> odd rows point right ►, even rows point left ◄. The pod at the arrow end leans into open air, so the row's biggest plant gets it.</li>
         <li><b>Headroom:</b> the pod directly above faces the other way, so a plant's real competition is the pod two rows up on its own side. Giants ▲ sit in rows 1–2, or under a Cap two rows up.</li>
         <li><b>Pairs:</b> an A/B pair shares a row or sits on a diagonal, never two rows apart in one column, where B would grow straight into A.</li>
-        <li><b>Salt rule (fruiting):</b> nothing salt-sensitive sits below a tomato in the same Column while that tomato stands. That's what the beans taught.</li>
+        <li><b>Salt rule (fruiting):</b> nothing salt-sensitive sits in an outer pod of rows 3–6 while the tomato above it stands. The strawberries in rows 7–9 already live under the tomatoes and do well; the beans and the cucamelon stay in the center Column. That's what the beans taught.</li>
         <li><b>Vines climb into light, bushes lean off:</b> tomatoes down the light bars, cucamelon up the Trellis, ground cherry off the left side.</li>
         <li><b>Window:</b> assumed on the right of the salad tower; the light-hungry outer plants sit on that side.</li>
-        <li><b>Nothing moves until you say so.</b> "Now" is where plants sat on Oct 27, updated by the moves you tick off. "Nov 2 plan" is the re-seating by light and space.</li>
+        <li><b>Now and Next:</b> Now is the tower as it stands: the Nov 2 maps (salad v5, fruiting v9), in place as of Nov 5. Next appears when a tower has steps still to come, like the bean swap, and shows the tower after them. Nothing moves until you say so.</li>
       </ul>
     </details>
   </section>
@@ -67,6 +69,32 @@
     <div id="plist" class="stack"></div>
   </section>
 
+  <section class="view wrap" id="view-salad" hidden>
+    <div class="view-head">
+      <div class="eyebrow">Salad</div>
+      <h2>What tastes good together</h2>
+      <p>Build tonight&rsquo;s bowl from what&rsquo;s growing and watch how it balances: sweet against pepper, tang against the soft greens, something crunchy, a dressing to match. Then the house salads, the microgreens, and what to know before you eat.</p>
+    </div>
+    <nav class="jumps" aria-label="On this page"><button data-jump="bowlSec">Bowl</button><button data-jump="houseSec">House salads</button><button data-jump="flightSec">Taste test</button><button data-jump="mgSec">Microgreens</button><button data-jump="cautSec">Before you eat</button></nav>
+    <div class="sec" id="bowlSec"><h3>Build a bowl</h3><div class="card bowl" id="bowl"></div><div class="stack" id="pickers"></div></div>
+    <div class="sec" id="saved" hidden><h3>Saved bowls</h3><div class="list" id="savedList"></div></div>
+    <div class="sec" id="houseSec"><h3>House salads</h3><div class="stack" id="house"></div></div>
+    <div class="sec" id="islandSec"><h3>From the island kitchen</h3><div class="list" id="island"></div></div>
+    <div class="sec" id="flightSec"><h3>Taste test</h3><p class="small" style="margin:-2px 0 0">A leaf of each, plain, side by side. Rate each one Keep, Retry or Retire; the verdicts show on every plant&rsquo;s page and in the plant list, so the next map can lean on them.</p><div class="stack" id="flights"></div></div>
+    <div class="sec" id="mgSec"><h3>Microgreens</h3>
+      <div class="card stack">
+        <h4>Finish together</h4>
+        <p class="small" style="margin:0">Pick the pads and the day you want to eat them. Each variety takes its own time, so this works out when to start each one to land on the same day.</p>
+        <label class="last" style="margin:0">Ready on <input type="date" id="mgDate"></label>
+        <div class="dome" id="mgChips" role="group" aria-label="Varieties"></div>
+        <div id="mgPlan"></div>
+      </div>
+      <details class="rules"><summary>How Gardyn grows them</summary><div class="list" id="mgHow" style="margin-top:10px"></div></details>
+      <div class="stack" id="mgList"></div>
+    </div>
+    <div class="sec" id="cautSec"><h3>Before you eat it</h3><div class="list" id="cautions"></div></div>
+  </section>
+
   <section class="view wrap" id="view-care" hidden>
     <div class="view-head">
       <div class="eyebrow">Care</div>
@@ -75,7 +103,7 @@
     </div>
     <div class="sec"><h3>Rhythm <span class="count" id="dueCount"></span></h3><div class="stack" id="rhythm"></div></div>
     <div class="sec"><h3>Campaigns</h3><div class="stack" id="camps"></div></div>
-    <div class="sec"><h3>Moves to the Nov 2 plan <span class="count" id="moveCount"></span></h3><div class="progress" aria-hidden="true"><i id="moveBar"></i></div><div class="moves" id="moves"></div></div>
+    <div class="sec"><h3>Next steps <span class="count" id="moveCount"></span></h3><div class="progress" aria-hidden="true"><i id="moveBar"></i></div><div class="moves" id="moves"></div></div>
     <div class="sec"><h3>Fixes</h3><div class="stack" id="fixes"></div></div>
     <div class="sec"><h3>Your data</h3>
       <div class="card stack">
@@ -128,6 +156,7 @@
   <div class="tabs-in">
     <button class="tab" data-view="towers" aria-selected="true"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="4" height="17" rx="2"/><rect x="10" y="4" width="4" height="17" rx="2"/><rect x="16" y="4" width="4" height="17" rx="2"/></svg>Towers</button>
     <button class="tab" data-view="plants" aria-selected="false"><svg viewBox="0 0 24 24"><path d="M3 5.5c3-1.2 6-1 9 1v13.5c-3-1.8-6-2-9-.8z"/><path d="M21 5.5c-3-1.2-6-1-9 1v13.5c3-1.8 6-2 9-.8z"/></svg>Plants</button>
+    <button class="tab" data-view="salad" aria-selected="false"><svg viewBox="0 0 24 24"><path d="M3 11.5h18a9 9 0 0 1-18 0z"/><path d="M9.5 21.5h5"/><path d="M7.6 11.5c-.6-3.3 1.1-5.8 4.4-6.8.7 3.2-1 5.8-4.4 6.8"/><path d="M12.6 11.5c1-2.8 3.4-4.3 6.5-4.1-.8 2.8-3.1 4.2-6.5 4.1"/></svg>Salad</button>
     <button class="tab" data-view="care" aria-selected="false"><svg viewBox="0 0 24 24"><path d="M12 3s6 6.4 6 11a6 6 0 0 1-12 0c0-4.6 6-11 6-11z"/><path d="M9.5 14.5l1.8 1.8 3.4-3.6"/></svg>Care</button>
     <button class="tab" data-view="ideas" aria-selected="false"><svg viewBox="0 0 24 24"><path d="M12 21v-8.5"/><path d="M12 12.5c0-4 2.8-6.5 7.5-6.5 0 4.2-2.8 6.5-7.5 6.5z"/><path d="M12 15c0-3.2-2.4-5.3-6.5-5.3 0 3.2 2.4 5.3 6.5 5.3z"/></svg>Ideas</button>
     <button class="tab" data-view="diy" aria-selected="false"><svg viewBox="0 0 24 24"><path d="M12 21s-6.5-5.8-6.5-10.5a6.5 6.5 0 0 1 13 0C18.5 15.2 12 21 12 21z"/><circle cx="12" cy="10.5" r="2.3"/></svg>DIY</button>

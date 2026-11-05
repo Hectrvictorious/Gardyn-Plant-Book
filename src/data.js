@@ -4,7 +4,7 @@
    (Help Center plant articles); seats and notes come from Josh's maps v4/v5 (salad) and v8/v9 (fruiting).
    Slot codes: tower letter + row + column, e.g. S3L = salad tower, row 3, left; F10C = fruiting, row 10, center. */
 window.PB = {
-version: '2026.11.05',
+version: '2026.11.05c',
 
 /* ---------- The book ---------- */
 groups: { greens: 'Leafy green', herbs: 'Herb', flowers: 'Edible flower', fruit: 'Fruiting plant' },
@@ -18,7 +18,7 @@ plants: {
   origin: `Same family as chard and beets. An heirloom that most likely came from England.`,
   harvest: [`Snip outer leaves just above the base once they are 2–3 inches tall. Never take more than a third of the plant.`, `One-time harvest: wait for maturity and cut the whole plant at the base.`],
   care: [`Monthly root check: trim anything brown or reaching past the yPod.`, `Snip yellow or brown leaves as they show up.`],
-  yours: [`The salad tower's staple: four plants. Never pull two at once.`, `The Nov 2 plan lifts two out of dim row 1 into the bright seats at row 3 (with Caps above them), keeps one at row 2 center, and moves one to row 6 left.`, `Rolling restart: when the oldest one's leaves shrink or it bolts, start its successor in the dome about four weeks ahead. Sow duplicates ½ inch deep; it's a beet-family seed cluster, so keep the strongest sprout.`],
+  yours: [`The salad tower's staple: four plants. Never pull two at once.`, `Since the Nov 2 re-seating, two sit in the bright seats at row 3 (with Caps above them in row 1), one at row 2 center, and one at row 6 left.`, `Rolling restart: when the oldest one's leaves shrink or it bolts, start its successor in the dome about four weeks ahead. Sow duplicates ½ inch deep; it's a beet-family seed cluster, so keep the strongest sprout.`],
   src: [['Gardyn Help: Perpetual Spinach', 'https://help.mygardyn.com/en/articles/1797377']] },
 
 'pink-celery': { name: 'Pink Celery', latin: 'Apium graveolens', group: 'greens', glyph: 'celery', tint: 'pink', status: 'tower', tags: ['fav', 'giant'],
@@ -28,7 +28,7 @@ plants: {
   origin: `Northern China, from wild celery. It traveled the trade routes to Europe and had a brief fashion in the 1800s.`,
   harvest: [`Cut stalks at the base once they are 6 inches or taller; the longer you wait, the thicker they get.`, `Take the big outer stalks and leave about a third of the plant. Leaves can be picked earlier.`, `Gardyn's yCube page puts the first stalks around 60 days, with harvests for about seven months.`],
   care: [`Early growth is slow. Gardyn says Plant Food can start as early as 10 days after it sprouts.`, `Monthly root check.`],
-  yours: [`Your pair: A and B. The new ones replace the old pair (ordered in September).`, `The Nov 2 plan puts both in row 2, where the light is medium: A climbs out of dim row 1 and shares the row with B and a spinach.`, `Surface-sow duplicate seed; celery needs light to germinate. Start B about two weeks behind A.`],
+  yours: [`Your pair: A and B. The new ones replace the old pair (ordered in September).`, `Both sit in row 2, where the light is medium. A came down out of dim row 1 in the Nov 2 re-seating and shares the row with B and a spinach.`, `Surface-sow duplicate seed; celery needs light to germinate. Start B about two weeks behind A.`],
   src: [['Gardyn Help: Pink Celery', 'https://help.mygardyn.com/en/articles/1797441'], ['Gardyn yCube page: Pink Celery', 'https://mygardyn.com/plant-book/pink-celery/']] },
 
 'red-tatsoi': { name: 'Red Tatsoi', latin: 'Brassica narinosa', group: 'greens', glyph: 'spoon', tint: 'beet', status: 'tower', tags: ['fav'],
@@ -38,7 +38,7 @@ plants: {
   origin: `Bred from Chinese green tatsoi. Its exact origin is unknown; France and other parts of Europe keep many cultivars.`,
   harvest: [`Snip outer leaves at 2–3 inches, just above the base, and leave a third.`, `Or wait for maturity and cut the whole rosette.`],
   care: [`Needs almost no pruning. Outer leaves yellow if you don't pick them.`, `Strong roots: check them monthly.`, `Cut flower stems the moment they appear to hold off bolting.`],
-  yours: [`Your pair: A and B. The Nov 2 plan sends B to row 5 center and A to row 6 right. That's a diagonal, so the two grow apart instead of into each other.`],
+  yours: [`Your pair: B at row 5 center and A at row 6 right since the Nov 2 re-seating. That's a diagonal, so the two grow apart instead of into each other.`],
   src: [['Gardyn Help: Red Tatsoi', 'https://help.mygardyn.com/en/articles/1798273']] },
 
 'green-tatsoi': { name: 'Green Tatsoi', latin: 'Brassica rapa var. narinosa', group: 'greens', glyph: 'spoon', tint: 'leaf', status: 'tower', tags: [],
@@ -58,7 +58,7 @@ plants: {
   origin: `First bred in the Netherlands in 1840, from Crapaudine, the oldest known beet.`,
   harvest: [`Snip outer leaves at 4 inches and leave a third.`, `One-time harvest: cut all the leaves and the little root together.`],
   care: [`Monthly root check.`],
-  yours: [`A back-burner pick from the September map that made it aboard; baby leaves from about 35 days.`, `Your pair: A stays at row 8 center; B moves up from dim row 10 to row 8 right, so the pair shares a row.`],
+  yours: [`A back-burner pick from the September map that made it aboard; baby leaves from about 35 days.`, `Your pair shares row 8: A at center, and B at right since it came up out of dim row 10 on Nov 2.`],
   src: [[`Gardyn Help: Bull's Blood Beets`, 'https://help.mygardyn.com/en/articles/1796225']] },
 
 'buttercrunch': { name: 'Buttercrunch', latin: 'Lactuca sativa', group: 'greens', glyph: 'head', tint: 'leaf', status: 'tower', tags: ['fav'],
@@ -68,7 +68,7 @@ plants: {
   origin: `Lettuce began in the Middle East. Egyptian art shows it around 2700 BC, already bred to be less bitter than wild lettuce.`,
   harvest: [`Snip outer leaves just above the base once they reach 4 inches; leave a third.`, `Or wait for the head to mature and cut it at the base.`],
   care: [`Warmth makes it bitter and bolty.`, `Monthly root check.`],
-  yours: [`The Nov 2 plan moves it up from row 9 to row 5 left, a bright seat.`],
+  yours: [`At row 5 left, a bright seat, since the Nov 2 re-seating (up from row 9).`],
   src: [['Gardyn Help: Buttercrunch', 'https://help.mygardyn.com/en/articles/1796417']] },
 
 'butterhead': { name: 'Butterhead', latin: 'Lactuca sativa', group: 'greens', glyph: 'head', tint: 'lime', status: 'tower', tags: ['fav'],
@@ -78,40 +78,40 @@ plants: {
   origin: `Lettuce began in the Middle East; Egyptians bred it to be less bitter, and used wild-lettuce oil for, among other things, mummification.`,
   harvest: [`Snip outer leaves once they reach 4 inches; leave a third.`, `Or cut the whole head at maturity.`],
   care: [`Bolts and turns bitter in heat.`, `Monthly root check.`],
-  yours: [`A favorite from the July map that bolted in the August heat. This is the retry, now that the house is cool.`, `The Nov 2 plan moves it from row 10 center to row 7 center, one of the brightest seats.`],
+  yours: [`A favorite from the July map that bolted in the August heat. This is the retry, now that the house is cool.`, `At row 7 center, one of the brightest seats, since the Nov 2 re-seating (up from row 10).`],
   src: [['Gardyn Help: Butterhead', 'https://help.mygardyn.com/en/articles/1780481']] },
 
-'green-salanova': { name: 'Green Salanova', latin: 'Lactuca sativa', group: 'greens', glyph: 'frill', tint: 'lime', status: 'dome', tags: ['fav'],
+'green-salanova': { name: 'Green Salanova', latin: 'Lactuca sativa', group: 'greens', glyph: 'frill', tint: 'lime', status: 'tower', tags: ['fav'],
   gb: { sprout: '7–14', mature: '55', zone: 'medium', size: 'Under 1 ft', care: 'Beginner', thin: '1 per yCube', temp: '60–70°F' },
   about: `Frilled, lime-green, crunchy-sweet leaves that grow into a compact rosette. Gardyn says the Salanova types yield about 40% more than ordinary baby-leaf lettuce.`,
   taste: `Anywhere lettuce goes: mixed salads, sandwiches, wraps.`,
   origin: `Lettuce began in the Middle East. Salanova is a recent line, bred so one head gives many uniform leaves.`,
   harvest: [`Snip outer leaves from 4 inches; leave a third.`, `Or wait for maturity and cut the head at the base.`],
   care: [`Bolts in heat.`, `Monthly root check.`],
-  yours: [`You pulled the old one on Oct 27 because it hadn't been trimmed. Salanova wants regular outer-leaf picking.`, `In the dome now. It lands at row 3 right: compact, leaning off the tower.`],
+  yours: [`You pulled the old one on Oct 27 because it hadn't been trimmed. Salanova wants regular outer-leaf picking.`, `Planted from the dome at row 3 right: compact, leaning off the tower.`],
   src: [['Gardyn Help: Green Salanova', 'https://help.mygardyn.com/en/articles/2349057'], [`Johnny's Seeds: Salanova`, 'https://www.johnnyseeds.com/vegetables/lettuce/salanova-lettuce/']] },
 
-'lollo-rossa': { name: 'Lollo Rossa', latin: 'Lactuca sativa', group: 'greens', glyph: 'frill', tint: 'beet', status: 'dome', tags: [],
+'lollo-rossa': { name: 'Lollo Rossa', latin: 'Lactuca sativa', group: 'greens', glyph: 'frill', tint: 'beet', status: 'tower', tags: [],
   gb: { sprout: '7–10', mature: '40', zone: 'medium', size: 'Under 1 ft', care: 'Beginner', thin: '1 per yCube', temp: '60–70°F' },
   about: `Tightly ruffled leaves edged in burgundy; tender and mild, never bitter. Anthocyanins, vitamins A and C, folate and iron.`,
   taste: `A showy base for salads, and a crunchy leaf for burgers and sandwiches.`,
   origin: `Probably descended from wild prickly lettuce of Europe, North Africa and Asia.`,
   harvest: [`Snip outer leaves at 2–3 inches; leave a third.`, `Or cut the whole head at maturity.`],
   care: [`Heat makes it bitter and bolty.`, `Monthly root check.`],
-  yours: [`In the dome now. It lands at row 5 right, leaning off the tower, once the dill moves out.`],
+  yours: [`Planted from the dome at row 5 right, leaning off the tower.`],
   src: [['Gardyn Help: Lollo Rossa', 'https://help.mygardyn.com/en/articles/1797121']] },
 
-'romaine': { name: 'Romaine', latin: `Lactuca sativa 'Paris Island Cos'`, group: 'greens', glyph: 'cos', tint: 'leaf', status: 'dome', tags: [],
+'romaine': { name: 'Romaine', latin: `Lactuca sativa 'Paris Island Cos'`, group: 'greens', glyph: 'cos', tint: 'leaf', status: 'tower', tags: [],
   gb: { sprout: '7–10', mature: '68', zone: 'medium', size: '1 ft', care: 'Beginner', thin: '1 per yCube', temp: '60–70°F' },
   about: `Firm, crunchy, mild and sweet. The other name, cos, may come from the Greek island of Kos.`,
   taste: `Salads, tacos, sandwiches, wraps, anything that wants crunch.`,
   origin: `An old Mediterranean type; this one is the American variety Paris Island Cos.`,
   harvest: [`Snip outer leaves at 4 inches; leave a third.`, `Or cut the head at maturity.`],
   care: [`Bolts in heat.`, `Monthly root check.`],
-  yours: [`In the dome now. It lands at row 6 center, a bright seat, once the borage moves.`, `It grows upright under other plants, so keep harvesting outer leaves so it never reaches the pod two rows up.`],
+  yours: [`Planted from the dome at row 6 center, a bright seat.`, `It grows upright under other plants, so keep harvesting outer leaves so it never reaches the pod two rows up.`],
   src: [['Gardyn Help: Romaine', 'https://help.mygardyn.com/en/articles/1798337']] },
 
-'flashy-trout-back': { name: 'Flashy Trout Back', latin: `Lactuca sativa 'Forellenschluss'`, group: 'greens', glyph: 'cos', tint: 'speckle', status: 'dome', tags: [],
+'flashy-trout-back': { name: 'Flashy Trout Back', latin: `Lactuca sativa 'Forellenschluss'`, group: 'greens', glyph: 'cos', tint: 'speckle', status: 'tower', tags: [],
   gb: { sprout: '5–10', mature: '27–55', zone: 'medium', size: '1 ft', care: 'Beginner', thin: '1 per yCube', temp: '60–70°F' },
   about: `An heirloom romaine splashed with red, like the back of a trout; the speckles are normal. More tender and buttery than most romaines.`,
   taste: `Use it wherever you'd use romaine.`,
@@ -119,10 +119,10 @@ plants: {
   harvest: [`Snip outer leaves at 4 inches; leave a third.`, `Or cut the head at maturity.`],
   care: [`Cut yellow flower stems as they appear to hold off bolting.`, `Monthly root check.`],
   pests: 'Aphids',
-  yours: [`In the dome now (your "flashy lettuce"). It lands at row 7 left, a bright seat, once the mint moves down.`],
+  yours: [`Your "flashy lettuce," planted from the dome at row 7 left, a bright seat.`],
   src: [['Gardyn Help: Flashy Trout Back', 'https://help.mygardyn.com/en/articles/1796737']] },
 
-'red-sorrel': { name: 'Red Sorrel', latin: 'Rumex', group: 'greens', glyph: 'leaf', tint: 'sorrel', status: 'dome', tags: ['fav', 'giant'],
+'red-sorrel': { name: 'Red Sorrel', latin: 'Rumex', group: 'greens', glyph: 'leaf', tint: 'sorrel', status: 'tower', tags: ['fav', 'giant'],
   gb: { sprout: '7–14', mature: '60–75', zone: 'medium', size: 'Under 1 ft', care: 'Intermediate', thin: '3 per yCube', temp: '60–70°F' },
   about: `Long leaves with deep red veins and a sharp lemon tang from oxalic acid. A cup covers a day's vitamins A and C.`,
   taste: `Young leaves raw: a few lemon up a whole bowl. Mature leaves mellow when cooked; good with fish, eggs and potatoes, in sauces and soups. Strip the stringy ribs from big leaves.`,
@@ -130,27 +130,27 @@ plants: {
   harvest: [`Snip outer leaves at 4 inches, about an inch above the base. Never more than a third at once.`],
   care: [`Snip yellow or brown leaves.`, `Monthly root check.`],
   pests: 'Thrips',
-  yours: [`In the dome now. It lands at row 1 right after Pink Celery A moves down to row 2.`, `It's the one giant that can hold a dim seat at no cost (Gardyn's own Salad Lover layout puts it in row 1), leaning off the top corner with nothing above it.`],
+  yours: [`Planted from the dome at row 1 right, once Pink Celery A moved down to row 2.`, `It's the one giant that can hold a dim seat at no cost (Gardyn's own Salad Lover layout puts it in row 1), leaning off the top corner with nothing above it.`],
   src: [['Gardyn Help: Red Sorrel', 'https://help.mygardyn.com/en/articles/1798209'], ['Gardyn yCube page: Red Sorrel', 'https://mygardyn.com/plant-book/red-sorrel/']] },
 
-'salad-burnet': { name: 'Salad Burnet', latin: 'Poterium sanguisorba', group: 'herbs', glyph: 'burnet', tint: 'leaf', status: 'dome', tags: [], notGardyn: true,
+'salad-burnet': { name: 'Salad Burnet', latin: 'Poterium sanguisorba', group: 'herbs', glyph: 'burnet', tint: 'leaf', status: 'tower', tags: [], notGardyn: true,
   gb: { sprout: '—', mature: 'Perennial', zone: 'medium', zoneNote: `Not in Gardyn's catalog; seated as a medium-light plant.`, size: '12–15 in', care: '—', thin: '—' },
   about: `A perennial herb that grows a loose mound of lacy, fern-like leaflets. It tastes nutty and cucumber-like. The young growth is the good part; old leaves turn tough and bitter.`,
   taste: `Fresh in salads, herb butter, vinegars and cold drinks.`,
   origin: `Europe; an old kitchen-garden herb.`,
   harvest: [`Pick the tender new leaves, often.`],
   care: [`Snip the small round pink flower heads as they form, so it keeps making leaves.`, `It resents being moved, so its rockwool goes straight into its permanent pod.`],
-  yours: [`In the dome now. It lands at row 9 left, in one move.`],
+  yours: [`Planted from the dome at row 9 left, rockwool straight into its permanent pod.`],
   src: [['Illinois Extension: Salad Burnet', 'https://extension.illinois.edu/herbs/salad-burnet'], ['Quickcrop: Salad Burnet', 'https://www.quickcrop.ie/learning/plant/salad-burnet']] },
 
-'nasturtium': { name: 'Nasturtium', latin: 'Tropaeolum majus', group: 'flowers', glyph: 'shield', tint: 'orange', status: 'dome', tags: ['bloom'],
+'nasturtium': { name: 'Nasturtium', latin: 'Tropaeolum majus', group: 'flowers', glyph: 'shield', tint: 'orange', status: 'tower', tags: ['bloom'],
   gb: { sprout: '7–18', mature: '55–65', zone: 'medium', size: '2 ft', care: 'Intermediate', thin: '3 per yCube' },
-  about: `Round, shield-like leaves and red, orange or yellow flowers. Leaves and flowers are both edible, mildly sweet and peppery. This variety mounds rather than sprawls.`,
+  about: `Round, shield-like leaves and red, orange or yellow flowers. Leaves and flowers are both edible, mildly sweet and peppery. This variety mounds at first, then trails over the edge of its yPod.`,
   taste: `Flowers as a garnish or filled with soft cheese; leaves for pesto or tea; both make a peppery infused vinegar.`,
   origin: `Wild in Peru; carried to Europe in the 1550s, where Danish botanists bred today's trailing kinds.`,
   harvest: [`Cut flowers at the stem once fully open.`, `Take foliage once the plant is 4–6 inches with healthy roots, then often.`],
   care: [`Germinate it off the Gardyn with the Soak Method; the seed wants a well-drained start.`, `It trails, so Gardyn suggests outer Columns in medium or low light, or the Trellis and Plant Belts to send it up.`, `Strong roots: check them twice a month.`, `Pinch faded flowers just below the head for more blooms.`],
-  yours: [`In the dome now. It lands at row 10 left, trailing off the bottom corner, once Bull's Blood B moves up.`, `Expect more leaves than flowers on Plant Food. Aphids find it first, which makes it your early-warning plant.`],
+  yours: [`Planted from the dome at row 10 left, trailing off the bottom corner.`, `Expect more leaves than flowers on Plant Food. Aphids find it first, which makes it your early-warning plant.`],
   src: [['Gardyn Help: Nasturtium', 'https://help.mygardyn.com/en/articles/1783169']] },
 
 'borage': { name: 'Borage', latin: 'Borago officinalis', group: 'flowers', glyph: 'star', tint: 'blue', status: 'tower', tags: ['bloom', 'giant'],
@@ -160,7 +160,7 @@ plants: {
   origin: `The eastern Mediterranean; naturalized across Europe and North America.`,
   harvest: [`Flowers come 6–8 weeks after sprouting. Pinch them off at the base once open.`, `Snip leaves where they meet the main stem.`],
   care: [`A Plant Belt if it gets top-heavy.`, `Snip older leaves as they yellow, where they meet the stem.`, `Monthly root check.`],
-  yours: [`On Oct 27 it sat at row 6 center, where it would grow into the tatsoi above it.`, `The Nov 2 plan moves it to row 9 right: it leans off the lower right corner, with a Cap two rows up at row 7 right. Pinch the tips.`],
+  yours: [`On Oct 27 it sat at row 6 center, where it would have grown into the tatsoi above it.`, `Since Nov 2 it's at row 9 right: it leans off the lower right corner, with a Cap two rows up at row 7 right. Pinch the tips.`],
   src: [['Gardyn Help: Borage', 'https://help.mygardyn.com/en/articles/1782657']] },
 
 'dill': { name: 'Dill', latin: 'Anethum graveolens', group: 'herbs', glyph: 'feather', tint: 'lime', status: 'tower', tags: [],
@@ -171,7 +171,7 @@ plants: {
   harvest: [`Harvest often, taking fronds from the top down for bushier growth.`, `Once mature, cut back the top third every couple of months.`, `Pinch flowers when they appear to keep it leafy.`],
   care: [`Remove leaves with brown spots.`, `Monthly root check.`],
   pests: 'Aphids',
-  yours: [`The Nov 2 plan moves it from row 5 right to row 10 right, its own low-light zone.`, `Treat it as a sprint crop: cut often and re-sow in the dome rather than letting it climb toward Bull's Blood B.`],
+  yours: [`At row 10 right since the Nov 2 re-seating, its own low-light zone.`, `Treat it as a sprint crop: cut often and re-sow in the dome rather than letting it climb toward Bull's Blood B.`],
   src: [['Gardyn Help: Dill', 'https://help.mygardyn.com/en/articles/1784065']] },
 
 'mint': { name: 'Mint', latin: 'Mentha', group: 'herbs', glyph: 'mint', tint: 'leaf', status: 'tower', tags: [],
@@ -182,7 +182,7 @@ plants: {
   harvest: [`Pinch leaves, or cut stems just above a growth node. Up to a third of its height at a time.`],
   care: [`Remove brown-spotted leaves and the red runners; they steal energy from leaf growth.`, `It regrows fast, so prune hard when it needs it.`, `Root-trim monthly; mint will try to take over the Column.`],
   pests: 'Spider mites',
-  yours: [`The Nov 2 plan moves it from row 7 left down to row 8 left, hanging off the side.`],
+  yours: [`At row 8 left since the Nov 2 re-seating, hanging off the side.`],
   src: [['Gardyn Help: Mint', 'https://help.mygardyn.com/en/articles/1784513']] },
 
 'chocolate-mint': { name: 'Chocolate Mint', latin: `Mentha × piperita f. citrata 'Chocolate'`, group: 'herbs', glyph: 'mint', tint: 'cocoa', status: 'tower', tags: [], notGardyn: true,
@@ -192,7 +192,7 @@ plants: {
   origin: `A garden selection of peppermint, itself a cross of water mint and spearmint.`,
   harvest: [`Same as mint: cut stems above a node, up to a third at a time.`],
   care: [`Root-trim monthly so it doesn't colonize the Column.`, `The Royal Horticultural Society lists powdery mildew and mint rust as its diseases; keep air moving.`],
-  yours: [`It arrived wilted by mail. You cut it back and planted it bare-root under a yCover on Oct 24, with the rhizome stubs laid flat. New growth was due in one to two weeks.`, `The Nov 2 plan moves it from row 9 right to row 9 center.`],
+  yours: [`It arrived wilted by mail. You cut it back and planted it bare-root under a yCover on Oct 24, with the rhizome stubs laid flat. New growth was due in one to two weeks.`, `At row 9 center since the Nov 2 re-seating.`],
   src: [['RHS: Chocolate Peppermint', 'https://rhs.org.uk/plants/104628/mentha-piperita-f-citrata-chocolate/details'], ['Gardyn Help: Mint', 'https://help.mygardyn.com/en/articles/1784513']] },
 
 'purslane': { name: 'Golden Purslane', latin: 'Portulaca oleracea', group: 'greens', glyph: 'succulent', tint: 'gold', status: 'tower', tags: [],
@@ -202,7 +202,7 @@ plants: {
   origin: `From Southeast Asia to southeastern Europe; nicknamed little hogweed and pigweed.`,
   harvest: [`Harvest often so it stays compact: pinch leaves or cut above a node, a third at a time.`],
   care: [`Remove leaves with brown spots.`, `Monthly root check.`],
-  yours: [`You bought "golden purslane," which is the right plant (Portulaca oleracea, small yellow flowers), not the ornamental moss rose.`, `The Nov 2 plan moves it from row 7 right to row 10 center, its own low-light zone.`],
+  yours: [`You bought "golden purslane," which is the right plant (Portulaca oleracea, small yellow flowers), not the ornamental moss rose.`, `At row 10 center since the Nov 2 re-seating, its own low-light zone.`],
   src: [['Gardyn Help: Purslane', 'https://help.mygardyn.com/en/articles/1797633']] },
 
 'tam-jalapeno': { name: 'TAM Jalapeño', latin: 'Capsicum annuum', group: 'fruit', glyph: 'pepper', tint: 'leaf', status: 'tower', tags: [], notGardyn: true,
@@ -213,7 +213,7 @@ plants: {
   harvest: [`Pick when firm and about 3 inches long; cut each at its own stem.`, `The longer it stays on, the hotter and redder it gets.`],
   care: [`Pinch off the first flower buds so roots and leaves come first.`, `Flowers arrive 4–6 weeks after sprouting: shake the plant or swirl the blossoms to pollinate.`, `A Plant Belt for the fruit; trim branches to keep it inside the light.`, `Gardyn says the small blisters called edema are harmless.`],
   pests: 'Aphids',
-  yours: [`Sown after you pulled the banana peppers. One seedling lost its top to a stuck seed coat.`, `The Nov 2 plan moves it to the fruiting tower, row 4 right (bright), with row 2 right kept open above it.`, `Open question: one TAM or two? The Oct 27 maps show one on each tower.`],
+  yours: [`Sown after you pulled the banana peppers. One seedling lost its top to a stuck seed coat.`, `On the fruiting tower at row 4 right (bright) since the Nov 2 re-seating, with row 2 right kept open above it for headroom.`],
   src: [['Gardyn Help: Jalapeños', 'https://help.mygardyn.com/en/articles/1799809'], ['True Leaf Market: TAM Jalapeño', 'https://www.trueleafmarket.com/a/amp/products/pepper-hot-tam-jalapeno-seeds'], ['Reimer Seeds: TAM Jalapeño', 'https://www.reimerseeds.com/tam-jalapeno-pepper-seeds']] },
 
 'strawberry': { name: 'Albion Strawberry', latin: `Fragaria × ananassa 'Albion'`, group: 'fruit', glyph: 'berry', tint: 'red', status: 'tower', tags: [],
@@ -224,7 +224,7 @@ plants: {
   harvest: [`Pick when red right up to the stem; color tells ripeness, not size.`, `Give a ripe berry an extra day or two for flavor; it should feel soft.`, `Pinch off or snip with clean scissors.`],
   care: [`Swirl each open flower 2–3 times with your thumb to pollinate; the berry forms about two weeks after the petals drop.`, `Remove flowers until a plant has at least six open leaves.`, `Cut runners for the plant's whole life (root one or two first if you want clones).`, `Never more than a third of the leaves at once.`, `Root-prune twice a month: brown, black or slimy roots, and anything past the yPod.`, `Keep Germination Mode off so they get full waterings; don't put unsprouted yCubes on the same unit.`],
   pests: 'Aphids, spider mites (Albion tolerates two-spotted mites), fungus gnats in wet rockwool',
-  yours: [`Eleven on the fruiting tower. Your first batch was lost to root rot; this batch was chosen for disease resistance.`, `Crowns: green algae on the wet rockwool around them, and gnats on a wilting one (Nov 2). The crown plan lives in Care, under Fixes.`, `Tank Refresh every two weeks while they're active; HydroBoost weekly, up to every three days with big fruiting plants.`, `The Nov 2 plan brings strawberries 9, 10 and 11 out of dim row 10 into center rows 5, 6 and 8 on a root-prune day.`],
+  yours: [`Eleven on the fruiting tower. Your first batch was lost to root rot; this batch was chosen for disease resistance.`, `Crowns: green algae on the wet rockwool around them, and gnats on a wilting one (Nov 2). The crown plan lives in Care, under Fixes.`, `Tank Refresh every two weeks while they're active; HydroBoost weekly, up to every three days with big fruiting plants.`, `Since the Nov 2 re-seating, strawberries 9, 10 and 11 sit in center rows 5, 6 and 8, out of dim row 10. If one comes out, row 8 center goes back to air.`],
   src: [['Gardyn Help: Strawberries', 'https://help.mygardyn.com/en/articles/1786241'], ['Gardyn Help: Strawberry Care Guide', 'https://help.mygardyn.com/en/articles/1782145'], ['UC ANR: Albion', 'https://ccfruitandnuts.ucanr.edu/sites/default/files/2018-03/281247.pdf']] },
 
 'yellow-cherry-tomato': { name: 'Yellow Cherry Tomato', latin: 'Solanum lycopersicum', group: 'fruit', glyph: 'tomato', tint: 'yellow', status: 'tower', tags: ['giant'],
@@ -256,27 +256,27 @@ plants: {
   harvest: [`Pick pods about 5 inches long and pencil-thick while still tender, usually 1–2 weeks after flowering.`, `It sets most of its crop at once but keeps going if you pick regularly. Overgrown pods tell it to quit.`],
   care: [`Germinate off the unit with the Soak Method: 5-minute soak to the top of the plastic, into the Nursery with no extra water, lid on, apart from other germinating seeds.`, `Seat the seed about an inch down in the rockwool.`, `Flowers 4–6 weeks after sprouting: shake or swirl to pollinate.`, `Trellis and Plant Belts; keep leaves dry.`],
   pests: 'Aphids, mites',
-  yours: [`All three rotted on Oct 27: each sat below a tomato's root mat, beans are the most salt-sensitive crop on the tower, and one hung in the humidifier plume.`, `New rule: nothing salt-sensitive sits below a tomato in the same Column.`, `Bean lane: center rows 3 and 4 after the cucumbers, row 2 center as the staggered third.`, `Seed saving: leave pods on until brown and rattling. Gardyn's bush variety is bred for the Columns; store-bought beans aren't a substitute.`],
+  yours: [`All three rotted on Oct 27: each sat below a tomato's root mat, beans (like strawberries) are rated salt-sensitive, and one hung in the humidifier plume.`, `The rule since: nothing salt-sensitive sits in an outer pod of rows 3–6 while the tomato above it stands. The strawberries in rows 7–9 already live under the tomatoes and do well; the beans and the cucamelon stay in the center Column.`, `Bean lane: center rows 3 and 4 after the cucumbers, row 2 center as the staggered third.`, `Seed saving: leave pods on until brown and rattling. Gardyn's bush variety is bred for the Columns; store-bought beans aren't a substitute.`],
   src: [['Gardyn Help: Green Beans', 'https://help.mygardyn.com/en/articles/1785665'], ['Gardyn: How to grow green beans indoors', 'https://mygardyn.com/pages/grow-green-beans']] },
 
-'ground-cherry': { name: 'Ground Cherry', latin: 'Physalis pruinosa', group: 'fruit', glyph: 'lantern', tint: 'husk', status: 'dome', tags: [], notGardyn: true,
+'ground-cherry': { name: 'Ground Cherry', latin: 'Physalis pruinosa', group: 'fruit', glyph: 'lantern', tint: 'husk', status: 'tower', tags: [], notGardyn: true,
   gb: { sprout: '14–21', mature: '70–75', zone: 'high', zoneNote: `Not in Gardyn's catalog. Its cousin Cape Gooseberry is a high-light plant there (10–28 days to sprout, 80+ to mature, Advanced, 70–85°F).`, size: '1½–3 ft', care: '—', thin: '1 per yCube' },
   about: `Sweet golden berries inside papery husks, with notes of pineapple, cherry tomato and vanilla. A low, sprawling, self-fertile bush.`,
   taste: `Fresh, in salads and salsa, baked into pies and scones, made into jam, or dried like raisins.`,
   origin: `The Americas; a nightshade, like tomatoes.`,
   harvest: [`Ripe fruit falls on its own, or drops when you shake the branch. The husk dries to tan.`, `Green fruit that falls early can finish ripening on a windowsill. In their husks they keep for weeks in the fridge.`],
   care: [`A gentle shake helps it pollinate.`, `Plant Belts, and a tray underneath to catch what drops.`, `Eat only fully golden fruit. Gardyn warns that the green fruit and leaves of its cousin are poisonous to people, cats and dogs.`],
-  yours: [`In the dome now. It lands at fruiting row 6 left (or Tomato #1's pod, whichever comes free first), leaning off the tower with row 4 left kept open above it.`],
+  yours: [`Planted from the dome at fruiting row 6 left, leaning off the tower with row 4 left kept open above it. Plant Belts, and a tray underneath to catch what drops.`],
   src: [['Savvy Gardening: Ground cherries', 'https://savvygardening.com/grow-ground-cherries-in-a-garden/'], ['Gardyn Help: Cape Gooseberry', 'https://help.mygardyn.com/en/articles/1785281'], ['Epic Gardening: Ground cherry', 'https://www.epicgardening.com/?p=116920']] },
 
-'cucamelon': { name: 'Cucamelon', latin: 'Melothria scabra', group: 'fruit', glyph: 'melon', tint: 'leaf', status: 'dome', tags: [], notGardyn: true,
+'cucamelon': { name: 'Cucamelon', latin: 'Melothria scabra', group: 'fruit', glyph: 'melon', tint: 'leaf', status: 'tower', tags: [], notGardyn: true,
   gb: { sprout: '—', mature: '≈75', zone: 'high', zoneNote: `Not in Gardyn's catalog; seated in Gardyn's cucumber seat, the bottom of the middle column.`, size: 'Long vines', care: '—', thin: '1 per yCube' },
   about: `Grape-sized fruit that look like tiny watermelons and taste like cucumber with a lime tang. Vigorous vines with male and female flowers on the same plant, and tuberous roots.`,
   taste: `Off the vine, in salads and salsa, pickled, or dropped in a gin and tonic.`,
   origin: `Mexico and Central America; also called the Mexican sour gherkin or mouse melon.`,
   harvest: [`Pick at about an inch, still firm. Start checking a week or two after the first flowers; older fruit gets sourer.`],
   care: [`Indoors you're the bee: move pollen from a male flower to a female one (the female has a tiny fruit behind the bloom).`, `Weave the vine up the Trellis.`, `Keep leaves dry; it's mildew-prone.`, `Its roots dislike strong feeding. If it sulks at fruiting-tower strength, the salad tower's lighter Tank is the fallback.`],
-  yours: [`In the dome now. It lands at fruiting row 10 center, Gardyn's vine seat, and climbs the Trellis into the bright center.`],
+  yours: [`Planted from the dome at fruiting row 10 center, Gardyn's vine seat; it climbs the Trellis up the face of the tower toward the high light.`],
   src: [['Savvy Gardening: Cucamelons', 'https://savvygardening.com/growing-cucamelons-in-a-garden/'], ['Epic Gardening: Cucamelon', 'https://www.epicgardening.com/?p=104763']] },
 
 /* ---------- Ideas ---------- */
@@ -287,7 +287,7 @@ plants: {
   origin: `The Mediterranean; the Egyptians and Romans grew it.`,
   harvest: [`Snip outer leaves at 2–3 inches. Smaller leaves are milder.`, `Cut yellow flower stems as they appear to hold off bolting.`],
   care: [`Monthly root check.`], pests: 'Aphids',
-  why: `The peppery bite the green mustard used to bring, at a tenth of the size. A low-light plant, so it fits row 1 or row 10.`,
+  why: `The peppery bite the green mustard used to bring, without the mustard’s habit of outgrowing its listing. A low-light plant, so it fits row 1 or row 10.`,
   src: [['Gardyn Help: Arugula', 'https://help.mygardyn.com/en/articles/1795649']] },
 
 'wasabi-greens': { name: 'Wasabi Greens', latin: 'Brassica juncea', group: 'greens', glyph: 'leaf', tint: 'lime', status: 'idea', tags: [],
@@ -416,42 +416,43 @@ towers: {
   F: { name: 'Fruiting tower', short: 'Fruiting', also: '' }
 },
 
-/* Each plant on (or headed for) a tower. now = Oct 27 seat ('dome', 'sow' = not sown yet); plan = Nov 2 seat ('out' = comes out). */
+/* Each plant on (or headed for) a tower. now = its seat today ('sow' = not sown yet); plan = its seat after the steps
+   still to come ('out' = comes out); was = its Oct 27 seat, before the Nov 2 re-seating ('dome' = planted from the dome).
+   Today's seats are the Nov 2 maps (salad v5, fruiting v9), in place as of Nov 5. */
 pods: [
-  // Salad tower
-  { id: 'spin-l1', p: 'perpetual-spinach', label: 'Perpetual Spinach', now: 'S1L', plan: 'S3L' },
-  { id: 'spin-c1', p: 'perpetual-spinach', label: 'Perpetual Spinach', now: 'S1C', plan: 'S3C' },
+  // Salad tower (v5)
+  { id: 'spin-l1', p: 'perpetual-spinach', label: 'Perpetual Spinach', now: 'S3L', plan: 'S3L', was: 'S1L' },
+  { id: 'spin-c1', p: 'perpetual-spinach', label: 'Perpetual Spinach', now: 'S3C', plan: 'S3C', was: 'S1C' },
   { id: 'spin-c2', p: 'perpetual-spinach', label: 'Perpetual Spinach', now: 'S2C', plan: 'S2C' },
-  { id: 'spin-r2', p: 'perpetual-spinach', label: 'Perpetual Spinach', now: 'S2R', plan: 'S6L' },
-  { id: 'celery-a', p: 'pink-celery', label: 'Pink Celery A', now: 'S1R', plan: 'S2R' },
+  { id: 'spin-r2', p: 'perpetual-spinach', label: 'Perpetual Spinach', now: 'S6L', plan: 'S6L', was: 'S2R' },
+  { id: 'celery-a', p: 'pink-celery', label: 'Pink Celery A', now: 'S2R', plan: 'S2R', was: 'S1R' },
   { id: 'celery-b', p: 'pink-celery', label: 'Pink Celery B', now: 'S2L', plan: 'S2L' },
-  { id: 'rtat-a', p: 'red-tatsoi', label: 'Red Tatsoi A', now: 'S3L', plan: 'S6R' },
-  { id: 'rtat-b', p: 'red-tatsoi', label: 'Red Tatsoi B', now: 'S3C', plan: 'S5C' },
+  { id: 'rtat-a', p: 'red-tatsoi', label: 'Red Tatsoi A', now: 'S6R', plan: 'S6R', was: 'S3L' },
+  { id: 'rtat-b', p: 'red-tatsoi', label: 'Red Tatsoi B', now: 'S5C', plan: 'S5C', was: 'S3C' },
   { id: 'gtat-a', p: 'green-tatsoi', label: 'Green Tatsoi A', now: 'S4C', plan: 'S4C' },
   { id: 'gtat-b', p: 'green-tatsoi', label: 'Green Tatsoi B', now: 'S4R', plan: 'S4R' },
-  { id: 'dill', p: 'dill', label: 'Dill', now: 'S5R', plan: 'S10R' },
-  { id: 'borage', p: 'borage', label: 'Borage', now: 'S6C', plan: 'S9R' },
-  { id: 'mint', p: 'mint', label: 'Mint', now: 'S7L', plan: 'S8L' },
-  { id: 'tam-1', p: 'tam-jalapeno', label: 'TAM Jalapeño', now: 'S7C', plan: 'F4R' },
-  { id: 'purslane', p: 'purslane', label: 'Golden Purslane', now: 'S7R', plan: 'S10C' },
+  { id: 'dill', p: 'dill', label: 'Dill', now: 'S10R', plan: 'S10R', was: 'S5R' },
+  { id: 'borage', p: 'borage', label: 'Borage', now: 'S9R', plan: 'S9R', was: 'S6C' },
+  { id: 'mint', p: 'mint', label: 'Mint', now: 'S8L', plan: 'S8L', was: 'S7L' },
+  { id: 'purslane', p: 'purslane', label: 'Golden Purslane', now: 'S10C', plan: 'S10C', was: 'S7R' },
   { id: 'bb-a', p: 'bulls-blood', label: `Bull's Blood A`, now: 'S8C', plan: 'S8C' },
-  { id: 'buttercrunch', p: 'buttercrunch', label: 'Buttercrunch', now: 'S9C', plan: 'S5L' },
-  { id: 'chocmint', p: 'chocolate-mint', label: 'Chocolate Mint', now: 'S9R', plan: 'S9C' },
-  { id: 'bb-b', p: 'bulls-blood', label: `Bull's Blood B`, now: 'S10L', plan: 'S8R' },
-  { id: 'butterhead', p: 'butterhead', label: 'Butterhead', now: 'S10C', plan: 'S7C' },
-  { id: 'sorrel', p: 'red-sorrel', label: 'Red Sorrel', now: 'dome', plan: 'S1R' },
-  { id: 'salanova', p: 'green-salanova', label: 'Green Salanova', now: 'dome', plan: 'S3R' },
-  { id: 'lollo', p: 'lollo-rossa', label: 'Lollo Rossa', now: 'dome', plan: 'S5R' },
-  { id: 'romaine', p: 'romaine', label: 'Romaine', now: 'dome', plan: 'S6C' },
-  { id: 'flashy', p: 'flashy-trout-back', label: 'Flashy Trout Back', now: 'dome', plan: 'S7L' },
-  { id: 'burnet', p: 'salad-burnet', label: 'Salad Burnet', now: 'dome', plan: 'S9L' },
-  { id: 'nasturtium', p: 'nasturtium', label: 'Nasturtium', now: 'dome', plan: 'S10L' },
-  // Fruiting tower
+  { id: 'buttercrunch', p: 'buttercrunch', label: 'Buttercrunch', now: 'S5L', plan: 'S5L', was: 'S9C' },
+  { id: 'chocmint', p: 'chocolate-mint', label: 'Chocolate Mint', now: 'S9C', plan: 'S9C', was: 'S9R' },
+  { id: 'bb-b', p: 'bulls-blood', label: `Bull's Blood B`, now: 'S8R', plan: 'S8R', was: 'S10L' },
+  { id: 'butterhead', p: 'butterhead', label: 'Butterhead', now: 'S7C', plan: 'S7C', was: 'S10C' },
+  { id: 'sorrel', p: 'red-sorrel', label: 'Red Sorrel', now: 'S1R', plan: 'S1R', was: 'dome' },
+  { id: 'salanova', p: 'green-salanova', label: 'Green Salanova', now: 'S3R', plan: 'S3R', was: 'dome' },
+  { id: 'lollo', p: 'lollo-rossa', label: 'Lollo Rossa', now: 'S5R', plan: 'S5R', was: 'dome' },
+  { id: 'romaine', p: 'romaine', label: 'Romaine', now: 'S6C', plan: 'S6C', was: 'dome' },
+  { id: 'flashy', p: 'flashy-trout-back', label: 'Flashy Trout Back', now: 'S7L', plan: 'S7L', was: 'dome' },
+  { id: 'burnet', p: 'salad-burnet', label: 'Salad Burnet', now: 'S9L', plan: 'S9L', was: 'dome' },
+  { id: 'nasturtium', p: 'nasturtium', label: 'Nasturtium', now: 'S10L', plan: 'S10L', was: 'dome' },
+  // Fruiting tower (v9)
   { id: 'tom-2', p: 'yellow-cherry-tomato', label: 'Tomato #2', now: 'F1R', plan: 'F1R', seat: 'A corner seat with nothing above it; the vine is belted down the right light bar into the bright band.' },
   { id: 'tom-1', p: 'yellow-cherry-tomato', label: 'Tomato #1', now: 'F2L', plan: 'F2L', seat: 'A corner seat leaning off the tower; the vine is belted down the left light bar into the bright band.' },
-  { id: 'cuke-1', p: 'cucumber', label: 'Cucumber #1', now: 'F3C', plan: 'out', fading: true },
-  { id: 'cuke-2', p: 'cucumber', label: 'Cucumber #2', now: 'F4C', plan: 'out', fading: true },
-  { id: 'tam-2', p: 'tam-jalapeno', label: 'TAM Jalapeño', now: 'F5R', plan: 'F5R', unsure: `The Oct 27 fruiting map shows a TAM seedling here and the salad map shows one at row 7 center. Your notes say one seedling survived. If there's only one, it goes to row 4 right and this pod stays open.` },
+  { id: 'cuke-1', p: 'cucumber', label: 'Cucumber #1', now: 'F3C', plan: 'out', fading: true, note: 'Fading. Green Bean 1 takes this pod next.' },
+  { id: 'cuke-2', p: 'cucumber', label: 'Cucumber #2', now: 'F4C', plan: 'out', fading: true, note: 'Fading. Green Bean 2 takes this pod next.' },
+  { id: 'tam-1', p: 'tam-jalapeno', label: 'TAM Jalapeño', now: 'F4R', plan: 'F4R', was: 'S7C' },
   { id: 's1', p: 'strawberry', label: 'Strawberry 1', now: 'F7L', plan: 'F7L' },
   { id: 's2', p: 'strawberry', label: 'Strawberry 2', now: 'F7C', plan: 'F7C' },
   { id: 's3', p: 'strawberry', label: 'Strawberry 3', now: 'F7R', plan: 'F7R' },
@@ -460,91 +461,56 @@ pods: [
   { id: 's6', p: 'strawberry', label: 'Strawberry 6', now: 'F9L', plan: 'F9L' },
   { id: 's7', p: 'strawberry', label: 'Strawberry 7', now: 'F9C', plan: 'F9C' },
   { id: 's8', p: 'strawberry', label: 'Strawberry 8', now: 'F9R', plan: 'F9R' },
-  { id: 's9', p: 'strawberry', label: 'Strawberry 9', now: 'F10L', plan: 'F5C' },
-  { id: 's10', p: 'strawberry', label: 'Strawberry 10', now: 'F10C', plan: 'F6C' },
-  { id: 's11', p: 'strawberry', label: 'Strawberry 11', now: 'F10R', plan: 'F8C', note: 'If a strawberry comes out first, this seat goes back to air.' },
+  { id: 's9', p: 'strawberry', label: 'Strawberry 9', now: 'F5C', plan: 'F5C', was: 'F10L' },
+  { id: 's10', p: 'strawberry', label: 'Strawberry 10', now: 'F6C', plan: 'F6C', was: 'F10C' },
+  { id: 's11', p: 'strawberry', label: 'Strawberry 11', now: 'F8C', plan: 'F8C', was: 'F10R', note: 'If a strawberry comes out, this seat goes back to air.' },
+  { id: 'gcherry', p: 'ground-cherry', label: 'Ground Cherry', now: 'F6L', plan: 'F6L', was: 'dome' },
+  { id: 'cucamelon', p: 'cucamelon', label: 'Cucamelon', now: 'F10C', plan: 'F10C', was: 'dome', seat: 'Gardyn’s vine seat: it starts low and climbs the Trellis up the face of the tower toward the high light.' },
   { id: 'bean-1', p: 'green-beans', label: 'Green Bean 1', now: 'sow', plan: 'F3C' },
   { id: 'bean-2', p: 'green-beans', label: 'Green Bean 2', now: 'sow', plan: 'F4C' },
-  { id: 'bean-3', p: 'green-beans', label: 'Green Bean 3', now: 'sow', plan: 'F2C' },
-  { id: 'gcherry', p: 'ground-cherry', label: 'Ground Cherry', now: 'dome', plan: 'F6L' },
-  { id: 'cucamelon', p: 'cucamelon', label: 'Cucamelon', now: 'dome', plan: 'F10C', seat: 'Gardyn\u2019s vine seat: it starts low and climbs the Trellis into the bright center.' }
+  { id: 'bean-3', p: 'green-beans', label: 'Green Bean 3', now: 'sow', plan: 'F2C' }
 ],
 
-/* Empty seats with a job. now = Oct 27, plan = Nov 2. */
+/* Empty seats with a job (the same today and after the bean swap). */
 holds: {
   now: {
-    S5C: { cap: true, note: 'Cap: headroom for the TAM jalapeño two rows below' },
-    S6L: { note: 'Kept clear: lean room for the borage' },
-    F8C: { note: 'Open: air and access in the strawberry block' }
-  },
-  plan: {
     S1L: { cap: true, note: 'Cap: headroom for the spinach at row 3 left' },
     S1C: { cap: true, note: 'Cap: headroom for the spinach at row 3 center' },
     S4L: { cap: true, note: 'Cap: headroom for the spinach at row 6 left' },
     S7R: { cap: true, note: 'Cap: headroom for the borage at row 9 right' },
-    F2R: { note: 'Open: headroom for the TAM at row 4 right' },
-    F4L: { note: 'Open: headroom for the ground cherry at row 6 left' },
-    F3L: { note: 'Open: tomato canopy and root zone' },
-    F3R: { note: 'Open: tomato canopy and root zone' },
-    F5L: { note: 'Open: tomato canopy and root zone' },
-    F6R: { note: 'Open: tomato canopy and root zone' },
-    F5R: { note: 'Open: a second TAM or the borage would fit here' }
+    F1L: { tag: 'low light', note: 'Open: low light at the top of the tower' },
+    F1C: { tag: 'low light', note: 'Open: low light at the top of the tower' },
+    F2C: { tag: 'Bean 3', note: 'Open: Green Bean 3’s seat, 3–4 weeks after the first two beans' },
+    F2R: { tag: 'headroom', note: 'Open: headroom for the TAM at row 4 right' },
+    F3L: { tag: 'canopy', note: 'Open: tomato canopy and root zone' },
+    F3R: { tag: 'canopy', note: 'Open: tomato canopy and root zone' },
+    F4L: { tag: 'headroom', note: 'Open: headroom for the ground cherry at row 6 left' },
+    F5L: { tag: 'canopy', note: 'Open: tomato canopy and root zone' },
+    F5R: { tag: 'free seat', free: true, note: 'Open: the one truly free seat on the tower; a second TAM would fit here' },
+    F6R: { tag: 'canopy', note: 'Open: tomato canopy and root zone' },
+    F10L: { tag: 'low light', note: 'Open: low light at the bottom of the tower' },
+    F10R: { tag: 'low light', note: 'Open: low light at the bottom of the tower' }
   }
 },
 
-/* The moves, in the order to do them. kind: move (a plant changes seat), cap (a Cap goes on), out (a plant comes out), task (a job, no seat change). */
+/* The steps still to come. kind: move (a plant changes seat), cap (a Cap goes on), out (a plant comes out), task (a job, no seat change). */
 moves: [
-  { phase: 'now', kind: 'cap', at: 'S4L', text: 'Cap on salad row 4 left (empty now)' },
-  { phase: 'now', kind: 'task', id: 'sow-beans', text: 'Sow Green Beans 1 and 2 in the Nursery (Soak Method, base drained)' },
-  { phase: 'now', kind: 'task', id: 'belt-tomatoes', text: 'Belt both tomato vines to their light bars so the canopy hangs at rows 3–6' },
-  { phase: 'dome', kind: 'move', pod: 'salanova', when: 'at true leaves and ½-inch roots' },
-  { phase: 'dome', kind: 'move', pod: 'burnet', when: 'rockwool straight into its permanent pod' },
-  { phase: 'evening', kind: 'move', pod: 'tam-1', when: 'to the fruiting tower' },
-  { phase: 'evening', kind: 'move', pod: 'butterhead' },
-  { phase: 'evening', kind: 'move', pod: 'purslane' },
-  { phase: 'evening', kind: 'cap', at: 'S7R', text: 'Cap on salad row 7 right, once the purslane is out' },
-  { phase: 'evening', kind: 'move', pod: 'dill' },
-  { phase: 'evening', kind: 'move', pod: 'mint' },
-  { phase: 'evening', kind: 'move', pod: 'buttercrunch' },
-  { phase: 'evening', kind: 'move', pod: 'chocmint' },
-  { phase: 'evening', kind: 'move', pod: 'borage' },
-  { phase: 'evening', kind: 'move', pod: 'bb-b' },
-  { phase: 'evening', kind: 'move', pod: 'rtat-a', when: 'clears row 3 for a spinach' },
-  { phase: 'evening', kind: 'move', pod: 'rtat-b', when: 'the Cap at row 5 center comes off' },
-  { phase: 'refresh1', kind: 'move', pod: 'spin-r2' },
-  { phase: 'refresh1', kind: 'move', pod: 'celery-a' },
-  { phase: 'refresh1', kind: 'move', pod: 'spin-l1' },
-  { phase: 'refresh1', kind: 'cap', at: 'S1L', text: 'Cap on salad row 1 left, behind the spinach' },
-  { phase: 'refresh1', kind: 'move', pod: 'sorrel', when: 'into the seat Celery A just left' },
-  { phase: 'refresh2', kind: 'move', pod: 'spin-c1', when: 'never two spinach in one Refresh' },
-  { phase: 'refresh2', kind: 'cap', at: 'S1C', text: 'Cap on salad row 1 center, behind the spinach' },
-  { phase: 'dome', kind: 'move', pod: 'lollo', when: 'after the dill moves' },
-  { phase: 'dome', kind: 'move', pod: 'romaine', when: 'after the borage moves' },
-  { phase: 'dome', kind: 'move', pod: 'flashy', when: 'after the mint moves' },
-  { phase: 'dome', kind: 'move', pod: 'nasturtium', when: `after Bull's Blood B moves` },
-  { phase: 'rootday', kind: 'move', pod: 's9', when: 'pull any soft crown instead of moving it' },
-  { phase: 'rootday', kind: 'move', pod: 's10' },
-  { phase: 'rootday', kind: 'move', pod: 's11', when: 'if a strawberry was pulled, leave this seat as air' },
+  { phase: 'now', kind: 'task', id: 'sow-beans', text: 'Sow Green Beans 1 and 2 in the Nursery by the Soak Method: soak, then drain the base. A drained Nursery leaves microgreen wicks dry, so no pads alongside' },
   { phase: 'beans', kind: 'out', pod: 'cuke-1' },
   { phase: 'beans', kind: 'out', pod: 'cuke-2' },
   { phase: 'beans', kind: 'task', id: 'refresh-empty', text: 'Tank Refresh and HydroBoost on the fruiting tower while the center Column is empty' },
   { phase: 'beans', kind: 'move', pod: 'bean-1' },
   { phase: 'beans', kind: 'move', pod: 'bean-2' },
-  { phase: 'later', kind: 'move', pod: 'bean-3', when: 'sow it 3–4 weeks after the first two' },
-  { phase: 'dome', kind: 'move', pod: 'gcherry', when: 'with Plant Belts and a tray below' },
-  { phase: 'dome', kind: 'move', pod: 'cucamelon', when: 'after Strawberry 10 moves; run the Trellis up the center' }
+  { phase: 'later', kind: 'task', id: 'sow-bean-3', text: 'Sow Green Bean 3 in the Nursery, 3–4 weeks after the first two' },
+  { phase: 'later', kind: 'move', pod: 'bean-3' }
 ],
 phases: {
-  now: { title: 'Now, nothing disturbed', sub: 'Jobs that don’t move a plant.' },
-  evening: { title: 'Small plants, any evening', sub: 'Salad tower. The order matters: each move clears a seat for the next.' },
-  refresh1: { title: 'Giants, at the next Tank Refresh', sub: 'Salad tower. The top half is on the towel anyway, and roots get trimmed to the yPod.', gate: 'the next salad Tank Refresh' },
-  refresh2: { title: 'Giants, the Tank Refresh after', sub: 'The plan spaces the two row-1 spinach a Refresh apart.', gate: 'the Tank Refresh after' },
-  rootday: { title: 'Fruiting, on the next root-prune day', sub: 'Strawberries out of dim row 10.', gate: 'a root-prune day' },
-  beans: { title: 'Fruiting, when the beans have true leaves', sub: 'About 2–3 weeks after sowing.', gate: 'bean seedlings with true leaves' },
-  later: { title: 'Fruiting, 3–4 weeks after that', sub: 'The staggered third bean.', gate: '3–4 weeks after the first beans' },
-  dome: { title: 'Dome graduates, as their seats open', sub: 'Gardyn: move a yCube at true leaves, ½-inch roots, or yellowing seed leaves.', gate: 'true leaves and ½-inch roots' }
+  now: { title: 'Now', sub: 'The bean swap starts in the Nursery.' },
+  beans: { title: 'When the beans have true leaves', sub: 'About 2–3 weeks after sowing. The cucumbers come out and the center Column gets a clean start.', gate: 'bean seedlings with true leaves' },
+  later: { title: 'The staggered third bean', sub: 'So the beans come in waves instead of all at once.', gate: '3–4 weeks after the first beans' }
 },
-phaseOrder: ['now', 'evening', 'refresh1', 'refresh2', 'dome', 'rootday', 'beans', 'later'],
+phaseOrder: ['now', 'beans', 'later'],
+done: { date: 'Nov 5', text: 'The Nov 2 re-seating is done: 22 salad moves, every dome plant planted, the TAM over to the fruiting tower, strawberries 9–11 out of row 10, and the Caps on.' },
 
 /* ---------- Care rhythm ---------- */
 care: [
@@ -552,7 +518,7 @@ care: [
   { id: 'hb-fruit', title: 'HydroBoost', every: 7, where: 'Fruiting tower', text: 'Weekly, up to every 3 days with big fruiting plants. Per full Tank: 2 tsp standard water, 4 tsp hard, 1 tsp filtered or naturally soft. Never with softened water.' },
   { id: 'hb-salad', title: 'HydroBoost', every: 7, where: 'Salad tower', text: 'Weekly, with the Tank Top-off or Tank Refresh. It keeps algae, biofilm and salt crust down; it doesn’t remove growth that’s already there.' },
   { id: 'refresh-fruit', title: 'Tank Refresh', every: 14, where: 'Fruiting tower', text: 'Every two weeks while the strawberries are active. Baking soda and a soft sponge; no soap. Never lift a full Tank.' },
-  { id: 'refresh-salad', title: 'Tank Refresh', every: 30, where: 'Salad tower', text: 'Gardyn’s minimum is monthly. The next one is the giants’ moving day.' },
+  { id: 'refresh-salad', title: 'Tank Refresh', every: 30, where: 'Salad tower', text: 'Gardyn’s minimum is monthly; HydroBoost in between keeps the Columns clean.' },
   { id: 'straw-roots', title: 'Strawberry root prune', every: 14, where: 'Fruiting tower', text: 'Twice a month: brown, black or slimy roots, and anything past the yPod. Feel every crown while you’re there.' },
   { id: 'roots', title: 'Root check, everyone else', every: 30, where: 'Both towers', text: 'Trim brown roots and anything past the yPod. Mints and tomatoes first; nasturtium wants it twice a month. Tomatoes skip it until about Nov 27, a month after the cleanout.' },
   { id: 'debris', title: 'Debris out', every: 7, where: 'Both towers', text: 'Dead leaves, spent flower stalks, runner stubs, any berry resting on the wool. The trimmings tub leaves the room.' },
@@ -587,7 +553,7 @@ fixes: [
 <h4>Salt-sensitive first</h4>
 <p>Beans and strawberries are rated "sensitive" on crop salt charts; tomatoes, cucumbers and peppers "moderately sensitive." In a shared Tank, beans and strawberries warn you first.</p>
 <h4>Checks, in order</h4>
-<ol><li>Roots.</li><li>Spider mite tap test.</li><li>Nothing misting or blowing onto the leaves.</li><li>Snip yellow and brown leaves.</li><li>Pick pods before they get fat.</li><li>Water: no softened water. CAL-MAG (1 teaspoon per gallon, weekly) only if the well test says your water is soft.</li></ol>` },
+<ol><li>Roots.</li><li>Spider mite tap test.</li><li>Nothing misting or blowing onto the leaves.</li><li>Snip yellow and brown leaves.</li><li>Pick beans before they get fat.</li><li>Water: no softened water. CAL-MAG (1 teaspoon per gallon, weekly) only if the well test says your water is soft.</li></ol>` },
   { id: 'mites', title: 'Spider mites', sub: 'The tap test and Gardyn’s soap dunk', body: `
 <p><b>Tap test:</b> hold white paper under a leaf and tap. Specks that start walking are mites. Also look for pale pin-dot speckling on top and fine webbing underneath. Dry, dusty air favors them.</p>
 <h4>Castile Soap Dunk</h4>
@@ -599,7 +565,7 @@ fixes: [
   { id: 'air', title: 'Humidifier and fans', sub: 'Air for the strawberry tier', body: `
 <h4>Fans</h4>
 <p>Two small fans at the base, low or medium: steady air across the strawberry tier that flutters the leaves, never blowing mist onto the tower.</p>
-<h4>Humidifier (off for three weeks from Nov 2)</h4>
+<h4>Humidifier (the Nov 2 advice: off for three weeks)</h4>
 <ul><li>Low and a few feet from the tower, nozzle into open air. The mist should vanish before it reaches a leaf; never at the crowns.</li><li>About 60% at strawberry height, the low end of Gardyn's 60–75% for strawberries. Read it with a separate hygrometer at plant level; the humidifier's own reading sits in its mist.</li><li>On while the lights are on; let the room dry a bit at night.</li><li>Distilled water. Cool-mist units throw tap-water minerals into the air; white dust on dark surfaces means it's happening.</li><li>Watch windows for condensation. The EPA's comfort guidance for the house itself is 50% or less.</li></ul>
 <p>If the hygrometer reads about 60% and new strawberry leaves still brown at the edges, look at the Tank, not the air.</p>` },
   { id: 'clean', title: 'Cleaning', sub: 'Which cleaner for which grime', body: `
@@ -626,12 +592,10 @@ gear: [
 ],
 questions: [
   { q: 'Which side of the salad tower faces the window?', a: 'The maps assume the right. If it’s the left, the outer columns swap so the light-hungry plants stay on the window side.' },
-  { q: 'One TAM jalapeño or two?', a: 'The Oct 27 maps show one on each tower; your notes say one seedling survived. If one, it goes to fruiting row 4 right and row 5 right stays open.' },
   { q: 'Where did strawberries 7–11 come from?', a: 'Rooted runners or new bare roots? It changes how much they’ll lean on the Tank.' },
-  { q: 'Two yellow cherry tomatoes, or one, at the next replant?', a: 'Two cost eight outer pods in canopy and root zone. One, trained down the right bar, frees rows 3 and 5 on the left for peppers and a second bean lane.' },
-  { q: 'Seat for the strawberry pod trial?', a: 'Right row 6 is open but sits under Tomato #2; the alternative is the first weak strawberry’s pod once it comes out.' },
-  { q: 'Well-water results', a: 'Sodium and chloride decide CAL-MAG and how hard to push Plant Food on the salt-sensitive crops.' },
-  { q: 'A note on the Nov 2 move list', a: 'It said “Caps on row 1 left and row 4 left (both empty today),” but row 1 left still holds a spinach until the Tank Refresh. This app puts that Cap on right after the spinach moves.' }
+  { q: 'Two yellow cherry tomatoes, or one, at the next replant?', a: 'Two vines claim the outer pods of rows 3–6: four stay open as canopy and root zone, and the rest can only take hardy plants like the TAM and the ground cherry. One tomato, trained down the right bar, frees left rows 3 and 5 (both high light) for peppers and a second bean lane.' },
+  { q: 'Seat for the strawberry pod trial?', a: 'The first weak strawberry’s pod, once it comes out. Right row 6 is open, but it’s an outer pod under Tomato #2, which the salt rule keeps clear of strawberries.' },
+  { q: 'Well-water results', a: 'Sodium and chloride decide CAL-MAG and how hard to push Plant Food on the salt-sensitive crops.' }
 ],
 watch: [
   { title: 'Maygrove AI Growbot Verti 30', text: 'The Gardyn look-alike on Kickstarter: auto-dosing, a fan, a 7-gallon tank, no subscription, shipping December 2026. No independent reviews yet, and its light is lettuce-grade for tomatoes and peppers. Not a reason to replace the v3s; revisit when real growers post results, probably early 2027.' },
@@ -663,7 +627,7 @@ media: [
   { name: 'Perlite, vermiculite, rice hulls', water: 'Varies', top: '—', note: 'Ruled out: they float and shed fines that clog the lines.', cost: '—' }
 ],
 brief: [
-  ['Flange', '51 mm round, 1.5–2 mm thick, chamfered underneath so it sits flush in the yPod'],
+  ['Flange', '51 mm round, 1.5–2 mm thick, chamfered underneath so it sits level in the yPod'],
   ['Mouth', 'Square, 33–34 mm across the flats, so yCovers and Caps still fit'],
   ['Body', 'Square, tapering from about 34 to 30 mm, with the original’s corner clips; about 45 mL inside'],
   ['Height', '46 mm and never taller downward: the floor has to stay above the yPod’s standing water'],
@@ -676,7 +640,7 @@ brief: [
   ['Material', 'Opaque PETG only (black blocks light best, white is easiest to inspect). Not PLA, not translucent, silk, glitter, wood or metal-filled'],
   ['Each pod', '12–18 g, 45–75 minutes, $0.17–0.36 of filament; 70 pods is about a kilogram']
 ],
-cleanPods: `<ul><li>Knock out roots and medium.</li><li>Gardyn's citric soak (2 tablespoons per 2 cups water) at room temperature, 15 minutes to overnight; bottle-brush the slots.</li><li>OxiClean Free is fine if the water is warm, not hot (under about 105°F), at the line-2 dose for 1–2 hours, followed by a rinse and a short citric rinse.</li><li>No dishwasher: PETG tops out around 70°C.</li><li>Pebbles: rinse, soak 24 hours in 3% peroxide, rinse, dry.</li></ul>`,
+cleanPods: `<ul><li>Knock out roots and medium.</li><li>Gardyn's citric soak (2 tablespoons per 2 cups water) at room temperature, 15 minutes to overnight; bottle-brush the slots.</li><li>OxiClean Free is fine if the water is warm, not hot (under about 105°F), at the line-2 dose for 1–2 hours, followed by a rinse and a short citric rinse.</li><li>No dishwasher: PETG starts to soften around 160°F (70°C).</li><li>Pebbles: rinse, soak 24 hours in 3% peroxide, rinse, dry.</li></ul>`,
 models: [
   ['Gardyn yCube Cup (jhalye)', 'https://makerworld.com/en/models/1134849-gardyn-ycube-cup', 'The starting model'],
   ['Gardyn yCube Cap (jhalye)', 'https://makerworld.com/en/models/1138174-gardyn-ycube-cap', 'Seats in the same mouth'],
@@ -693,6 +657,7 @@ shop: [
 bench: [
   { title: 'Standoff cover', text: 'An opaque disc on three short legs that shades the wool 5–8 mm above it, with a stem slot and an air gap. It does what a yCover does without trapping moisture against the crown.' },
   { title: 'Water-level alarm', text: 'Both units’ level sensors are gone. Three ways around it: ask Gardyn support (support@mygardyn.com) for a replacement part; a dipstick marked at full and 60% for each Tank Top-off; or a reed float switch in the Tank wired to a small microcontroller that beeps or pings your phone.' },
+  { title: 'QR tags for the yPods', text: 'A small printed tag on each yPod whose QR code opens that seat in this app. The link is the app’s address plus #seat- and the seat, like hectrvictorious.github.io/Gardyn-Plant-Book/#seat-S9R for the borage (S for salad, F for fruiting, then row and column). Every seat page has a Copy link button.' },
   { title: 'Caps for open pods', text: 'jhalye’s yCube Cap prints in the same opaque PETG and seats in the mouth: Caps for the four headroom seats on the salad plan.' }
 ],
 why: [
