@@ -512,12 +512,12 @@
   function renderAll() { renderToday(); renderTower(); if (!$('view-care').hidden) renderCare(); if (!$('view-plants').hidden) renderPlants(); }
 
   /* ----- Boxes: preview copy, install, news ----- */
-  const SITE = 'https://hectrvictorious.github.io/gardyn-plant-book/';
+  const SITE = 'https://hectrvictorious.github.io/Gardyn-Plant-Book/';
   const standalone = () => window.matchMedia && (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true);
   let deferredInstall = null;
   function setupBoxes() {
     if (!window.__STANDALONE_SITE__) {
-      $('movedBox').innerHTML = '<b>This is the preview copy</b><div class="small">The phone app lives at <a href="' + SITE + '" target="_blank" rel="noopener">hectrvictorious.github.io/gardyn-plant-book</a>. Open it on your phone and add it to your home screen. Ticks and notes saved here stay in this browser.</div>';
+      $('movedBox').innerHTML = '<b>This is the preview copy</b><div class="small">The phone app lives at <a href="' + SITE + '" target="_blank" rel="noopener">hectrvictorious.github.io/Gardyn-Plant-Book</a>. Open it on your phone and add it to your home screen. Ticks and notes saved here stay in this browser.</div>';
       $('movedBox').hidden = false;
       return;
     }

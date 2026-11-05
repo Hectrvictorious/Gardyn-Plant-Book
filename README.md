@@ -1,7 +1,7 @@
 # Swan's Island Plant Book
 
 Josh's plant book for his two Gardyn Home v3 towers. It lives at
-**https://hectrvictorious.github.io/gardyn-plant-book/** and installs on a phone as its own app
+**https://hectrvictorious.github.io/Gardyn-Plant-Book/** and installs on a phone as its own app
 (Share → Add to Home Screen on iPhone).
 
 - **Towers** — both towers drawn as they stand, every yPod a button. *Now* is where plants sat on
