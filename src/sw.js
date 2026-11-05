@@ -5,7 +5,7 @@
    Nothing ever needs reinstalling. (Same design as the Swan's Island Boat app.) */
 const BUILD = '@@BUILD@@';
 const VERSION = 'plantbook-' + BUILD;
-const SHELL = ['./', './index.html', './manifest.json', './icon-192.png', './icon-512.png', './apple-touch-icon.png'];
+const SHELL = ['./', './index.html', './manifest.json', './icon-v2-192.png', './icon-v2-512.png', './icon-v2-maskable-512.png', './apple-touch-icon-v2.png'];
 let isUpdate = false;
 const acked = new Set();
 

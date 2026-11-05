@@ -5,14 +5,14 @@
   const $ = id => document.getElementById(id);
   const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const APP_VERSION = P.version;
-  const NEWS = 'A Salad tab: build a bowl from what’s growing and see its balance, texture and dressing, plus house salads, island plates, a taste test and the microgreens. The map has a Flavor view with heads-ups on bristly and stringy plants, and there’s a picking round and a cat check.'; // shown once to returning users
+  const NEWS = 'A new icon, a Plant Doctor on the Care tab, 24 more plants to try on the Ideas tab (star the ones you like), the Forbidden Shelf, a Greener tab with what the towers cost in power and water, and a Picking view on the map.'; // shown once to returning users
 
   /* ----- Storage (this phone only) ----- */
   const store = {
     get(k, d) { try { const v = localStorage.getItem('pb:' + k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } },
     set(k, v) { try { localStorage.setItem('pb:' + k, JSON.stringify(v)); } catch (e) { /* storage off: the page still works */ } }
   };
-  const KEYS = ['done', 'care', 'camp', 'notes', 'trail', 'ui', 'seenVersion', 'installLater', 'bowl', 'bowls', 'mgsel', 'pick', 'verdict'];
+  const KEYS = ['done', 'care', 'camp', 'notes', 'trail', 'ui', 'seenVersion', 'installLater', 'bowl', 'bowls', 'mgsel', 'pick', 'verdict', 'scout', 'ate', 'foot'];
   let DONE = store.get('done', {});
   let CARE = store.get('care', {});
   let CAMP = store.get('camp', {});
@@ -139,7 +139,8 @@
     $('towerSub').textContent = mode === 'plan'
       ? 'After the steps still to come: the cucumbers out and a bean lane up the center column.'
       : (pending ? 'The tower as it stands: the Nov 2 map, in place as of Nov 5. A pink mark means a step is still to come.' : 'The tower as it stands: the Nov 2 map, in place as of Nov 5. Tap any pod.');
-    if (UI.lens === 'flavor') $('towerSub').textContent = 'Colored by what each plant brings to a salad. The word on each pod is its taste, or a heads-up marked ! before you eat it. Tap a pod for texture and pairings.';
+    if (UI.lens === 'pick') $('towerSub').textContent = mode === 'plan' ? 'Picking shows on the Now map.' : 'Colored by picking: about once a week keeps leafy plants from bolting. Tap a pod to log it, or open the picking round from the Today strip.';
+    else if (UI.lens === 'flavor') $('towerSub').textContent = 'Colored by what each plant brings to a salad. The word on each pod is its taste, or a heads-up marked ! before you eat it. Tap a pod for texture and pairings.';
     let pods = '';
     for (let r = 1; r <= 10; r++) for (const c of ['L', 'C', 'R']) pods += podHTML(t + r + c, L[t + r + c], mode);
     let bars = ''; for (let r = 1; r <= 10; r++) bars += '<span>' + r + '</span>';
@@ -149,7 +150,9 @@
       '<div class="tower"><div class="bar" aria-hidden="true">' + bars + '</div><div class="cols">' + pods + '</div><div class="bar r" aria-hidden="true">' + barsR + '</div>' +
       '<div class="tank"><b>Tank</b><span>' + (t === 'S' ? 'Salad Tank · Refresh monthly' : 'Fruiting Tank · Refresh every two weeks') + '</span></div></div>';
     document.querySelectorAll('[data-lens]').forEach(b => b.setAttribute('aria-pressed', b.dataset.lens === (UI.lens || 'light') ? 'true' : 'false'));
-    $('legendLight').hidden = UI.lens === 'flavor'; $('legendFlavor').hidden = UI.lens !== 'flavor';
+    const lensNow = UI.lens || 'light';
+    $('legendLight').hidden = lensNow !== 'light'; $('legendFlavor').hidden = lensNow !== 'flavor'; $('legendPick').hidden = lensNow !== 'pick';
+    if (lensNow === 'pick') $('legendPick').innerHTML = '<span><i class="sw k-fresh"></i>picked this week</span><span><i class="sw k-due"></i>due a picking</span><span><i class="sw k-none"></i>not logged</span><span><i class="sw k-fruit"></i>fruit: pick when ripe</span>';
     if (UI.lens === 'flavor') $('legendFlavor').innerHTML = P.roleOrder.filter(r => r !== 'topper').map(r => '<span><i class="sw ax-' + r + '"></i>' + esc(P.roles[r].name) + '</span>').join('') + '<span><b class="flagk" aria-hidden="true">!</b>a heads-up before you eat it</span>';
     const pendKind = k => P.pods.some(p => { const m = MOVE_BY_POD[p.id]; return m && m.kind === k && !isDone(m) && parse(cur(p)) && parse(cur(p)).t === t; });
     const outs = pendKind('out'), mvs = pendKind('move');
@@ -172,8 +175,11 @@
       if (cell.pods.length > 1) cls.push('clash');
       const lens = UI.lens === 'flavor' && pl.flav;
       if (lens) cls.push('r-' + pl.flav.roles[0]);
-      const tg = lens ? esc(pl.flav.flag || (pl.flav.flavor.find(x => x !== 'mild' && x.length <= 9) || pl.flav.flavor.find(x => x !== 'mild') || pl.flav.flavor[0]).replace(/ \(.*\)/, '')) : tagStr(pl);
-      inner = '<span class="top">' + plantGlyph(pl) + '<span class="t' + (lens ? ' fwt' + (pl.flav.flag ? ' flagged' : '') : '') + '">' + tg + (cell.pods.length > 1 ? ' +' + (cell.pods.length - 1) : '') + '</span></span><span class="n">' + esc(pod.label) + '</span>' + badge;
+      const pk = UI.lens === 'pick' && mode === 'now';
+      let pkTag = '';
+      if (pk) { if (!pickable(pod)) { cls.push('k-fruit'); pkTag = 'fruit'; } else { const last = PICK[pod.id], d = last ? dayNum(todayISO()) - dayNum(last) : null; cls.push(d === null ? 'k-none' : d >= PICK_EVERY ? 'k-due' : 'k-fresh'); pkTag = d === null ? 'not logged' : d === 0 ? 'today' : d >= PICK_EVERY ? d + 'd · due' : d + 'd ago'; } }
+      const tg = pk ? esc(pkTag) : lens ? esc(pl.flav.flag || (pl.flav.flavor.find(x => x !== 'mild' && x.length <= 9) || pl.flav.flavor.find(x => x !== 'mild') || pl.flav.flavor[0]).replace(/ \(.*\)/, '')) : tagStr(pl);
+      inner = '<span class="top">' + plantGlyph(pl) + '<span class="t' + (pk ? ' fwt' : lens ? ' fwt' + (pl.flav.flag ? ' flagged' : '') : '') + '">' + tg + (cell.pods.length > 1 ? ' +' + (cell.pods.length - 1) : '') + '</span></span><span class="n">' + esc(pod.label) + '</span>' + badge;
       label = where + ': ' + cell.pods.map(x => x.label).join(' and ') + (badge ? (mode === 'now' ? ', move waiting' : ', moved here') : '');
       return '<button class="' + cls.join(' ') + '" data-slot="' + slot + '" data-pod="' + pod.id + '" aria-label="' + esc(label) + '">' + inner + '</button>';
     }
@@ -302,7 +308,7 @@
     if (fv && fv.warn && fv.warn.length) h += '<div class="warn"><b>Before you eat it</b><ul>' + fv.warn.map(x => '<li>' + esc(x) + '</li>').join('') + '</ul></div>';
     const pet = P.pets[pid]; if (pet && pet.toxic) h += '<div class="petnote"><b>For the cat.</b> ' + esc(pet.text) + ' <a href="' + esc(pet.src) + '" target="_blank" rel="noopener">Source</a></div>';
     if (podId && POD[podId]) h += seatCard(POD[podId]);
-    if (pl.why) h += '<div class="callout"><b>Why it’s on the list.</b> ' + esc(pl.why) + '</div>';
+    if (pl.why) h += '<div class="callout"><b>Why it’s on the list.</b> ' + esc(pl.why) + (pl.status === 'idea' ? '<div class="btnrow" style="margin-top:8px"><button class="btn small' + (SCOUT[pid] ? ' ghost' : ' primary') + '" data-act="scoutStar" data-pid="' + pid + '">' + (SCOUT[pid] ? '★ On your shortlist · remove' : '☆ Add to your shortlist') + '</button></div>' : '') + '</div>';
     if (P.audition[pid] && P.plants[P.audition[pid]]) h += '<div class="callout"><b>Taste it first.</b> Gardyn’s ' + esc(P.plants[P.audition[pid]].name) + ' pad is the same plant, ready in ' + esc(P.plants[P.audition[pid]].gb.mature) + ' days in the Sprout Nursery. If you love it, it earns a yPod. <button class="btn small" style="margin-top:6px" data-open="plant" data-pid="' + P.audition[pid] + '">Open the pad</button></div>';
     const aud = Object.keys(P.audition).find(k => P.audition[k] === pid); if (aud && P.plants[aud]) h += '<div class="callout"><b>An audition.</b> ' + esc(P.plants[aud].name) + ' is on your Ideas list for a yPod. This pad lets you taste it first, in under two weeks.</div>';
     if (pl.gone) h += '<div class="callout"><b>Why it’s retired.</b> ' + esc(pl.gone) + '</div>';
@@ -330,7 +336,7 @@
     if (fv.kitchen) h += '<p class="small" style="margin:6px 0 0"><b>From the kitchen:</b> ' + esc(fv.kitchen) + '</p>';
     if (bowlable(pid)) { const inB = BOWL.includes(pid); h += '<div class="btnrow" style="margin-top:8px"><button class="btn small ' + (inB ? 'ghost' : 'primary') + '" data-act="bowlToggle" data-pid="' + pid + '">' + (inB ? 'In tonight\u2019s bowl · remove' : 'Add to tonight\u2019s bowl') + '</button></div>'; }
     if (pet && !pet.toxic) h += '<p class="small" style="margin:6px 0 0">' + esc(pet.text) + '</p>';
-    h += '<div class="verdict"><span class="small"><b>Your verdict</b></span>' + verdictSeg(pid) + '</div>';
+    if (pl.status === 'tower' || pl.status === 'micro') h += '<div class="verdict"><span class="small"><b>Your verdict</b></span>' + verdictSeg(pid) + '</div>';
     return h + '</div>';
   }
   function journalHTML(pid) {
@@ -397,7 +403,7 @@
       return '<div class="task"><div><h4>' + esc(c.title) + '</h4><div class="where">' + esc(c.where) + ' · every ' + everyText(c.every) + '</div></div><div class="st"><span class="chip ' + chip + '">' + esc(s.text) + '</span>' +
         (doneToday ? '<button class="btn small ghost" data-act="careUndo" data-id="' + c.id + '">Undo</button>' : '<button class="btn small' + (s.state === 'over' || s.state === 'due' ? ' primary' : '') + '" data-act="careDone" data-id="' + c.id + '">Done today</button>') + '</div><div class="txt">' + esc(c.text) + '<label class="last">Last done <input type="date" data-care-date="' + c.id + '" value="' + (CARE[c.id] || '') + '" max="' + todayISO() + '" aria-label="Last done: ' + esc(c.title) + ', ' + esc(c.where) + '"></label></div></div>';
     }).join('');
-    renderCamps(); renderMoves(); renderFixes();
+    renderCamps(); renderMoves(); renderFixes(); renderDoctor();
   }
   function everyText(n) { return n === 7 ? 'week' : n === 14 ? '2 weeks' : n === 30 ? 'month' : n === 90 ? '3 months' : n + ' days'; }
   function renderCamps() {
@@ -442,10 +448,51 @@
     $('fixes').innerHTML = P.fixes.map(f => '<button class="fix" data-open="fix" data-id="' + f.id + '"><span><h4>' + esc(f.title) + '</h4><span class="small">' + esc(f.sub) + '</span></span><span class="go" aria-hidden="true">›</span></button>').join('');
   }
 
+  function renderDoctor() {
+    $('doctorChips').innerHTML = P.doctor.map(d => '<button data-act="doctor" data-id="' + d.id + '">' + esc(d.label) + '</button>').join('');
+  }
+  function doctorSheet(id) {
+    const d = P.doctor.find(x => x.id === id); if (!d) return;
+    const li = x => '<li>' + esc(x) + '</li>';
+    let h = '<div><div class="eyebrow">Plant Doctor</div><h2 id="sheetTitle">' + esc(d.title) + '</h2></div>';
+    h += '<div class="block"><h3>Most likely</h3><ul>' + d.likely.map(li).join('') + '</ul></div>';
+    h += '<div class="block"><h3>What to do</h3><ul>' + d.todo.map(li).join('') + '</ul></div>';
+    if (d.note) h += '<p class="small" style="margin:0">' + esc(d.note) + '</p>';
+    const fx = d.fix && P.fixes.find(x => x.id === d.fix);
+    if (fx) h += '<div class="btnrow"><button class="btn small" data-open="fix" data-id="' + fx.id + '">Your notes: ' + esc(fx.title) + ' ›</button></div>';
+    h += '<div class="block"><h3>Something else?</h3><div class="dchips">' + P.doctor.filter(x => x.id !== id).map(x => '<button data-act="doctor" data-id="' + x.id + '">' + esc(x.label) + '</button>').join('') + '</div></div>';
+    if (d.src && d.src.length) h += '<p class="src">Sources: ' + d.src.map(x => '<a href="' + esc(x[1]) + '" target="_blank" rel="noopener">' + esc(x[0]) + '</a>').join(' · ') + '</p>';
+    showSheet(h, { kind: 'doctor', id });
+  }
+  function forbiddenSheet() {
+    const F = P.forbidden;
+    const cls = st => /Illegal|Schedule|Controlled/.test(st) ? 'due' : /gray/i.test(st) ? 'wait' : 'ok';
+    let h = '<div><div class="eyebrow">Just for fun</div><h2 id="sheetTitle">The Forbidden Shelf</h2><p class="small" style="margin:4px 0 0">' + esc(F.intro) + '</p></div>';
+    h += F.items.map(x => '<div class="card forb"><div class="forb-h"><span class="gwrap">' + glyph(x.glyph, x.tint) + '</span><div style="min-width:0"><h4>' + esc(x.name) + '</h4><div class="latin small">' + esc(x.latin) + '</div></div></div><span class="chip ' + cls(x.status) + '">' + esc(x.status) + '</span><p><b>The law.</b> ' + esc(x.law) + '</p><p><b>In a Gardyn?</b> ' + esc(x.gardyn) + '</p><p class="small muted">' + esc(x.fun) + '</p></div>').join('');
+    h += '<p class="src">Not legal advice. Sources: ' + F.src.map(x => '<a href="' + esc(x[1]) + '" target="_blank" rel="noopener">' + esc(x[0]) + '</a>').join(' · ') + '</p>';
+    showSheet(h, { kind: 'forbidden' });
+  }
+
   /* ----- Ideas ----- */
+  let SCOUT = store.get('scout', {});
+  const inScout = (id, pl, f) => f === 'all' ? true : f === 'short' ? !!SCOUT[id] : f === 'outside' ? !!pl.notGardyn : (pl.fit || []).includes(f);
+  function ideaCard(id, pl) {
+    const g = pl.gb || {}, on = !!SCOUT[id], pet = P.pets[id], fv = pl.flav;
+    return '<div class="idea' + (on ? ' starred' : '') + '"><button class="idea-main" data-open="plant" data-pid="' + id + '"><span class="gwrap">' + plantGlyph(pl) + '</span><span style="min-width:0"><h4>' + esc(pl.name) + (pl.notGardyn ? ' <span class="og">outside Gardyn</span>' : '') + '</h4>' +
+      (fv ? '<span class="fw">' + esc(fv.flavor.join(', ')) + (fv.texture && fv.texture[0] ? ' · ' + esc(fv.texture[0]) : '') + '</span>' : '') + '<p>' + esc(pl.why || '') + '</p><span class="chips">' +
+      (g.zone ? '<span class="chip z-' + g.zone + '">' + ZONE[g.zone] + '</span>' : '') + (/\d/.test(g.mature || '') ? '<span class="chip">' + esc(g.mature) + ' days</span>' : '') + (g.size && g.size !== '—' ? '<span class="chip">' + esc(g.size) + '</span>' : '') +
+      (pet ? '<span class="chip ' + (pet.toxic ? 'wait' : 'ok') + '">' + (pet.toxic ? 'cat: careful' : 'cat-safe') + '</span>' : '') + '</span></span></button>' +
+      '<button class="star" data-act="scoutStar" data-pid="' + id + '" aria-pressed="' + on + '" aria-label="' + (on ? 'Take ' + esc(pl.name) + ' off the shortlist' : 'Add ' + esc(pl.name) + ' to the shortlist') + '">' + (on ? '★' : '☆') + '</button></div>';
+  }
   function renderIdeas() {
     const ideas = Object.entries(P.plants).filter(([, pl]) => pl.status === 'idea');
-    $('ideaPlants').innerHTML = ideas.map(([id, pl]) => { const g = pl.gb || {}; return '<button class="idea" data-open="plant" data-pid="' + id + '"><span class="gwrap">' + plantGlyph(pl) + '</span><span style="min-width:0"><h4>' + esc(pl.name) + '</h4><p>' + esc(pl.why) + '</p><span class="chips"><span class="chip z-' + g.zone + '">' + ZONE[g.zone] + '</span><span class="chip">' + esc(g.sprout) + ' days to sprout</span><span class="chip">' + esc(g.mature) + ' to harvest</span></span></span></button>'; }).join('');
+    const f = UI.scout || 'all';
+    const starred = ideas.filter(([id]) => SCOUT[id]).length;
+    $('scoutFilters').innerHTML = P.scoutFilters.map(([k, l]) => { const n = ideas.filter(([id, pl]) => inScout(id, pl, k)).length; return (k === 'short' && !n && f !== 'short') ? '' : '<button data-scout="' + k + '" aria-pressed="' + (f === k) + '">' + l + '<span class="n">' + n + '</span></button>'; }).join('');
+    $('scoutCount').textContent = starred ? starred + ' starred' : ideas.length + ' ideas';
+    const list = ideas.filter(([id, pl]) => inScout(id, pl, f)).sort((a, b) => ((SCOUT[b[0]] ? 1 : 0) - (SCOUT[a[0]] ? 1 : 0)) || a[1].name.localeCompare(b[1].name));
+    $('ideaPlants').innerHTML = list.length ? list.map(([id, pl]) => ideaCard(id, pl)).join('') : '<div class="card small">Nothing starred yet. Tap ☆ on any idea to shortlist it.</div>';
+    $('shelfCard').innerHTML = '<button class="fshelf" data-act="forbidden"><span class="fs-glyphs" aria-hidden="true">' + P.forbidden.items.slice(0, 5).map(x => glyph(x.glyph, x.tint)).join('') + '</span><span class="fs-t"><b>The Forbidden Shelf</b><span>Cannabis, coca, opium poppy and seven more: what Maine and federal law say, and why none of them belong in a Gardyn.</span></span><span class="go" aria-hidden="true">›</span></button>';
     $('gear').innerHTML = P.gear.map(g => '<div><b>' + esc(g.title) + '</b><p>' + esc(g.why) + '</p></div>').join('');
     $('questions').innerHTML = P.questions.map(q => '<div><b>' + esc(q.q) + '</b><p>' + esc(q.a) + '</p></div>').join('');
     $('watch').innerHTML = P.watch.map(w => '<div><b>' + esc(w.title) + '</b><p>' + esc(w.text) + '</p></div>').join('');
@@ -465,7 +512,33 @@
     });
     $('trail').innerHTML = h;
   }
+  const FOOT = Object.assign({ towers: 2, kwh: P.greener.kwh, rate: P.greener.rate }, store.get('foot', {}));
+  let ATE = store.get('ate', []);
+  const bowlsThisMonth = () => ATE.filter(a => a.d.slice(0, 7) === todayISO().slice(0, 7)).length;
+  function paintFoot() {
+    const kwh = FOOT.towers * FOOT.kwh, m = kwh * FOOT.rate, n = bowlsThisMonth();
+    $('footOut').innerHTML = '<div class="stats"><div><span class="k">Electricity</span><span class="v">' + Math.round(kwh) + ' <small>kWh a month</small></span></div><div><span class="k">Costs</span><span class="v">$' + m.toFixed(2) + ' <small>a month</small></span></div><div><span class="k">A year</span><span class="v">$' + Math.round(m * 12) + '</span></div></div>' +
+      '<p class="small" style="margin:0">' + esc(P.greener.heat) + '</p>' +
+      '<p class="small" style="margin:0"><b>' + n + (n === 1 ? ' bowl' : ' bowls') + ' from the towers this month</b>' + (n ? ', each one a clamshell of greens that didn’t have to ride the ferry.' : '. Tap “We ate this” on the Salad tab and they’ll count here.') + '</p>';
+  }
+  function renderGreener() {
+    const el = $('footprint');
+    if (!el.dataset.ready) {
+      el.dataset.ready = '1';
+      el.innerHTML = '<div class="fields"><label for="fTow">Towers<input id="fTow" type="number" min="1" max="6" step="1" inputmode="numeric"></label><label for="fKwh">kWh per tower, per month<input id="fKwh" type="number" min="5" max="200" step="1" inputmode="numeric"></label><label for="fRate">Your rate, $ per kWh<input id="fRate" type="number" min="0.05" max="1" step="0.0001" inputmode="decimal"></label></div><div id="footOut" class="stack"></div><p class="small" style="margin:0">' + esc(P.greener.kwhNote) + '</p><p class="small" style="margin:0">' + esc(P.greener.rateNote) + '</p>';
+      $('fTow').value = FOOT.towers; $('fKwh').value = FOOT.kwh; $('fRate').value = FOOT.rate;
+      ['fTow', 'fKwh', 'fRate'].forEach(i => $(i).addEventListener('input', () => { FOOT.towers = Math.max(0, +$('fTow').value || 0); FOOT.kwh = Math.max(0, +$('fKwh').value || 0); FOOT.rate = Math.max(0, +$('fRate').value || 0); store.set('foot', FOOT); paintFoot(); }));
+    }
+    paintFoot();
+    const ref = P.care.filter(c => /^refresh-/.test(c.id)), tank = P.greener.tank;
+    const gal = ref.reduce((g, c) => g + tank * 30 / c.every, 0);
+    $('waterCard').innerHTML = '<p style="margin:0"><b>About ' + Math.round(gal) + ' gallons a month</b> leave the towers at Tank Refresh time: ' + tank + ' gallons per Tank, ' + ref.map(c => esc(c.where.toLowerCase()) + ' every ' + everyText(c.every)).join(', ') + '.</p><p>' + esc(P.greener.water) + '</p>';
+    const rows = a => a.map(([k, v]) => '<div><b>' + esc(k) + '</b><p>' + esc(v) + '</p></div>').join('');
+    $('wasteList').innerHTML = rows(P.greener.waste); $('seedList').innerHTML = rows(P.greener.seeds); $('regrowList').innerHTML = rows(P.greener.regrow);
+    $('greenSrc').innerHTML = 'Sources: ' + P.greener.src.map(x => '<a href="' + esc(x[1]) + '" target="_blank" rel="noopener">' + esc(x[0]) + '</a>').join(' · ');
+  }
   function renderDIY() {
+    renderGreener();
     renderTrail();
     $('why').innerHTML = P.why.map(([t, x]) => '<div class="card"><h4>' + esc(t) + '</h4><p>' + esc(x) + '</p></div>').join('');
     $('fillList').innerHTML = P.fill.map(f => '<div><div class="rowtop"><b>' + esc(f.crop) + '</b><span class="chip">' + esc(f.cost) + ' each</span></div><p><span class="fillname">' + esc(f.fill) + '.</span> ' + esc(f.note) + '</p></div>').join('');
@@ -581,7 +654,8 @@
       const d = dressingFor(t);
       h += '<div class="callout" style="margin-top:8px"><b>' + esc(d.name) + '.</b> ' + esc(d.how) + ' <span class="muted">' + esc(d.why) + '</span></div>';
       const sug = suggestions(); if (sug.length) h += '<div class="sug"><span class="small"><b>It could use:</b></span>' + sug.map(([r, id]) => '<button class="btn small" data-act="bowlToggle" data-pid="' + id + '">' + plantGlyph(P.plants[id]) + '+ ' + esc(P.plants[id].name) + ' <span class="muted">(' + esc(P.roles[r].name.toLowerCase()) + ')</span></button>').join('') + '</div>';
-      h += '<div class="btnrow" style="margin-top:2px"><button class="btn small" data-act="bowlAte">We ate this: log it as picked</button></div>';
+      h += '<div class="btnrow" style="margin-top:2px"><button class="btn small" data-act="bowlAte">We ate this</button><button class="btn small ghost" data-act="bowlShare">Share</button></div>';
+      const nb = bowlsThisMonth(); if (nb) h += '<p class="small muted" style="margin:0">' + nb + (nb === 1 ? ' bowl' : ' bowls') + ' from the towers this month.</p>';
       h += '<div class="saverow"><input id="bowlName" class="search" placeholder="Name it to save it" aria-label="Bowl name" maxlength="60"><button class="btn small primary" data-act="bowlSave">Save</button></div>';
     }
     $('bowl').innerHTML = h;
@@ -612,6 +686,7 @@
     }).join('');
   }
   function renderIsland() {
+    $('islandSrc').innerHTML = 'Sources: ' + (P.islandSources || []).map(x => '<a href="' + esc(x[1]) + '" target="_blank" rel="noopener">' + esc(x[0]) + '</a>').join(' · ');
     $('island').innerHTML = P.island.map(x => '<div><div class="rowtop"><b>' + esc(x.name) + '</b><span class="glyphs sm">' + x.plants.filter(id => P.plants[id]).map(id => '<button data-open="plant" data-pid="' + id + '" title="' + esc(P.plants[id].name) + '" aria-label="' + esc(P.plants[id].name) + '">' + plantGlyph(P.plants[id]) + '</button>').join('') + '</span></div><p>' + esc(x.how) + '</p></div>').join('');
   }
   function nurseryNote() {
@@ -709,6 +784,7 @@
     else if (SHEET.kind === 'stop') stopSheet(SHEET.id);
     else if (SHEET.kind === 'pick') pickSheet();
     else if (SHEET.kind === 'catch') catchSheet();
+    else if (SHEET.kind === 'doctor') doctorSheet(SHEET.id);
     $('sheet').scrollTop = top;
   }
 
@@ -803,7 +879,7 @@
       const o = JSON.parse($('restoreText').value); if (!o || o.app !== 'plant-book' || !o.data) throw new Error('not a backup');
       KEYS.forEach(k => { if (o.data[k] != null) store.set(k, o.data[k]); });
       DONE = store.get('done', {}); CARE = store.get('care', {}); CAMP = store.get('camp', {}); NOTES = store.get('notes', {}); TRAIL = store.get('trail', {});
-      PICK = store.get('pick', {}); VERD = store.get('verdict', {});
+      PICK = store.get('pick', {}); VERD = store.get('verdict', {}); SCOUT = store.get('scout', {}); ATE = store.get('ate', []); Object.assign(FOOT, store.get('foot', {}));
       BOWL.splice(0, BOWL.length, ...store.get('bowl', []).filter(id => P.plants[id])); SAVED.splice(0, SAVED.length, ...store.get('bowls', [])); MGSEL.splice(0, MGSEL.length, ...store.get('mgsel', []));
       $('restoreBox').hidden = true; renderAll(); renderCare(); toast('Restored.');
     } catch (e) { toast('That doesn’t look like a Plant Book backup. Paste the whole thing.'); }
@@ -817,8 +893,10 @@
     showView(VIEWS.includes(start) ? start : 'towers');
     if (/^p-/.test(start) && P.plants[start.slice(2)]) { showView('plants'); plantSheet(start.slice(2)); }
     const sm = /^seat-([SF](?:10|[1-9])[LCR])$/.exec(start); if (sm) openSeat(sm[1]);
+    if (start === 'pick') { showView('towers'); pickSheet(); }
+    if (start === 'doctor') showView('care', 'doctorSec');
     setupWorker();
-    window.addEventListener('hashchange', () => { const h = location.hash.slice(1); if (VIEWS.includes(h)) { if (sheetOpen()) hideSheet(true); showView(h); } else { const sm2 = /^seat-([SF](?:10|[1-9])[LCR])$/.exec(h); if (sm2) { if (sheetOpen()) hideSheet(true); openSeat(sm2[1]); } } });
+    window.addEventListener('hashchange', () => { const h = location.hash.slice(1); if (VIEWS.includes(h)) { if (sheetOpen()) hideSheet(true); showView(h); } else if (h === 'pick') { if (sheetOpen()) hideSheet(true); showView('towers'); pickSheet(); } else if (h === 'doctor') { if (sheetOpen()) hideSheet(true); showView('care', 'doctorSec'); } else if (/^p-/.test(h) && P.plants[h.slice(2)]) { if (sheetOpen()) hideSheet(true); showView('plants'); plantSheet(h.slice(2)); } else { const sm2 = /^seat-([SF](?:10|[1-9])[LCR])$/.exec(h); if (sm2) { if (sheetOpen()) hideSheet(true); openSeat(sm2[1]); } } });
     window.addEventListener('popstate', () => { if (sheetOpen()) hideSheet(true); });
     document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => { if (sheetOpen()) hideSheet(); showView(t.dataset.view); }));
     $('sheetBack').addEventListener('click', () => hideSheet());
@@ -839,6 +917,7 @@
       const t = e.target;
       const tw = t.closest('[data-tower]'); if (tw) { UI.tower = tw.dataset.tower; saveUI(); renderTower(); return; }
       const ln = t.closest('[data-lens]'); if (ln) { UI.lens = ln.dataset.lens; saveUI(); renderTower(); return; }
+      const sc = t.closest('[data-scout]'); if (sc) { UI.scout = sc.dataset.scout; saveUI(); renderIdeas(); return; }
       const jump = t.closest('[data-jump]'); if (jump) { const el = $(jump.dataset.jump); if (el) window.scrollTo({ top: Math.max(0, el.getBoundingClientRect().top + window.scrollY - 70), behavior: 'smooth' }); return; }
       const md = t.closest('[data-mode]'); if (md) { UI.mode = md.dataset.mode; saveUI(); renderTower(); return; }
       const fl = t.closest('[data-filter]'); if (fl) { UI.filter = fl.dataset.filter; saveUI(); $('q').value = ''; renderPlants(); return; }
@@ -869,7 +948,11 @@
       else if (act === 'bowlSave') { if (!BOWL.length) return; const nm = ($('bowlName').value || '').trim() || 'Bowl of ' + fmtDate(todayISO()); SAVED.unshift({ name: nm.slice(0, 60), plants: BOWL.slice(), d: todayISO() }); store.set('bowls', SAVED.slice(0, 30)); $('bowlName').value = ''; renderSaved(); toast('Saved.'); }
       else if (act === 'bowlDel') { SAVED.splice(+a.dataset.i, 1); store.set('bowls', SAVED); renderSaved(); }
       else if (act === 'mgPick') { const id = a.dataset.pid; const i = MGSEL.indexOf(id); if (i >= 0) MGSEL.splice(i, 1); else MGSEL.push(id); store.set('mgsel', MGSEL); renderPlanner(); }
-      else if (act === 'bowlAte') { const ids = P.pods.filter(p => BOWL.includes(p.p) && pickable(p)).map(p => p.id); setPicked(ids, true); renderToday(); toast(ids.length ? 'Logged: ' + ids.length + (ids.length === 1 ? ' pod' : ' pods') + ' picked today.' : 'Nothing leafy in this bowl to log.'); }
+      else if (act === 'bowlAte') { const ids = P.pods.filter(p => BOWL.includes(p.p) && pickable(p)).map(p => p.id); setPicked(ids, true); ATE.push({ d: todayISO(), p: BOWL.slice() }); ATE = ATE.slice(-300); store.set('ate', ATE); renderToday(); renderBowl(); toast('Counted' + (ids.length ? ', and ' + ids.length + (ids.length === 1 ? ' pod' : ' pods') + ' logged as picked today.' : '.')); }
+      else if (act === 'bowlShare') { const d = dressingFor(bowlTotals()); const text = 'Tonight’s bowl from the towers: ' + BOWL.map(id => P.plants[id].name).join(', ') + '. Dressing: ' + d.name.toLowerCase() + ', ' + d.how.replace(/\.$/, '').toLowerCase() + '.'; const copy = () => { try { navigator.clipboard.writeText(text).then(() => toast('Copied. Paste it anywhere.'), () => toast(text)); } catch (e) { toast(text); } }; if (navigator.share) navigator.share({ title: 'Tonight’s bowl', text }).catch(e => { if (!e || e.name !== 'AbortError') copy(); }); else copy(); }
+      else if (act === 'scoutStar') { const id = a.dataset.pid; if (SCOUT[id]) delete SCOUT[id]; else SCOUT[id] = todayISO(); store.set('scout', SCOUT); if (!$('view-ideas').hidden) renderIdeas(); if (SHEET) refreshSheet(); toast(SCOUT[id] ? 'On the shortlist.' : 'Off the shortlist.'); }
+      else if (act === 'doctor') doctorSheet(a.dataset.id);
+      else if (act === 'forbidden') forbiddenSheet();
       else if (act === 'pickRound') pickSheet();
       else if (act === 'pickToggle') { const id = a.dataset.pod; setPicked([id], PICK[id] !== todayISO()); renderToday(); refreshSheet(); }
       else if (act === 'pickAll') { setPicked(pickList().map(x => x.p.id), true); renderToday(); refreshSheet(); toast('Picking round logged.'); }

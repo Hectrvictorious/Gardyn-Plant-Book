@@ -1,7 +1,7 @@
 {
   "name": "Swan's Island Plant Book",
   "short_name": "Plant Book",
-  "description": "Josh's Gardyn plant book: tap any pod on the salad and fruiting towers, plant pages, care rhythm, moves, fixes, and the trail to printed pods.",
+  "description": "Josh's Gardyn plant book: both towers pod by pod, Gardyn-style plant pages, a salad builder, microgreens, care rhythm, a plant doctor, and greener ways to grow.",
   "start_url": "./",
   "scope": "./",
   "id": "gardyn-plant-book",
@@ -11,8 +11,14 @@
   "theme_color": "#1b3929",
   "lang": "en-US",
   "icons": [
-    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
-    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
-    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+    { "src": "icon-v2-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-v2-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-v2-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Build a salad", "short_name": "Salad", "url": "./#salad", "icons": [{ "src": "shortcut-salad-96.png", "sizes": "96x96", "type": "image/png" }] },
+    { "name": "Picking round", "short_name": "Pick", "url": "./#pick", "icons": [{ "src": "shortcut-pick-96.png", "sizes": "96x96", "type": "image/png" }] },
+    { "name": "Plant Doctor", "short_name": "Doctor", "url": "./#doctor", "icons": [{ "src": "shortcut-doctor-96.png", "sizes": "96x96", "type": "image/png" }] },
+    { "name": "Care", "short_name": "Care", "url": "./#care", "icons": [{ "src": "shortcut-care-96.png", "sizes": "96x96", "type": "image/png" }] }
   ]
 }

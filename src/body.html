@@ -10,7 +10,7 @@
 
 <header class="mast">
   <div class="mast-in">
-    <div class="wordmark"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4.5" y="8" width="4" height="14" rx="2" fill="currentColor" opacity=".92"/><rect x="10" y="8" width="4" height="14" rx="2" fill="currentColor"/><rect x="15.5" y="8" width="4" height="14" rx="2" fill="currentColor" opacity=".92"/><path d="M12 7.5C12 4.5 14 2.5 17.5 2.5 17.5 5.5 15.5 7.5 12 7.5Z" fill="#ff8fbb"/></svg>Plant Book <small>Swan&rsquo;s Island</small></div>
+    <div class="wordmark"><svg viewBox="0 0 24 24" aria-hidden="true"><g transform="rotate(-6 12 19.3)"><path d="M11.7 4.5C8.9 6.4 5.7 9.3 5.4 13c-.3 3.4 2.4 5.6 6.3 6.2Z" fill="currentColor"/></g><g transform="rotate(6 12 19.3)"><path d="M12.3 4.5c2.8 1.9 6 4.8 6.3 8.5.3 3.4-2.4 5.6-6.3 6.2Z" fill="currentColor" opacity=".78"/></g><path d="M12 19v2.3" stroke="#ff8fbb" stroke-width="1.6" stroke-linecap="round"/></svg>Plant Book <small>Swan&rsquo;s Island</small></div>
     <div class="mast-date" id="mastDate"></div>
   </div>
 </header>
@@ -31,7 +31,7 @@
     <div class="switches">
       <div class="seg" role="group" aria-label="Tower"><button data-tower="S" aria-pressed="true">Salad</button><button data-tower="F" aria-pressed="false">Fruiting</button></div>
       <div class="seg" role="group" aria-label="Layout"><button data-mode="now" aria-pressed="true">Now</button><button data-mode="plan" aria-pressed="false">Next</button></div>
-      <div class="seg" role="group" aria-label="Color the map by"><button data-lens="light" aria-pressed="true">Light</button><button data-lens="flavor" aria-pressed="false">Flavor</button></div>
+      <div class="seg" role="group" aria-label="Color the map by"><button data-lens="light" aria-pressed="true">Light</button><button data-lens="flavor" aria-pressed="false">Flavor</button><button data-lens="pick" aria-pressed="false">Picking</button></div>
     </div>
     <div class="tower-head"><h3 id="towerName">Salad tower</h3><span class="small muted" id="towerCount"></span></div>
     <p class="small" id="towerSub" style="margin:-8px 0 0"></p>
@@ -40,6 +40,7 @@
       <span class="lgset" id="legendLight"><span><i class="sw z-high"></i>High light</span><span><i class="sw z-medium"></i>Medium</span><span><i class="sw z-low"></i>Low</span>
       <span><i class="sw" style="background:var(--surface);box-shadow:inset -3px 0 0 color-mix(in srgb,var(--ink) 26%,transparent)"></i>dark edge: the way the pod faces (► ◄ on the right bar)</span><span>★ salad favorite</span><span>▲ giant</span><span>✿ blooms</span></span>
       <span class="lgset" id="legendFlavor" hidden></span>
+      <span class="lgset" id="legendPick" hidden></span>
       <span id="legendMove"></span>
     </div>
     <div class="sec" id="domeSec"><h3 id="domeTitle">In the dome</h3><div class="dome" id="dome"></div></div>
@@ -79,7 +80,7 @@
     <div class="sec" id="bowlSec"><h3>Build a bowl</h3><div class="card bowl" id="bowl"></div><div class="stack" id="pickers"></div></div>
     <div class="sec" id="saved" hidden><h3>Saved bowls</h3><div class="list" id="savedList"></div></div>
     <div class="sec" id="houseSec"><h3>House salads</h3><div class="stack" id="house"></div></div>
-    <div class="sec" id="islandSec"><h3>From the island kitchen</h3><div class="list" id="island"></div></div>
+    <div class="sec" id="islandSec"><h3>From the island kitchen</h3><div class="list" id="island"></div><p class="src" id="islandSrc" style="margin:0"></p></div>
     <div class="sec" id="flightSec"><h3>Taste test</h3><p class="small" style="margin:-2px 0 0">A leaf of each, plain, side by side. Rate each one Keep, Retry or Retire; the verdicts show on every plant&rsquo;s page and in the plant list, so the next map can lean on them.</p><div class="stack" id="flights"></div></div>
     <div class="sec" id="mgSec"><h3>Microgreens</h3>
       <div class="card stack">
@@ -104,7 +105,8 @@
     <div class="sec"><h3>Rhythm <span class="count" id="dueCount"></span></h3><div class="stack" id="rhythm"></div></div>
     <div class="sec"><h3>Campaigns</h3><div class="stack" id="camps"></div></div>
     <div class="sec"><h3>Next steps <span class="count" id="moveCount"></span></h3><div class="progress" aria-hidden="true"><i id="moveBar"></i></div><div class="moves" id="moves"></div></div>
-    <div class="sec"><h3>Fixes</h3><div class="stack" id="fixes"></div></div>
+    <div class="sec" id="doctorSec"><h3>Plant Doctor</h3><div class="card stack"><p style="margin:0"><b>What do you see?</b> Tap the closest match for what Gardyn says it usually is, and what to do.</p><div class="dchips" id="doctorChips"></div></div></div>
+    <div class="sec"><h3>Your fixes</h3><div class="stack" id="fixes"></div></div>
     <div class="sec"><h3>Your data</h3>
       <div class="card stack">
         <p class="small" style="margin:0">Ticks, dates and notes live on this phone only. Copy a backup now and then, and paste it back on a new phone.</p>
@@ -120,7 +122,12 @@
       <h2>Good things for the towers</h2>
       <p>Plants to try next, gear that earns its place, and the questions only you can answer.</p>
     </div>
-    <div class="sec"><h3>Plants to try next</h3><div class="stack" id="ideaPlants"></div></div>
+    <div class="sec" id="scoutSec"><h3>Plants to try next <span class="count" id="scoutCount"></span></h3>
+      <p class="small" style="margin:-2px 0 0">Gardyn&rsquo;s catalog plus a few from outside it, picked for your salads and your light. These are ideas only: nothing moves on a map until you say so. Star the ones you&rsquo;d try.</p>
+      <div class="filters" id="scoutFilters" role="group" aria-label="Show"></div>
+      <div class="stack" id="ideaPlants"></div>
+    </div>
+    <div class="sec"><h3>Just for fun</h3><div id="shelfCard"></div></div>
     <div class="sec"><h3>Gear that earns its place</h3><div class="list" id="gear"></div></div>
     <div class="sec"><h3>Decisions waiting on you</h3><div class="list" id="questions"></div></div>
     <div class="sec"><h3>On the watch list</h3><div class="list" id="watch"></div></div>
@@ -135,11 +142,17 @@
 
   <section class="view wrap" id="view-diy" hidden>
     <div class="view-head">
-      <div class="eyebrow">DIY</div>
-      <h2>Beyond the yCube</h2>
-      <p>The trail from rockwool to a reusable printed pod: what to fill it with for each crop, what it costs, and how to print it. Tap a stop to open it.</p>
+      <div class="eyebrow">Greener</div>
+      <h2>Grow more, waste less</h2>
+      <p>What two towers cost in power and water, what to do with spent yCubes, the seeds and plants you can keep for free, and the trail from rockwool to a reusable printed pod.</p>
     </div>
-    <div class="card"><div class="trail" id="trail"></div></div>
+    <div class="sec" id="footSec"><h3>The footprint</h3><div class="card calc" id="footprint"></div></div>
+    <div class="sec"><h3>Water</h3><div class="card prose" id="waterCard"></div></div>
+    <div class="sec"><h3>Less waste</h3><div class="list" id="wasteList"></div></div>
+    <div class="sec"><h3>Seeds you can save</h3><div class="list" id="seedList"></div></div>
+    <div class="sec"><h3>Plants that keep giving</h3><div class="list" id="regrowList"></div></div>
+    <p class="src" id="greenSrc" style="margin:0"></p>
+    <div class="sec"><h3>Beyond the yCube</h3><p class="small" style="margin:-2px 0 0">The trail from rockwool to a reusable printed pod: what to fill it with for each crop, what it costs, and how to print it. Tap a stop to open it.</p><div class="card"><div class="trail" id="trail"></div></div></div>
     <div class="sec"><h3>Why move off rockwool</h3><div class="why" id="why"></div></div>
     <div class="sec"><h3>What goes in the pod</h3><div class="list" id="fillList"></div></div>
     <div class="sec"><h3>What it costs</h3><div class="card calc" id="calc"></div></div>
@@ -148,7 +161,7 @@
     <div class="sec"><h3>Growing media compared</h3><div class="list" id="mediaList"></div></div>
     <div class="sec"><h3>Models and shops</h3><div class="list" id="models"></div></div>
     <div class="sec"><h3>Also on the workbench</h3><div class="list" id="bench"></div></div>
-    <p class="foot">From the Oct 30 report "yCube Alternatives: Media and Printed Pod" in your Gardyn project. Prices as read on Oct 30.</p>
+    <p class="foot">The printed-pod trail is from the Oct 30 report "yCube Alternatives: Media and Printed Pod" in your Gardyn project. Prices as read on Oct 30.</p>
   </section>
 </div>
 
@@ -159,7 +172,7 @@
     <button class="tab" data-view="salad" aria-selected="false"><svg viewBox="0 0 24 24"><path d="M3 11.5h18a9 9 0 0 1-18 0z"/><path d="M9.5 21.5h5"/><path d="M7.6 11.5c-.6-3.3 1.1-5.8 4.4-6.8.7 3.2-1 5.8-4.4 6.8"/><path d="M12.6 11.5c1-2.8 3.4-4.3 6.5-4.1-.8 2.8-3.1 4.2-6.5 4.1"/></svg>Salad</button>
     <button class="tab" data-view="care" aria-selected="false"><svg viewBox="0 0 24 24"><path d="M12 3s6 6.4 6 11a6 6 0 0 1-12 0c0-4.6 6-11 6-11z"/><path d="M9.5 14.5l1.8 1.8 3.4-3.6"/></svg>Care</button>
     <button class="tab" data-view="ideas" aria-selected="false"><svg viewBox="0 0 24 24"><path d="M12 21v-8.5"/><path d="M12 12.5c0-4 2.8-6.5 7.5-6.5 0 4.2-2.8 6.5-7.5 6.5z"/><path d="M12 15c0-3.2-2.4-5.3-6.5-5.3 0 3.2 2.4 5.3 6.5 5.3z"/></svg>Ideas</button>
-    <button class="tab" data-view="diy" aria-selected="false"><svg viewBox="0 0 24 24"><path d="M12 21s-6.5-5.8-6.5-10.5a6.5 6.5 0 0 1 13 0C18.5 15.2 12 21 12 21z"/><circle cx="12" cy="10.5" r="2.3"/></svg>DIY</button>
+    <button class="tab" data-view="diy" aria-selected="false"><svg viewBox="0 0 24 24"><path d="M20 4c-9 0-15 4.5-15 11.5 0 1.6.4 3 1 4.5"/><path d="M20 4c.6 8.6-3.4 14.4-11.2 14.9"/><path d="M5.8 20C8 14.5 11.5 11 16 8.5"/></svg>Greener</button>
   </div>
 </nav>
 <div class="sheet-back" id="sheetBack" hidden></div>

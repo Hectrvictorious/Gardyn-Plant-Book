@@ -5,7 +5,7 @@
   python3 tools/build.py --artifact -> also artifact/plant-book.html (the same page, no head, for a claude.ai preview)
 
 src/body.html holds the page; its /*@@CSS@@*/, /*@@DATA@@*/ and /*@@APP@@*/ markers are filled from
-src/style.css, src/data.js + src/taste.js, and src/app.js. Every build gets a new BUILD stamp, which is how installed
+src/style.css, src/data.js + src/taste.js + src/explore.js, and src/app.js. Every build gets a new BUILD stamp, which is how installed
 phones notice an update (see src/sw.js)."""
 import datetime, os, sys
 
@@ -14,7 +14,7 @@ src = lambda n: open(os.path.join(ROOT, 'src', n), encoding='utf-8').read()
 BUILD = os.environ.get('BUILD') or datetime.datetime.now(datetime.timezone.utc).strftime('%Y%m%dT%H%M')
 
 page = src('body.html')
-for marker, names in (('/*@@CSS@@*/', ['style.css']), ('/*@@DATA@@*/', ['data.js', 'taste.js']), ('/*@@APP@@*/', ['app.js'])):
+for marker, names in (('/*@@CSS@@*/', ['style.css']), ('/*@@DATA@@*/', ['data.js', 'taste.js', 'explore.js']), ('/*@@APP@@*/', ['app.js'])):
     assert page.count(marker) == 1, marker
     page = page.replace(marker, '\n'.join(src(n).strip() for n in names))
 
@@ -33,8 +33,8 @@ HEAD = """<!doctype html>
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Plant Book">
 <link rel="manifest" href="manifest.json">
-<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
-<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-v2-32.png">
+<link rel="apple-touch-icon" href="apple-touch-icon-v2.png">
 <script>window.__STANDALONE_SITE__ = true; window.__BUILD__ = '%s';</script>
 <style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#1b3929;color:#000}img{max-width:100%%}[hidden]:not([hidden=until-found i]){display:none!important}</style>
 """ % BUILD
