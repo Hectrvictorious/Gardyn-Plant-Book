@@ -1,0 +1,5 @@
+# Built by tools/build.py (the Pages workflow builds them on every push)
+site/index.html
+site/sw.js
+artifact/
+__pycache__/

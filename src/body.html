@@ -1,0 +1,145 @@
+<title>Swan's Island Plant Book</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Josh's Gardyn plant book: tap any pod on the salad and fruiting towers, Gardyn-style plant pages, care rhythm, moves, fixes, and the trail to printed pods.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:ital,wght@0,500;0,600;0,700;1,500&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,600;1,7..72,400&display=swap">
+<style>
+/*@@CSS@@*/
+</style>
+
+<header class="mast">
+  <div class="mast-in">
+    <div class="wordmark"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4.5" y="8" width="4" height="14" rx="2" fill="currentColor" opacity=".92"/><rect x="10" y="8" width="4" height="14" rx="2" fill="currentColor"/><rect x="15.5" y="8" width="4" height="14" rx="2" fill="currentColor" opacity=".92"/><path d="M12 7.5C12 4.5 14 2.5 17.5 2.5 17.5 5.5 15.5 7.5 12 7.5Z" fill="#ff8fbb"/></svg>Plant Book <small>Swan&rsquo;s Island</small></div>
+    <div class="mast-date" id="mastDate"></div>
+  </div>
+</header>
+
+<div class="app">
+  <section class="view wrap" id="view-towers">
+    <div class="note acc" id="movedBox" hidden></div>
+    <div class="note" id="installBox" hidden>
+      <b>Put it on your home screen</b>
+      <div class="small" id="installHint">It opens like an app, with no address bar, and works without a signal.</div>
+      <div class="btnrow"><button class="btn primary" id="installBtn">Install</button><button class="btn ghost" id="installLater">Not now</button></div>
+    </div>
+    <div class="note acc" id="newsBox" hidden></div>
+    <div class="today" id="today"></div>
+    <div class="view-head">
+      <div class="eyebrow">The two towers</div>
+    </div>
+    <div class="switches">
+      <div class="seg" role="group" aria-label="Tower"><button data-tower="S" aria-pressed="true">Salad</button><button data-tower="F" aria-pressed="false">Fruiting</button></div>
+      <div class="seg" role="group" aria-label="Layout"><button data-mode="now" aria-pressed="true">Now</button><button data-mode="plan" aria-pressed="false">Nov 2 plan</button></div>
+    </div>
+    <div class="tower-head"><h3 id="towerName">Salad tower</h3><span class="small muted" id="towerCount"></span></div>
+    <p class="small" id="towerSub" style="margin:-8px 0 0"></p>
+    <div id="towerWrap"></div>
+    <div class="legend" aria-label="Legend">
+      <span><i class="sw z-high"></i>High light</span><span><i class="sw z-medium"></i>Medium</span><span><i class="sw z-low"></i>Low</span>
+      <span><i class="sw" style="background:var(--surface);box-shadow:inset -3px 0 0 color-mix(in srgb,var(--ink) 26%,transparent)"></i>dark edge: the way the pod faces (► ◄ on the right bar)</span><span>★ salad favorite</span><span>▲ giant</span><span>✿ blooms</span>
+      <span id="legendMove"></span>
+    </div>
+    <div class="sec" id="domeSec"><h3 id="domeTitle">In the dome</h3><div class="dome" id="dome"></div></div>
+    <details class="rules">
+      <summary>How these maps work</summary>
+      <ul>
+        <li><b>Light zones (Gardyn's):</b> high is the 12-pod center cluster: the center column in rows 3–8, plus the outer pods that point toward the center. Medium is rows 2 and 9 plus the outer pods that point away. Low is rows 1 and 10. Gardyn's fallback is one zone lower when the ideal seat is full, and its own kit layouts put medium plants in high seats.</li>
+        <li><b>Facing:</b> odd rows point right ►, even rows point left ◄. The pod at the arrow end leans into open air, so the row's biggest plant gets it.</li>
+        <li><b>Headroom:</b> the pod directly above faces the other way, so a plant's real competition is the pod two rows up on its own side. Giants ▲ sit in rows 1–2, or under a Cap two rows up.</li>
+        <li><b>Pairs:</b> an A/B pair shares a row or sits on a diagonal, never two rows apart in one column, where B would grow straight into A.</li>
+        <li><b>Salt rule (fruiting):</b> nothing salt-sensitive sits below a tomato in the same Column while that tomato stands. That's what the beans taught.</li>
+        <li><b>Vines climb into light, bushes lean off:</b> tomatoes down the light bars, cucamelon up the Trellis, ground cherry off the left side.</li>
+        <li><b>Window:</b> assumed on the right of the salad tower; the light-hungry outer plants sit on that side.</li>
+        <li><b>Nothing moves until you say so.</b> "Now" is where plants sat on Oct 27, updated by the moves you tick off. "Nov 2 plan" is the re-seating by light and space.</li>
+      </ul>
+    </details>
+  </section>
+
+  <section class="view wrap" id="view-plants" hidden>
+    <div class="view-head">
+      <div class="eyebrow">Plant Book</div>
+      <h2>Every plant on the towers</h2>
+      <p>Gardyn's growing basics for each one, the plants Gardyn doesn't carry, and your seats and lessons on top.</p>
+    </div>
+    <input class="search" id="q" type="search" placeholder="Search: sorrel, aphids, low light…" autocomplete="off" aria-label="Search plants">
+    <div class="filters" id="filters" role="group" aria-label="Show"></div>
+    <div id="plist" class="stack"></div>
+  </section>
+
+  <section class="view wrap" id="view-care" hidden>
+    <div class="view-head">
+      <div class="eyebrow">Care</div>
+      <h2>The rhythm, the moves, the fixes</h2>
+      <p>Tap Done when you finish a job; the app works out when it's due again. Everything you tick stays on this phone.</p>
+    </div>
+    <div class="sec"><h3>Rhythm <span class="count" id="dueCount"></span></h3><div class="stack" id="rhythm"></div></div>
+    <div class="sec"><h3>Campaigns</h3><div class="stack" id="camps"></div></div>
+    <div class="sec"><h3>Moves to the Nov 2 plan <span class="count" id="moveCount"></span></h3><div class="progress" aria-hidden="true"><i id="moveBar"></i></div><div class="moves" id="moves"></div></div>
+    <div class="sec"><h3>Fixes</h3><div class="stack" id="fixes"></div></div>
+    <div class="sec"><h3>Your data</h3>
+      <div class="card stack">
+        <p class="small" style="margin:0">Ticks, dates and notes live on this phone only. Copy a backup now and then, and paste it back on a new phone.</p>
+        <div class="btnrow"><button class="btn small" id="backupBtn">Copy a backup</button><button class="btn small ghost" id="restoreBtn">Restore from a backup</button></div>
+        <div id="restoreBox" hidden class="stack"><textarea id="restoreText" class="search" rows="3" aria-label="Paste a backup"></textarea><div class="btnrow"><button class="btn small primary" id="restoreGo">Restore</button></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="view wrap" id="view-ideas" hidden>
+    <div class="view-head">
+      <div class="eyebrow">Ideas</div>
+      <h2>Good things for the towers</h2>
+      <p>Plants to try next, gear that earns its place, and the questions only you can answer.</p>
+    </div>
+    <div class="sec"><h3>Plants to try next</h3><div class="stack" id="ideaPlants"></div></div>
+    <div class="sec"><h3>Gear that earns its place</h3><div class="list" id="gear"></div></div>
+    <div class="sec"><h3>Decisions waiting on you</h3><div class="list" id="questions"></div></div>
+    <div class="sec"><h3>On the watch list</h3><div class="list" id="watch"></div></div>
+    <div class="sec"><h3>About this app</h3>
+      <div class="card small">
+        <p style="margin:0">Built for Josh's two Gardyn Home v3 towers on Swan's Island. Plant facts paraphrase Gardyn's Plant Book (its Help Center plant articles) and, for plants Gardyn doesn't carry, extension and seed-company sources linked on each page. Seats come from your maps: salad v4 and v5, fruiting v8 and v9.</p>
+        <p>Not affiliated with or endorsed by Gardyn. Gardyn, Kelby, yCube, yPod, Plant Food and HydroBoost are Gardyn's names.</p>
+        <p class="muted" id="aboutVersion"></p>
+      </div>
+    </div>
+  </section>
+
+  <section class="view wrap" id="view-diy" hidden>
+    <div class="view-head">
+      <div class="eyebrow">DIY</div>
+      <h2>Beyond the yCube</h2>
+      <p>The trail from rockwool to a reusable printed pod: what to fill it with for each crop, what it costs, and how to print it. Tap a stop to open it.</p>
+    </div>
+    <div class="card"><div class="trail" id="trail"></div></div>
+    <div class="sec"><h3>Why move off rockwool</h3><div class="why" id="why"></div></div>
+    <div class="sec"><h3>What goes in the pod</h3><div class="list" id="fillList"></div></div>
+    <div class="sec"><h3>What it costs</h3><div class="card calc" id="calc"></div></div>
+    <div class="sec"><h3>The pod, by the numbers</h3><div class="tbl-wrap"><table id="briefTbl"></table></div><p class="small" style="margin:0">Measured from community replicas, not from Gardyn. Caliper a real yCube and yPod first and trust your numbers over these.</p></div>
+    <div class="sec"><h3>Cleaning printed pods</h3><div class="card prose" id="cleanPods"></div></div>
+    <div class="sec"><h3>Growing media compared</h3><div class="list" id="mediaList"></div></div>
+    <div class="sec"><h3>Models and shops</h3><div class="list" id="models"></div></div>
+    <div class="sec"><h3>Also on the workbench</h3><div class="list" id="bench"></div></div>
+    <p class="foot">From the Oct 30 report "yCube Alternatives: Media and Printed Pod" in your Gardyn project. Prices as read on Oct 30.</p>
+  </section>
+</div>
+
+<nav class="tabs" aria-label="Sections">
+  <div class="tabs-in">
+    <button class="tab" data-view="towers" aria-selected="true"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="4" height="17" rx="2"/><rect x="10" y="4" width="4" height="17" rx="2"/><rect x="16" y="4" width="4" height="17" rx="2"/></svg>Towers</button>
+    <button class="tab" data-view="plants" aria-selected="false"><svg viewBox="0 0 24 24"><path d="M3 5.5c3-1.2 6-1 9 1v13.5c-3-1.8-6-2-9-.8z"/><path d="M21 5.5c-3-1.2-6-1-9 1v13.5c3-1.8 6-2 9-.8z"/></svg>Plants</button>
+    <button class="tab" data-view="care" aria-selected="false"><svg viewBox="0 0 24 24"><path d="M12 3s6 6.4 6 11a6 6 0 0 1-12 0c0-4.6 6-11 6-11z"/><path d="M9.5 14.5l1.8 1.8 3.4-3.6"/></svg>Care</button>
+    <button class="tab" data-view="ideas" aria-selected="false"><svg viewBox="0 0 24 24"><path d="M12 21v-8.5"/><path d="M12 12.5c0-4 2.8-6.5 7.5-6.5 0 4.2-2.8 6.5-7.5 6.5z"/><path d="M12 15c0-3.2-2.4-5.3-6.5-5.3 0 3.2 2.4 5.3 6.5 5.3z"/></svg>Ideas</button>
+    <button class="tab" data-view="diy" aria-selected="false"><svg viewBox="0 0 24 24"><path d="M12 21s-6.5-5.8-6.5-10.5a6.5 6.5 0 0 1 13 0C18.5 15.2 12 21 12 21z"/><circle cx="12" cy="10.5" r="2.3"/></svg>DIY</button>
+  </div>
+</nav>
+<div class="sheet-back" id="sheetBack" hidden></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle" hidden><div class="grab"></div><div class="sheet-top"><button class="x" id="sheetX" aria-label="Close">✕</button></div><div class="sheet-in" id="sheetIn"></div></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+/*@@DATA@@*/
+</script>
+<script>
+/*@@APP@@*/
+</script>
