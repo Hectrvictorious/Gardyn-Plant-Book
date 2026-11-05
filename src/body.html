@@ -25,6 +25,7 @@
     </div>
     <div class="note acc" id="newsBox" hidden></div>
     <div class="today" id="today"></div>
+    <div class="tip" id="tipBox"></div>
     <div class="view-head">
       <div class="eyebrow">The two towers</div>
     </div>
@@ -109,7 +110,7 @@
     <div class="sec"><h3>Your fixes</h3><div class="stack" id="fixes"></div></div>
     <div class="sec"><h3>Your data</h3>
       <div class="card stack">
-        <p class="small" style="margin:0">Ticks, dates and notes live on this phone only. Copy a backup now and then, and paste it back on a new phone.</p>
+        <p class="small" style="margin:0">Ticks, dates, notes, bowls and stars live on this phone only. Copy a backup now and then, and paste it back on a new phone. Photos stay on the phone and aren&rsquo;t in the backup.</p>
         <div class="btnrow"><button class="btn small" id="backupBtn">Copy a backup</button><button class="btn small ghost" id="restoreBtn">Restore from a backup</button></div>
         <div id="restoreBox" hidden class="stack"><textarea id="restoreText" class="search" rows="3" aria-label="Paste a backup"></textarea><div class="btnrow"><button class="btn small primary" id="restoreGo">Restore</button></div></div>
       </div>
@@ -177,6 +178,7 @@
 </nav>
 <div class="sheet-back" id="sheetBack" hidden></div>
 <div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle" hidden><div class="grab"></div><div class="sheet-top"><button class="x" id="sheetX" aria-label="Close">✕</button></div><div class="sheet-in" id="sheetIn"></div></div>
+<div class="lightbox" id="lightbox" hidden></div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script>

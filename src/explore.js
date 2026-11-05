@@ -424,4 +424,34 @@ P.greener = {
     ['Gardyn Help: Bunching Onions', GH(1783745)], ['Gardyn Help: Wheatgrass', GH(1795713)], ['Gardyn Help: Harvesting leafy greens', GH(1770945)]
   ]
 };
+/* ---------- A tip a day (Gardyn's guidance and your own notes) ---------- */
+P.tips = [
+  { t: 'Fuzzy white roots are root hairs, not mold. Gardyn calls them a sign of vigor.', go: { doctor: 'fuzz' } },
+  { t: 'Never germinate yCubes on a tower with Plant Food in the Tank: Plant Food stops seeds from sprouting.', go: { doctor: 'nosprout' } },
+  { t: 'Harvest outer leaves and leave a third of the plant, and it keeps producing.' },
+  { t: 'Cut flower stems the moment they appear; it slows bolting.', go: { doctor: 'bolt' } },
+  { t: 'Little blisters under pepper, tomato or tatsoi leaves are edema, not a disease. More light and a fan on low help.', go: { doctor: 'blisters' } },
+  { t: 'Small, regular root trims are gentler than big, rare ones.', go: { doctor: 'rot' } },
+  { t: 'Keep the day-to-night temperature swing under 5°F.' },
+  { t: 'Run a small fan on low near the towers, not pointed at the plants.' },
+  { t: 'Caps on every open slot keep out algae and debris.', go: { doctor: 'algae' } },
+  { t: 'yCovers go on once plants have true leaves and have been thinned.', go: { doctor: 'algae' } },
+  { t: 'For bugs, Castile soap only: 2.5 tablespoons per gallon of warm water. Never dish soap.', go: { doctor: 'bugs' } },
+  { t: 'After a soap dunk, lights off for 4 hours, and wait 24 hours before you harvest.', go: { doctor: 'bugs' } },
+  { t: 'Refresh a Tank early if you see yellowing between the veins or leaf-edge burn.', go: { doctor: 'yellow' } },
+  { t: 'Gardyn’s sprout guarantee: a yCube that hasn’t grown in 21 days earns replacement credits.', go: { doctor: 'nosprout' } },
+  { t: 'Spent rockwool can go straight into garden soil, where it helps hold water.', go: { view: 'diy' } },
+  { t: 'Green nasturtium seed pods steeped in seasoned vinegar make a peppery stand-in for capers.', go: { plant: 'nasturtium' } },
+  { t: 'Borage: eat the flowers, pulled from their hairy green cups, and go easy on the leaves.', go: { plant: 'borage' } },
+  { t: 'Red sorrel’s tang is oxalic acid: four or five leaves are plenty for two people.', go: { plant: 'red-sorrel' } },
+  { t: 'Mint and purslane are on the ASPCA’s toxic list for cats; nasturtium and dill are cat-safe.', go: { plant: 'mint' } },
+  { t: 'Red roots on the Bull’s Blood are just Bull’s Blood. Slimy, brown and sour is rot.', go: { doctor: 'rot' } },
+  { t: 'Crispy leaves? Gardyn says the lights being too bright is rarely the cause.', go: { doctor: 'tips' } },
+  { t: 'Some seeds are late bloomers and take up to about six weeks to sprout.', go: { doctor: 'nosprout' } },
+  { t: 'Frankfurt green sauce takes seven herbs, and you already grow three of them.', go: { view: 'salad' } },
+  { t: 'Microgreen cover paper comes off when it’s ready. Gardyn: “If you have to tug, it’s not ready!”', go: { view: 'salad' } },
+  { t: 'Bunching onions grow back a week or two after each cut: scallions from one yCube, on repeat.', go: { plant: 'bunching-onions' } },
+  { t: 'A bowl from the towers is a clamshell of greens that didn’t have to ride the ferry. Tap “We ate this” to count it.', go: { view: 'salad' } }
+];
+P.tipSources = [['Gardyn Help: Soak Method', GH(1778497)]];
 })();

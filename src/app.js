@@ -179,7 +179,8 @@
       let pkTag = '';
       if (pk) { if (!pickable(pod)) { cls.push('k-fruit'); pkTag = 'fruit'; } else { const last = PICK[pod.id], d = last ? dayNum(todayISO()) - dayNum(last) : null; cls.push(d === null ? 'k-none' : d >= PICK_EVERY ? 'k-due' : 'k-fresh'); pkTag = d === null ? 'not logged' : d === 0 ? 'today' : d >= PICK_EVERY ? d + 'd · due' : d + 'd ago'; } }
       const tg = pk ? esc(pkTag) : lens ? esc(pl.flav.flag || (pl.flav.flavor.find(x => x !== 'mild' && x.length <= 9) || pl.flav.flavor.find(x => x !== 'mild') || pl.flav.flavor[0]).replace(/ \(.*\)/, '')) : tagStr(pl);
-      inner = '<span class="top">' + plantGlyph(pl) + '<span class="t' + (pk ? ' fwt' : lens ? ' fwt' + (pl.flav.flag ? ' flagged' : '') : '') + '">' + tg + (cell.pods.length > 1 ? ' +' + (cell.pods.length - 1) : '') + '</span></span><span class="n">' + esc(pod.label) + '</span>' + badge;
+      const vd = lens && VERD[pod.p] ? VERD[pod.p].v : '';
+      inner = '<span class="top">' + plantGlyph(pl) + '<span class="t' + (pk ? ' fwt' : lens ? ' fwt' + (pl.flav.flag ? ' flagged' : '') : '') + '">' + tg + (cell.pods.length > 1 ? ' +' + (cell.pods.length - 1) : '') + '</span></span><span class="n">' + esc(pod.label) + (vd ? ' <span class="vb vd-' + vd + '" title="Your verdict: ' + VNAME[vd] + '">' + ({ keep: '✓', retry: '↻', retire: '✕' })[vd] + '</span>' : '') + '</span>' + badge;
       label = where + ': ' + cell.pods.map(x => x.label).join(' and ') + (badge ? (mode === 'now' ? ', move waiting' : ', moved here') : '');
       return '<button class="' + cls.join(' ') + '" data-slot="' + slot + '" data-pod="' + pod.id + '" aria-label="' + esc(label) + '">' + inner + '</button>';
     }
@@ -225,6 +226,11 @@
       '<button data-go="care" data-anchor="rhythm" class="' + (due.length ? 'hot' : '') + '"><span class="big">' + due.length + '</span><span class="lbl">' + (due.length === 1 ? 'care job due' : 'care jobs due') + '</span><span class="sub">' + (due.length ? esc(due.slice(0, 2).map(c => c.title).join(', ')) : unlogged ? unlogged + ' not logged' : 'All caught up') + '</span></button>' +
       '<button data-go="care" data-anchor="moves"><span class="big">' + ready + '</span><span class="lbl">' + (ready === 1 ? 'step ready now' : 'steps ready now') + '</span><span class="sub">' + done + ' of ' + P.moves.length + ' done</span></button>' +
       (() => { const pk = pickList(), n = pk.filter(x => x.due).length; return '<button data-act="pickRound" class="' + (n && pk.some(x => x.last) ? 'hot' : '') + '"><span class="big">' + n + '</span><span class="lbl">to pick</span><span class="sub">' + (!pk.length ? 'nothing leafy' : pk.some(x => x.last) ? (n ? 'a week or more' : 'all picked') : 'start a round') + '</span></button>'; })();
+  }
+
+  function renderTip() {
+    const n = P.tips.length, i = ((dayNum(todayISO()) + (UI.tipShift || 0)) % n + n) % n, tp = P.tips[i];
+    $('tipBox').innerHTML = '<div class="tip-t"><span class="eyebrow">Tip</span><p>' + esc(tp.t) + '</p></div><div class="tip-b">' + (tp.go ? '<button class="btn small ghost" data-act="tipGo" data-i="' + i + '">More</button>' : '') + '<button class="btn small ghost" data-act="tipNext" aria-label="Another tip">Another</button></div>';
   }
 
   /* ----- Plant sheet ----- */
@@ -325,6 +331,7 @@
     h += journalHTML(pid);
     h += '<p class="src">Sources: ' + (pl.src || []).map(s => '<a href="' + esc(s[1]) + '" target="_blank" rel="noopener">' + esc(s[0]) + '</a>').join(' · ') + '</p>';
     showSheet(h, { kind: 'plant', pid, podId });
+    paintPhotos(pid);
   }
   function statusWord(pl) { return { dome: ' · in the dome', planned: ' · planned', idea: ' · an idea', retired: ' · retired', micro: ' · Microgreens Kit' }[pl.status] || ''; }
   function tasteBlock(pid, pl) {
@@ -339,9 +346,48 @@
     if (pl.status === 'tower' || pl.status === 'micro') h += '<div class="verdict"><span class="small"><b>Your verdict</b></span>' + verdictSeg(pid) + '</div>';
     return h + '</div>';
   }
+  /* ----- Photos: kept in this phone's IndexedDB, not in the backup ----- */
+  const PH = { db: null, ok: (() => { try { return typeof indexedDB !== 'undefined' && !!indexedDB; } catch (e) { return false; } })(), urls: [] };
+  function phDB() {
+    if (PH.db) return Promise.resolve(PH.db);
+    return new Promise((res, rej) => {
+      try {
+        const r = indexedDB.open('plantbook', 1);
+        r.onupgradeneeded = () => { const d = r.result; if (!d.objectStoreNames.contains('photos')) d.createObjectStore('photos', { keyPath: 'id', autoIncrement: true }).createIndex('pid', 'pid'); };
+        r.onsuccess = () => { PH.db = r.result; res(PH.db); };
+        r.onerror = () => rej(r.error);
+      } catch (e) { rej(e); }
+    });
+  }
+  const phList = pid => phDB().then(d => new Promise((res, rej) => { const out = [], rq = d.transaction('photos').objectStore('photos').index('pid').openCursor(IDBKeyRange.only(pid)); rq.onsuccess = () => { const c = rq.result; if (c) { out.push(c.value); c.continue(); } else res(out); }; rq.onerror = () => rej(rq.error); }));
+  const phWrite = (fn) => phDB().then(d => new Promise((res, rej) => { const tx = d.transaction('photos', 'readwrite'); fn(tx.objectStore('photos')); tx.oncomplete = () => res(); tx.onerror = () => rej(tx.error); }));
+  const phAdd = (pid, blob) => phWrite(st => st.add({ pid, d: todayISO(), t: Date.now(), blob }));
+  const phDel = id => phWrite(st => st.delete(id));
+  function shrink(file) {
+    return new Promise((res, rej) => {
+      const url = URL.createObjectURL(file), img = new Image();
+      img.onload = () => { const sc = Math.min(1, 1280 / Math.max(img.naturalWidth, img.naturalHeight)), c = document.createElement('canvas'); c.width = Math.round(img.naturalWidth * sc); c.height = Math.round(img.naturalHeight * sc); c.getContext('2d').drawImage(img, 0, 0, c.width, c.height); URL.revokeObjectURL(url); c.toBlob(b => b ? res(b) : rej(new Error('no image')), 'image/jpeg', 0.82); };
+      img.onerror = () => { URL.revokeObjectURL(url); rej(new Error('bad image')); };
+      img.src = url;
+    });
+  }
+  function phFree() { PH.urls.forEach(u => { try { URL.revokeObjectURL(u); } catch (e) {} }); PH.urls = []; }
+  function paintPhotos(pid) {
+    if (!PH.ok || !$('photos')) return;
+    phList(pid).then(list => {
+      const el = $('photos'); if (!el || !SHEET || SHEET.pid !== pid) return;
+      phFree(); list.sort((a, b) => b.t - a.t);
+      el.innerHTML = list.map(x => { const u = URL.createObjectURL(x.blob); PH.urls.push(u); return '<button class="ph-t" data-act="photoOpen" data-id="' + x.id + '" data-src="' + u + '" data-d="' + x.d + '"><img src="' + u + '" alt="Photo from ' + esc(fmtDate(x.d)) + '"><span>' + esc(fmtDate(x.d)) + '</span></button>'; }).join('');
+    }).catch(() => {});
+  }
+  function openLight(id, src, d) {
+    const L = $('lightbox');
+    L.innerHTML = '<div class="lb-in" role="dialog" aria-label="Photo"><img src="' + src + '" alt="Photo from ' + esc(fmtDate(d)) + '"><div class="lb-bar"><b>' + esc(fmtDate(d)) + '</b><span class="btnrow"><button class="btn small ghost" data-act="photoDel" data-id="' + id + '">Delete</button><button class="btn small primary" data-act="lightClose">Close</button></span></div></div>';
+    L.hidden = false;
+  }
   function journalHTML(pid) {
     const list = NOTES[pid] || [];
-    return '<div class="block journal"><h3>Your journal</h3><textarea id="jText" placeholder="First harvest, a root trim, a pest sighting…" aria-label="Add a note"></textarea><div class="btnrow"><button class="btn small primary" data-act="addNote" data-pid="' + pid + '">Add note</button></div>' +
+    return '<div class="block journal"><h3>Your journal</h3><textarea id="jText" placeholder="First harvest, a root trim, a pest sighting…" aria-label="Add a note"></textarea><div class="btnrow"><button class="btn small primary" data-act="addNote" data-pid="' + pid + '">Add note</button>' + (PH.ok ? '<label class="btn small">Add a photo<input type="file" accept="image/*" data-photo="' + pid + '" hidden></label>' : '') + '</div><div class="photos" id="photos"></div>' +
       (list.length ? '<ul class="jlist">' + list.slice().reverse().map((n, i) => '<li><div><div class="d">' + esc(fmtDate(n.d)) + '</div>' + esc(n.t) + '</div><button data-act="delNote" data-pid="' + pid + '" data-i="' + (list.length - 1 - i) + '" aria-label="Delete note">Delete</button></li>').join('') + '</ul>' : '') + '</div>';
   }
   function seatSheet(slot) {
@@ -546,7 +592,7 @@
     $('cleanPods').innerHTML = P.cleanPods;
     $('mediaList').innerHTML = P.media.map(m => '<div><div class="rowtop"><b>' + esc(m.name) + '</b><span class="chip' + (/Dries|Drier/.test(m.top) ? ' ok' : '') + '">' + esc(m.top) + '</span></div><p>' + esc(m.note) + '</p><div class="facts"><span>Water held <b class="num">' + esc(m.water) + '</b></span><span>Each <b class="num">' + esc(m.cost) + '</b></span></div></div>').join('');
     $('models').innerHTML = P.models.map(([t, u, n]) => '<div><b><a href="' + esc(u) + '" target="_blank" rel="noopener">' + esc(t) + '</a></b><p>' + esc(n) + '</p></div>').join('') + P.shop.map(([t, u, n]) => '<div><b><a href="' + esc(u) + '" target="_blank" rel="noopener">' + esc(t) + '</a></b><p>' + esc(n) + '</p></div>').join('');
-    $('bench').innerHTML = P.bench.map(b => '<div><b>' + esc(b.title) + '</b><p>' + esc(b.text) + '</p></div>').join('');
+    $('bench').innerHTML = P.bench.map(b => '<div><b>' + esc(b.title) + '</b><p>' + esc(b.text) + '</p>' + (/QR tags/.test(b.title) ? '<p><a class="btn small" href="' + SITE + 'tags.html" target="_blank" rel="noopener">Open the printable tags</a></p>' : '') + '</div>').join('');
     renderCalc();
   }
   const CALC = { slots: 60, rot: 2, ycube: 5.99, plug: 0.21, berries: 11 };
@@ -775,7 +821,8 @@
   function hideSheet(fromPop) {
     const s = $('sheet'), b = $('sheetBack');
     s.classList.remove('show'); b.classList.remove('show'); SHEET = null;
-    setTimeout(() => { if (!SHEET) { s.hidden = true; b.hidden = true; $('sheetIn').innerHTML = ''; } }, 230);
+    setTimeout(() => { if (!SHEET) { s.hidden = true; b.hidden = true; $('sheetIn').innerHTML = ''; phFree(); } }, 230);
+    $('lightbox').hidden = true;
     if (!fromPop && history.state && history.state.sheet) { try { history.back(); } catch (e) {} }
   }
   function refreshSheet() {
@@ -802,7 +849,7 @@
     if (v === 'ideas') renderIdeas();
     if (v === 'diy') renderDIY();
     if (v === 'salad') renderSalad();
-    if (v === 'towers') { renderToday(); renderTower(); }
+    if (v === 'towers') { renderToday(); renderTip(); renderTower(); }
     if (location.hash !== '#' + v) { try { history.replaceState(history.state, '', '#' + v); } catch (e) {} }
     const el = anchor ? $(anchor) : null;
     if (el) { const top = el.getBoundingClientRect().top + window.scrollY - 70; window.scrollTo({ top: Math.max(0, top), behavior: 'auto' }); }
@@ -901,13 +948,16 @@
     document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => { if (sheetOpen()) hideSheet(); showView(t.dataset.view); }));
     $('sheetBack').addEventListener('click', () => hideSheet());
     $('sheetX').addEventListener('click', () => hideSheet());
-    document.addEventListener('keydown', e => { if (e.key === 'Escape' && sheetOpen()) hideSheet(); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') { if (!$('lightbox').hidden) { $('lightbox').hidden = true; return; } if (sheetOpen()) hideSheet(); } });
+    $('lightbox').addEventListener('click', e => { if (e.target === $('lightbox')) $('lightbox').hidden = true; });
     $('q').addEventListener('input', renderPlants);
     $('backupBtn').addEventListener('click', backup);
     $('restoreBtn').addEventListener('click', () => { $('restoreBox').hidden = !$('restoreBox').hidden; if (!$('restoreBox').hidden) { $('restoreText').value = ''; $('restoreText').focus(); } });
     $('restoreGo').addEventListener('click', restore);
     let rz; window.addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(() => { if (!$('view-diy').hidden) renderTrail(); }, 150); });
     document.addEventListener('change', e => {
+      const ph = e.target.closest && e.target.closest('input[data-photo]');
+      if (ph) { const f = ph.files && ph.files[0], pid = ph.dataset.photo; ph.value = ''; if (!f) return; toast('Saving the photo…'); shrink(f).then(b => phAdd(pid, b)).then(() => { toast('Photo saved on this phone.'); paintPhotos(pid); }).catch(() => toast('That photo couldn’t be saved.')); return; }
       const inp = e.target.closest && e.target.closest('input[data-care-date]'); if (!inp) return;
       const id = inp.dataset.careDate, v = inp.value;
       if (v && v <= todayISO()) CARE[id] = v; else if (!v) delete CARE[id];
@@ -952,6 +1002,11 @@
       else if (act === 'bowlShare') { const d = dressingFor(bowlTotals()); const text = 'Tonight’s bowl from the towers: ' + BOWL.map(id => P.plants[id].name).join(', ') + '. Dressing: ' + d.name.toLowerCase() + ', ' + d.how.replace(/\.$/, '').toLowerCase() + '.'; const copy = () => { try { navigator.clipboard.writeText(text).then(() => toast('Copied. Paste it anywhere.'), () => toast(text)); } catch (e) { toast(text); } }; if (navigator.share) navigator.share({ title: 'Tonight’s bowl', text }).catch(e => { if (!e || e.name !== 'AbortError') copy(); }); else copy(); }
       else if (act === 'scoutStar') { const id = a.dataset.pid; if (SCOUT[id]) delete SCOUT[id]; else SCOUT[id] = todayISO(); store.set('scout', SCOUT); if (!$('view-ideas').hidden) renderIdeas(); if (SHEET) refreshSheet(); toast(SCOUT[id] ? 'On the shortlist.' : 'Off the shortlist.'); }
       else if (act === 'doctor') doctorSheet(a.dataset.id);
+      else if (act === 'photoOpen') openLight(+a.dataset.id, a.dataset.src, a.dataset.d);
+      else if (act === 'lightClose') $('lightbox').hidden = true;
+      else if (act === 'photoDel') { if (!a.dataset.armed) { a.dataset.armed = '1'; a.textContent = 'Tap again to delete'; return; } phDel(+a.dataset.id).then(() => { $('lightbox').hidden = true; if (SHEET && SHEET.pid) paintPhotos(SHEET.pid); toast('Photo deleted.'); }).catch(() => toast('Couldn’t delete it.')); }
+      else if (act === 'tipNext') { UI.tipShift = (UI.tipShift || 0) + 1; renderTip(); }
+      else if (act === 'tipGo') { const g = P.tips[+a.dataset.i].go || {}; if (g.doctor) doctorSheet(g.doctor); else if (g.plant) plantSheet(g.plant); else if (g.view) showView(g.view); }
       else if (act === 'forbidden') forbiddenSheet();
       else if (act === 'pickRound') pickSheet();
       else if (act === 'pickToggle') { const id = a.dataset.pod; setPicked([id], PICK[id] !== todayISO()); renderToday(); refreshSheet(); }

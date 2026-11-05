@@ -657,7 +657,7 @@ shop: [
 bench: [
   { title: 'Standoff cover', text: 'An opaque disc on three short legs that shades the wool 5–8 mm above it, with a stem slot and an air gap. It does what a yCover does without trapping moisture against the crown.' },
   { title: 'Water-level alarm', text: 'Both units’ level sensors are gone. Three ways around it: ask Gardyn support (support@mygardyn.com) for a replacement part; a dipstick marked at full and 60% for each Tank Top-off; or a reed float switch in the Tank wired to a small microcontroller that beeps or pings your phone.' },
-  { title: 'QR tags for the yPods', text: 'A small printed tag on each yPod whose QR code opens that seat in this app. The link is the app’s address plus #seat- and the seat, like hectrvictorious.github.io/Gardyn-Plant-Book/#seat-S9R for the borage (S for salad, F for fruiting, then row and column). Every seat page has a Copy link button.' },
+  { title: 'QR tags for the yPods', text: 'A small printed tag on each yPod whose QR code opens that seat in this app. The link is the app’s address plus #seat- and the seat, like hectrvictorious.github.io/Gardyn-Plant-Book/#seat-S9R for the borage (S for salad, F for fruiting, then row and column). Every seat page has a Copy link button, and the printable sheet below has a code for all 60 seats.' },
   { title: 'Caps for open pods', text: 'jhalye’s yCube Cap prints in the same opaque PETG and seats in the mouth: Caps for the four headroom seats on the salad plan.' }
 ],
 why: [
