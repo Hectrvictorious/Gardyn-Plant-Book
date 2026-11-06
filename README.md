@@ -11,36 +11,53 @@ Plant Doctor and Care. On iPhone: Share → Add to Home Screen.
   tower still has steps to come (the bean swap). Four views: *Light* (Gardyn's zones), *Flavor*
   (what each plant brings to a salad, one-word heads-ups like bristly or stringy, and your taste-test
   verdicts), *Picking* (days since each leafy pod was picked) and *Pods* (which seats hold a printed
-  pod, and how many plantings each has had). The Today strip counts care jobs
-  due, steps ready now and pods due a picking, with a tip a day underneath.
+  pod, and how many plantings each has had); on the Picking view, fruit pods show when the flowers
+  you've logged should ripen. The Today strip counts care jobs due, steps ready now and pods due a
+  picking (plus fruit that should be ripe), with a tip a day underneath, and a backup reminder
+  when one is due.
+- **The picking round** (`#pick`): tick each leafy pod as you pick it, say roughly how much came
+  off (in 5-oz boxes of salad greens, or ounces off a scale), and count flowers and fruit on the
+  fruiting tower. That's the harvest log: from each flower's date it works out when the fruit should
+  be ripe (strawberries about 30 days, cherry tomatoes six to eight weeks, jalapeños 45–55, beans
+  7–10, cucumbers 8–10; sourced on each plant page), and after three matched pickings it goes by
+  your towers' own timing. *Share tonight's picture* draws the bowl, what was picked and what's
+  ready as an image to send.
 - **Plants**: a Gardyn-style page for every plant on the towers, the microgreens, the planned
   plants, the ideas and the retired ones: a tasting note, "Before you eat it", a cat check (ASPCA),
   taste and texture, pairings, your verdict, growing basics, harvest, care, origin, your notes, a
-  journal with photos, sources.
+  journal with photos, a seed box (yCubes or seed pads on hand, packets with source and year,
+  flagged when low or getting old), sources.
 - **Salad**: build tonight's bowl from what's growing (flavor balance, texture, heads-ups, a matched
-  dressing, what it's missing), save it, share it, count it; six house salads, island plates, taste
+  dressing, what it's missing), save it, share it as a picture, count it; six house salads, island plates, taste
   tests, Gardyn's microgreens with a finish-together planner, and the cautions.
 - **Care**: a catch-up sheet for jobs with no date yet, the rhythm with due dates, the campaigns,
   the next steps, a **Plant Doctor** (what you see → what Gardyn says it usually is and what to do),
   and your fixes.
 - **Ideas**: 32 plants to try, 24 of them researched for this round (Gardyn's catalog plus ice
   plant, oyster leaf and miner's lettuce), with filters and a starred shortlist; gear, open
-  questions, the watch list; and the door to the Forbidden Shelf.
+  questions, the watch list; **the seed box** (what's on hand, and a to-buy list from low packets
+  and the shortlist, ready to share); and the door to the Forbidden Shelf.
 - **The Forbidden Shelf** (`#forbidden`): 42 plants on six shelves (controlled plants, legal ones
   with a reputation, the dark side of the plants already on the towers, a poison cabinet with the
   cat in mind, what Maine and the USDA ban, and plants that were once banned), each with the law,
   the Gardyn angle and sources, plus *Legal in Maine?*, a ten-card game that keeps your best score.
   History and law only, never a grow guide. Plant pages link to their shelf entries.
-- **Greener**: what the towers cost in power at your rate and what they use in water, yCube and
+- **Greener**: what the towers cost in power at your rate; **harvest against power**, the month's
+  logged harvest priced like the store (USDA national averages for Oct 23, 2026, editable to the
+  island's prices) against the month's electricity, with the day the towers paid for their power and
+  earlier months; what they use in water, yCube and
   rockwool end of life, then **the printer**: three rules for when a print is actually green, an
   *Off rockwool* card (seats in printed pods, plantings, money, trash and a carbon balance), parts
   worth printing with their payback, a print log with your own numbers, the habits that keep a
   printer green, scrap and spools. Then *Beyond the yCube* (the trail from rockwool to a printed PETG
   pod), seed saving and plants that keep giving.
 
-Ticks, dates, picks, verdicts, stars, bowls, notes, printed-pod seats, the print log and the game
-score are stored on the phone (Care → Your data makes a backup to paste back). Photos stay in the
-phone's storage and aren't in the backup.
+Everything you log (ticks, dates, picks, the harvest log, flowers, verdicts, stars, bowls, notes,
+seeds, printed-pod seats, the print log) is stored on the phone, with photos in its IndexedDB.
+**Care → Your data** backs it all up as one file, photos included, through the phone's share sheet
+(Drive, Gmail, Files), and restores it from a file, with an undo. A reminder appears on the Towers
+tab when there's something new and no backup for a week, and turns firmer after two. The app also
+asks Chrome to mark its storage as persistent. Copy-as-text and paste remain under *Other ways*.
 
 **Links into the app**: `#seat-S9R` opens that seat (S salad or F fruiting, row, column); `#p-borage`
 opens a plant page; `#pick` the picking round; `#doctor` the Plant Doctor; `#forbidden` the Forbidden
@@ -58,6 +75,7 @@ The page is built from `src/`:
 | `src/explore.js` | The plant scout, more cat checks, the Plant Doctor, the Greener figures and the tips |
 | `src/forbidden.js` | The Forbidden Shelf: six shelves, 42 plants with law, sources and links to the towers, and the Legal in Maine? cards |
 | `src/printer.js` | The printer on the Greener tab: the rules, payback factors, parts worth printing, habits, scrap and spools |
+| `src/harvest.js` | The harvest log's store prices and item weights, flower-to-ripe windows with sources, and how long seed keeps |
 | `src/app.js` | The app itself |
 | `src/style.css` | The look |
 | `src/body.html` | The page skeleton |

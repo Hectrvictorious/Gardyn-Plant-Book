@@ -24,6 +24,7 @@
       <div class="btnrow"><button class="btn primary" id="installBtn">Install</button><button class="btn ghost" id="installLater">Not now</button></div>
     </div>
     <div class="note acc" id="newsBox" hidden></div>
+    <div class="note bk" id="bkBox" hidden></div>
     <div class="today" id="today"></div>
     <div class="tip" id="tipBox"></div>
     <div class="view-head">
@@ -109,13 +110,7 @@
     <div class="sec"><h3>Next steps <span class="count" id="moveCount"></span></h3><div class="progress" aria-hidden="true"><i id="moveBar"></i></div><div class="moves" id="moves"></div></div>
     <div class="sec" id="doctorSec"><h3>Plant Doctor</h3><div class="card stack"><p style="margin:0"><b>What do you see?</b> Tap the closest match for what Gardyn says it usually is, and what to do.</p><div class="dchips" id="doctorChips"></div></div></div>
     <div class="sec"><h3>Your fixes</h3><div class="stack" id="fixes"></div></div>
-    <div class="sec"><h3>Your data</h3>
-      <div class="card stack">
-        <p class="small" style="margin:0">Ticks, dates, notes, bowls and stars live on this phone only. Copy a backup now and then, and paste it back on a new phone. Photos stay on the phone and aren&rsquo;t in the backup.</p>
-        <div class="btnrow"><button class="btn small" id="backupBtn">Copy a backup</button><button class="btn small ghost" id="restoreBtn">Restore from a backup</button></div>
-        <div id="restoreBox" hidden class="stack"><textarea id="restoreText" class="search" rows="3" aria-label="Paste a backup"></textarea><div class="btnrow"><button class="btn small primary" id="restoreGo">Restore</button></div></div>
-      </div>
-    </div>
+    <div class="sec" id="dataSec"><h3>Your data</h3><div class="card stack" id="dataCard"></div></div>
   </section>
 
   <section class="view wrap" id="view-ideas" hidden>
@@ -129,6 +124,7 @@
       <div class="filters" id="scoutFilters" role="group" aria-label="Show"></div>
       <div class="stack" id="ideaPlants"></div>
     </div>
+    <div class="sec" id="seedBoxSec"><h3>The seed box <span class="count" id="seedCount"></span></h3><div class="card stack" id="seedBox"></div></div>
     <div class="sec"><h3>Just for fun</h3><div id="shelfCard"></div></div>
     <div class="sec"><h3>Gear that earns its place</h3><div class="list" id="gear"></div></div>
     <div class="sec"><h3>Decisions waiting on you</h3><div class="list" id="questions"></div></div>
@@ -159,10 +155,11 @@
     <div class="view-head">
       <div class="eyebrow">Greener</div>
       <h2>Grow more, waste less</h2>
-      <p>What two towers cost in power and water, what leaves the house, where a printer earns its keep, and the seeds and plants you can keep for free.</p>
+      <p>What two towers cost in power and water, what they give back, what leaves the house, where a printer earns its keep, and the seeds and plants you can keep for free.</p>
     </div>
-    <div class="jumps"><button data-jump="footSec">Footprint</button><button data-jump="wasteSec">Waste</button><button data-jump="printSec">The printer</button><button data-jump="trailSec">Beyond the yCube</button><button data-jump="seedSec">Seeds</button></div>
+    <div class="jumps"><button data-jump="footSec">Footprint</button><button data-jump="harvSec">Harvest</button><button data-jump="wasteSec">Waste</button><button data-jump="printSec">The printer</button><button data-jump="trailSec">Beyond the yCube</button><button data-jump="seedSec">Seeds</button></div>
     <div class="sec" id="footSec"><h3>The footprint</h3><div class="card calc" id="footprint"></div></div>
+    <div class="sec" id="harvSec"><h3>Harvest against power</h3><p class="small" style="margin:-2px 0 0">Every picking and every fruit you log, priced like the store, against what the towers cost to run. A scoreboard, not a ledger: the numbers are honest estimates, and the prices are yours to change.</p><div class="card calc hv" id="harvest"></div></div>
     <div class="sec"><h3>Water</h3><div class="card prose" id="waterCard"></div></div>
     <div class="sec" id="wasteSec"><h3>Less waste</h3><div class="list" id="wasteList"></div></div>
     <div class="sec" id="printSec"><h3>The printer</h3>

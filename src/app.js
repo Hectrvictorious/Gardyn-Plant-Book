@@ -5,14 +5,18 @@
   const $ = id => document.getElementById(id);
   const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const APP_VERSION = P.version;
-  const NEWS = 'A new icon: the painted open book from Muse. And from last night: the Forbidden Shelf has its own page, with a Legal in Maine? game, and the Greener tab has a printer ledger, with a Pods view on the map.'; // shown once to returning users
+  const NEWS = 'Backups are one tap now, photos and all. The picking round keeps a harvest log, counts flowers and fruit on the fruiting tower and says when they should ripen, and the Greener tab weighs the harvest against the power bill. Plus a picture of tonight to send, and a seed box on the Ideas tab.'; // shown once to returning users
 
   /* ----- Storage (this phone only) ----- */
   const store = {
     get(k, d) { try { const v = localStorage.getItem('pb:' + k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } },
-    set(k, v) { try { localStorage.setItem('pb:' + k, JSON.stringify(v)); } catch (e) { /* storage off: the page still works */ } }
+    set(k, v) { try { localStorage.setItem('pb:' + k, JSON.stringify(v)); } catch (e) { /* storage off: the page still works */ } if (TRACKED.has(k)) touched(); },
+    raw(k, v) { try { if (v == null) localStorage.removeItem('pb:' + k); else localStorage.setItem('pb:' + k, JSON.stringify(v)); } catch (e) {} }
   };
-  const KEYS = ['done', 'care', 'camp', 'notes', 'trail', 'ui', 'seenVersion', 'installLater', 'bowl', 'bowls', 'mgsel', 'pick', 'verdict', 'scout', 'ate', 'foot', 'podseats', 'prints', 'printer', 'fgame'];
+  const KEYS = ['done', 'care', 'camp', 'notes', 'trail', 'ui', 'seenVersion', 'installLater', 'bowl', 'bowls', 'mgsel', 'pick', 'verdict', 'scout', 'ate', 'foot', 'podseats', 'prints', 'printer', 'fgame', 'harv', 'hamt', 'flow', 'hprice', 'seeds'];
+  /* What counts as something worth backing up: everything but view settings and the game score. */
+  const TRACKED = new Set(KEYS.filter(k => !['ui', 'seenVersion', 'installLater', 'bowl', 'mgsel', 'fgame'].includes(k)));
+  function touched() { const d = store.get('dirty', null) || { n: 0, since: todayISO() }; d.n++; store.raw('dirty', d); }
   let DONE = store.get('done', {});
   let CARE = store.get('care', {});
   let CAMP = store.get('camp', {});
@@ -131,8 +135,10 @@
   function renderDate() { const d = new Date(); $('mastDate').textContent = DAYS[d.getDay()] + ', ' + MONTHS[d.getMonth()] + ' ' + d.getDate(); }
 
   /* ----- Towers ----- */
+  let FMC = {};
+  const fmCached = pid => pid in FMC ? FMC[pid] : (FMC[pid] = P.plants[pid] && P.plants[pid].group === 'fruit' ? fruitModel(pid) : null);
   function renderTower() {
-    const t = UI.tower;
+    const t = UI.tower; FMC = {};
     const pending = P.pods.some(p => { const m = MOVE_BY_POD[p.id]; return m && !isDone(m) && [p.now, p.plan].some(x => parse(x) && parse(x).t === t); });
     if (!pending && UI.mode === 'plan') UI.mode = 'now';
     const mode = UI.mode;
@@ -147,7 +153,7 @@
     $('towerSub').textContent = mode === 'plan'
       ? 'After the steps still to come: the cucumbers out and a bean lane up the center column.'
       : (pending ? 'The tower as it stands: the Nov 2 map, in place as of Nov 5. A pink mark means a step is still to come.' : 'The tower as it stands: the Nov 2 map, in place as of Nov 5. Tap any pod.');
-    if (UI.lens === 'pick') $('towerSub').textContent = mode === 'plan' ? 'Picking shows on the Now map.' : 'Colored by picking: about once a week keeps leafy plants from bolting. Tap a pod to log it, or open the picking round from the Today strip.';
+    if (UI.lens === 'pick') $('towerSub').textContent = mode === 'plan' ? 'Picking shows on the Now map.' : 'Colored by picking: about once a week keeps leafy plants from bolting. Fruit shows when the flowers you’ve logged should ripen. Tap a pod to log it, or open the picking round from the Today strip.';
     else if (UI.lens === 'flavor') $('towerSub').textContent = 'Colored by what each plant brings to a salad. The word on each pod is its taste, or a heads-up marked ! before you eat it. Tap a pod for texture and pairings.';
     else if (UI.lens === 'pods') { const n = Object.keys(PODS.seats).filter(x => x[0] === t).length; $('towerSub').textContent = mode === 'plan' ? 'Printed pods show on the Now map.' : n + ' of 30 seats on this tower ' + (n === 1 ? 'is' : 'are') + ' in a printed pod. Tap a pod to mark one, or to count a replanting.'; }
     let pods = '';
@@ -162,7 +168,7 @@
     const lensNow = UI.lens || 'light';
     $('legendLight').hidden = lensNow !== 'light'; $('legendFlavor').hidden = lensNow !== 'flavor'; $('legendPick').hidden = lensNow !== 'pick'; $('legendPods').hidden = lensNow !== 'pods';
     if (lensNow === 'pods') $('legendPods').innerHTML = '<span><i class="sw k-printed"></i>printed pod (× plantings)</span><span><i class="sw k-rock"></i>yCube</span><span><i class="sw k-none" style="border-style:dashed"></i>open</span>';
-    if (lensNow === 'pick') $('legendPick').innerHTML = '<span><i class="sw k-fresh"></i>picked this week</span><span><i class="sw k-due"></i>due a picking</span><span><i class="sw k-none"></i>not logged</span><span><i class="sw k-fruit"></i>fruit: pick when ripe</span>';
+    if (lensNow === 'pick') $('legendPick').innerHTML = '<span><i class="sw k-fresh"></i>picked this week</span><span><i class="sw k-due"></i>due a picking</span><span><i class="sw k-none"></i>not logged</span><span><i class="sw k-ripe"></i>ripe? some of this plant’s fruit should be</span><span><i class="sw k-fruit"></i>fruit: ~ when its logged flowers ripen</span>';
     if (UI.lens === 'flavor') $('legendFlavor').innerHTML = P.roleOrder.filter(r => r !== 'topper').map(r => '<span><i class="sw ax-' + r + '"></i>' + esc(P.roles[r].name) + '</span>').join('') + '<span><b class="flagk" aria-hidden="true">!</b>a heads-up before you eat it</span>';
     const pendKind = k => P.pods.some(p => { const m = MOVE_BY_POD[p.id]; return m && m.kind === k && !isDone(m) && parse(cur(p)) && parse(cur(p)).t === t; });
     const outs = pendKind('out'), mvs = pendKind('move');
@@ -189,7 +195,7 @@
       const pz = UI.lens === 'pods' && mode === 'now';
       let pkTag = '';
       if (pz) { const ps = PODS.seats[slot]; cls.push(ps ? 'k-printed' : 'k-rock'); pkTag = ps ? (ps.n ? 'printed ×' + ps.n : 'printed') : ''; }
-      if (pk) { if (!pickable(pod)) { cls.push('k-fruit'); pkTag = 'fruit'; } else { const last = PICK[pod.id], d = last ? dayNum(todayISO()) - dayNum(last) : null; cls.push(d === null ? 'k-none' : d >= PICK_EVERY ? 'k-due' : 'k-fresh'); pkTag = d === null ? 'not logged' : d === 0 ? 'today' : d >= PICK_EVERY ? d + 'd · due' : d + 'd ago'; } }
+      if (pk) { if (!pickable(pod)) { const fm = fmCached(pod.p); if (fm && fm.now.length) { cls.push('k-ripe'); pkTag = 'ripe?'; } else { cls.push('k-fruit'); pkTag = fm && fm.next ? '~' + fmtDate(fm.next) : fm && fm.open.length ? 'in flower' : 'fruit'; } } else { const last = PICK[pod.id], d = last ? dayNum(todayISO()) - dayNum(last) : null; cls.push(d === null ? 'k-none' : d >= PICK_EVERY ? 'k-due' : 'k-fresh'); pkTag = d === null ? 'not logged' : d === 0 ? 'today' : d >= PICK_EVERY ? d + 'd · due' : d + 'd ago'; } }
       const tg = (pk || pz) ? esc(pkTag) : lens ? esc(pl.flav.flag || (pl.flav.flavor.find(x => x !== 'mild' && x.length <= 9) || pl.flav.flavor.find(x => x !== 'mild') || pl.flav.flavor[0]).replace(/ \(.*\)/, '')) : tagStr(pl);
       const vd = lens && VERD[pod.p] ? VERD[pod.p].v : '';
       inner = '<span class="top">' + plantGlyph(pl) + '<span class="t' + ((pk || pz) ? ' fwt' : lens ? ' fwt' + (pl.flav.flag ? ' flagged' : '') : '') + '">' + tg + (cell.pods.length > 1 ? ' +' + (cell.pods.length - 1) : '') + '</span></span><span class="n">' + esc(pod.label) + (vd ? ' <span class="vb vd-' + vd + '" title="Your verdict: ' + VNAME[vd] + '">' + ({ keep: '✓', retry: '↻', retire: '✕' })[vd] + '</span>' : '') + '</span>' + badge;
@@ -238,7 +244,8 @@
     $('today').innerHTML =
       '<button data-go="care" data-anchor="rhythm" class="' + (due.length ? 'hot' : '') + '"><span class="big">' + due.length + '</span><span class="lbl">' + (due.length === 1 ? 'care job due' : 'care jobs due') + '</span><span class="sub">' + (due.length ? esc(due.slice(0, 2).map(c => c.title).join(', ')) : unlogged ? unlogged + ' not logged' : 'All caught up') + '</span></button>' +
       '<button data-go="care" data-anchor="moves"><span class="big">' + ready + '</span><span class="lbl">' + (ready === 1 ? 'step ready now' : 'steps ready now') + '</span><span class="sub">' + done + ' of ' + P.moves.length + ' done</span></button>' +
-      (() => { const pk = pickList(), n = pk.filter(x => x.due).length; return '<button data-act="pickRound" class="' + (n && pk.some(x => x.last) ? 'hot' : '') + '"><span class="big">' + n + '</span><span class="lbl">to pick</span><span class="sub">' + (!pk.length ? 'nothing leafy' : pk.some(x => x.last) ? (n ? 'a week or more' : 'all picked') : 'start a round') + '</span></button>'; })();
+      (() => { const pk = pickList(), n = pk.filter(x => x.due).length, rp = ripeNow(); const fr = rp.length ? rp.map(m => fw(m.pid, 2)).join(', ') + ' ripe' : ''; return '<button data-act="pickRound" class="' + ((n && pk.some(x => x.last)) || rp.length ? 'hot' : '') + '"><span class="big">' + (n + rp.length) + '</span><span class="lbl">to pick</span><span class="sub">' + esc(fr || (!pk.length ? 'nothing leafy' : pk.some(x => x.last) ? (n ? 'a week or more' : 'all picked') : 'start a round')) + '</span></button>'; })();
+    renderBackupNote();
   }
 
   function renderTip() {
@@ -327,6 +334,7 @@
     if (fv && fv.warn && fv.warn.length) h += '<div class="warn"><b>Before you eat it</b><ul>' + fv.warn.map(x => '<li>' + esc(x) + '</li>').join('') + '</ul></div>';
     const pet = P.pets[pid]; if (pet && pet.toxic) h += '<div class="petnote"><b>For the cat.</b> ' + esc(pet.text) + ' <a href="' + esc(pet.src) + '" target="_blank" rel="noopener">Source</a></div>';
     if (podId && POD[podId]) h += seatCard(POD[podId]);
+    if (pl.group === 'fruit' && fruitPlants().includes(pid)) h += fruitBlock(pid);
     if (pl.why) h += '<div class="callout"><b>Why it’s on the list.</b> ' + esc(pl.why) + (pl.status === 'idea' ? '<div class="btnrow" style="margin-top:8px"><button class="btn small' + (SCOUT[pid] ? ' ghost' : ' primary') + '" data-act="scoutStar" data-pid="' + pid + '">' + (SCOUT[pid] ? '★ On your shortlist · remove' : '☆ Add to your shortlist') + '</button></div>' : '') + '</div>';
     if (P.audition[pid] && P.plants[P.audition[pid]]) h += '<div class="callout"><b>Taste it first.</b> Gardyn’s ' + esc(P.plants[P.audition[pid]].name) + ' pad is the same plant, ready in ' + esc(P.plants[P.audition[pid]].gb.mature) + ' days in the Sprout Nursery. If you love it, it earns a yPod. <button class="btn small" style="margin-top:6px" data-open="plant" data-pid="' + P.audition[pid] + '">Open the pad</button></div>';
     const aud = Object.keys(P.audition).find(k => P.audition[k] === pid); if (aud && P.plants[aud]) h += '<div class="callout"><b>An audition.</b> ' + esc(P.plants[aud].name) + ' is on your Ideas list for a yPod. This pad lets you taste it first, in under two weeks.</div>';
@@ -343,6 +351,7 @@
     if (pl.care || pl.pests) h += '<div class="block"><h3>Care</h3><ul>' + (pl.care || []).map(x => '<li>' + esc(x) + '</li>').join('') + (pl.pests ? '<li><b>Common pests:</b> ' + esc(pl.pests) + '</li>' : '') + '</ul></div>';
     if (pl.taste && typeof pl.taste === 'string') h += '<div class="block"><h3>Taste and use</h3><p>' + esc(pl.taste) + '</p></div>';
     if (pl.about || pl.origin) h += '<div class="block"><h3>Qualities and origin</h3>' + (pl.about ? '<p>' + esc(pl.about) + '</p>' : '') + (pl.origin ? '<p class="small" style="margin-top:6px">' + esc(pl.origin) + '</p>' : '') + '</div>';
+    h += seedBlock(pid);
     h += journalHTML(pid);
     h += '<p class="src">Sources: ' + (pl.src || []).map(s => '<a href="' + esc(s[1]) + '" target="_blank" rel="noopener">' + esc(s[0]) + '</a>').join(' · ') + '</p>';
     showSheet(h, { kind: 'plant', pid, podId });
@@ -376,8 +385,9 @@
   }
   const phList = pid => phDB().then(d => new Promise((res, rej) => { const out = [], rq = d.transaction('photos').objectStore('photos').index('pid').openCursor(IDBKeyRange.only(pid)); rq.onsuccess = () => { const c = rq.result; if (c) { out.push(c.value); c.continue(); } else res(out); }; rq.onerror = () => rej(rq.error); }));
   const phWrite = (fn) => phDB().then(d => new Promise((res, rej) => { const tx = d.transaction('photos', 'readwrite'); fn(tx.objectStore('photos')); tx.oncomplete = () => res(); tx.onerror = () => rej(tx.error); }));
-  const phAdd = (pid, blob) => phWrite(st => st.add({ pid, d: todayISO(), t: Date.now(), blob }));
-  const phDel = id => phWrite(st => st.delete(id));
+  const phAdd = (pid, blob, d, t) => phWrite(st => st.add({ pid, d: d || todayISO(), t: t || Date.now(), blob })).then(() => { touched(); BK.photos = null; });
+  const phDel = id => phWrite(st => st.delete(id)).then(() => { touched(); BK.photos = null; });
+  const phAll = () => phDB().then(d => new Promise((res, rej) => { const rq = d.transaction('photos').objectStore('photos').getAll(); rq.onsuccess = () => res(rq.result || []); rq.onerror = () => rej(rq.error); }));
   function shrink(file) {
     return new Promise((res, rej) => {
       const url = URL.createObjectURL(file), img = new Image();
@@ -463,9 +473,9 @@
       const chip = s.state === 'over' ? 'due' : s.state === 'due' ? 'due' : s.state === 'ok' ? 'ok' : '';
       const doneToday = CARE[c.id] === todayISO();
       return '<div class="task"><div><h4>' + esc(c.title) + '</h4><div class="where">' + esc(c.where) + ' · every ' + everyText(c.every) + '</div></div><div class="st"><span class="chip ' + chip + '">' + esc(s.text) + '</span>' +
-        (doneToday ? '<button class="btn small ghost" data-act="careUndo" data-id="' + c.id + '">Undo</button>' : '<button class="btn small' + (s.state === 'over' || s.state === 'due' ? ' primary' : '') + '" data-act="careDone" data-id="' + c.id + '">Done today</button>') + '</div><div class="txt">' + esc(c.text) + '<label class="last">Last done <input type="date" data-care-date="' + c.id + '" value="' + (CARE[c.id] || '') + '" max="' + todayISO() + '" aria-label="Last done: ' + esc(c.title) + ', ' + esc(c.where) + '"></label></div></div>';
+        (doneToday ? '<button class="btn small ghost" data-act="careUndo" data-id="' + c.id + '">Undo</button>' : '<button class="btn small' + (s.state === 'over' || s.state === 'due' ? ' primary' : '') + '" data-act="careDone" data-id="' + c.id + '">Done today</button>') + '</div><div class="txt">' + esc(c.text) + (c.id === 'pollinate' ? ' <button class="linkish" data-act="fruitRound">Count the flowers while you’re there</button>' : '') + '<label class="last">Last done <input type="date" data-care-date="' + c.id + '" value="' + (CARE[c.id] || '') + '" max="' + todayISO() + '" aria-label="Last done: ' + esc(c.title) + ', ' + esc(c.where) + '"></label></div></div>';
     }).join('');
-    renderCamps(); renderMoves(); renderFixes(); renderDoctor();
+    renderCamps(); renderMoves(); renderFixes(); renderDoctor(); renderData();
   }
   function everyText(n) { return n === 7 ? 'week' : n === 14 ? '2 weeks' : n === 30 ? 'month' : n === 90 ? '3 months' : n + ' days'; }
   function renderCamps() {
@@ -604,6 +614,7 @@
     $('questions').innerHTML = P.questions.map(q => '<div><b>' + esc(q.q) + '</b><p>' + esc(q.a) + '</p></div>').join('');
     $('watch').innerHTML = P.watch.map(w => '<div><b>' + esc(w.title) + '</b><p>' + esc(w.text) + '</p></div>').join('');
     $('aboutVersion').textContent = 'Version ' + APP_VERSION + (window.__BUILD__ ? ' · build ' + window.__BUILD__ : '');
+    renderSeedBox();
   }
 
   /* ----- DIY ----- */
@@ -628,6 +639,45 @@
       '<p class="small" style="margin:0">' + esc(P.greener.heat) + '</p>' +
       (PRINTS.length ? (() => { const t = printTotals(); return '<p class="small" style="margin:0"><b>The printer so far:</b> ' + t.kwh.toFixed(2) + ' kWh, ' + usd(t.pow) + '. Switched off between runs, it stays that small.</p>'; })() : '') +
       '<p class="small" style="margin:0"><b>' + n + (n === 1 ? ' bowl' : ' bowls') + ' from the towers this month</b>' + (n ? ', each one a clamshell of greens that didn’t have to ride the ferry.' : '. Tap “We ate this” on the Salad tab and they’ll count here.') + '</p>';
+    paintHarvest();
+  }
+
+  /* ----- The scoreboard: the month's harvest at store prices, against the month's power ----- */
+  function renderHarvest() {
+    const el = $('harvest'); if (!el) return;
+    if (!el.dataset.ready) {
+      el.dataset.ready = '1';
+      el.innerHTML = '<div id="hvOut" class="stack"></div><details class="pset" id="hvSet"><summary>Store prices, and how it’s counted</summary>' +
+        '<div class="fields">' + HV.prices.map(x => '<label for="hp-' + x.id + '">' + esc(x.label) + '<input id="hp-' + x.id + '" data-hprice="' + x.id + '" type="number" min="0" max="100" step="0.01" inputmode="decimal"></label>').join('') + '</div>' +
+        '<p class="small" style="margin:0">These are the USDA’s national average advertised prices for Oct 23, 2026: sale prices, mostly, and a ferry ride cheaper than the island. Put in what you actually pay and the tally follows.</p>' +
+        '<div class="list hv-notes">' + HV.prices.map(x => '<div><b>' + esc(x.label.split(',')[0]) + '</b><p>' + esc(x.note) + '</p></div>').join('') + '<div><b>Leafy pickings</b><p id="hvCal"></p></div><div><b>Not priced</b><p>' + esc(HV.unpriced) + '</p></div></div>' +
+        '<div class="btnrow"><button class="btn small ghost" data-act="hpReset">Back to the USDA prices</button></div>' +
+        '<p class="src" style="margin:0">Sources: ' + HV.src.map(s => '<a href="' + esc(s[1]) + '" target="_blank" rel="noopener">' + esc(s[0]) + '</a>').join(' · ') + '</p></details>';
+      fillPrices();
+      el.querySelectorAll('[data-hprice]').forEach(inp => inp.addEventListener('input', () => { const v = parseFloat(inp.value); if (isFinite(v) && v >= 0) PRICE[inp.dataset.hprice] = Math.min(100, v); store.set('hprice', PRICE); paintHarvest(); }));
+    }
+    paintHarvest();
+  }
+  function fillPrices() { HV.prices.forEach(x => { const i = $('hp-' + x.id); if (i) i.value = PRICE[x.id]; }); }
+  function paintHarvest() {
+    const el = $('hvOut'); if (!el) return;
+    const today = todayISO(), ym = today.slice(0, 7), y = +ym.slice(0, 4), m = +ym.slice(5), t = tally(ym + '-01', today), pow = powerMonth();
+    const dim = new Date(Date.UTC(y, m, 0)).getUTCDate(), dom = +today.slice(8);
+    let run = 0, paid = null; Object.keys(t.byDay).sort().forEach(d => { run += t.byDay[d]; if (!paid && pow > 0 && run >= pow) paid = d; });
+    const pct = pow > 0 ? Math.min(100, t.total / pow * 100) : 100, pace = dom >= 5 && t.total > 0 ? t.total / dom * dim : 0;
+    let h = '<div class="hv-head"><span class="eyebrow">' + MONTHS_LONG[m - 1] + ' so far</span><span class="hv-big num">' + usd(t.total) + '</span><span class="small">of groceries from the towers, at store prices, against <b>' + usd(pow) + '</b> of power for the whole month</span></div>';
+    h += '<div class="hv-bar" role="img" aria-label="' + Math.round(pct) + ' percent of the month’s power covered"><i style="width:' + pct.toFixed(1) + '%"></i></div>';
+    h += '<p class="small" style="margin:0">' + (paid ? '<b>The towers paid for the month’s power on ' + fmtDate(paid) + '.</b> Everything since is ahead.' : t.total > 0 ? usd(Math.max(0, pow - t.total)) + ' to go to cover it.' + (pace ? ' On pace for about ' + usd(pace) + ' by the end of ' + MONTHS_LONG[m - 1] + '.' : '') : 'Nothing logged yet this month. Tick pods on the picking round and count fruit as you pick it.') + '</p>';
+    const rows = [];
+    if (t.leafOz > 0) rows.push(['Greens and herbs', ozStr(t.leafOz) + ', about ' + boxWord(t.leafOz / HV.boxOz) + ' · ' + plural(t.picks, 'picking', 'pickings'), usd(t.leafV)]);
+    Object.keys(t.fruit).forEach(pid => { const x = t.fruit[pid]; rows.push([P.plants[pid] ? P.plants[pid].name : pid, x.n + ' ' + fw(pid, x.n), eachPrice(pid) > 0 ? usd(x.v) : 'not priced']); });
+    if (rows.length) h += '<div class="hv-rows">' + rows.map(r => '<div><span>' + esc(r[0]) + '<small>' + esc(r[1]) + '</small></span><b class="num">' + esc(r[2]) + '</b></div>').join('') + '</div>';
+    const past = [];
+    for (let i = 1; i <= 6; i++) { const dt = new Date(Date.UTC(y, m - 1 - i, 1)), k = dt.getUTCFullYear() + '-' + String(dt.getUTCMonth() + 1).padStart(2, '0'), tt = tally(k + '-01', monthEnd(k)); if (tt.total > 0) past.push([dt.getUTCMonth(), tt.total]); }
+    if (past.length) h += '<div class="hv-months"><span class="eyebrow">Earlier months, against ' + usd(pow) + ' of power</span>' + past.map(([mi, v]) => '<div><span>' + MONTHS_LONG[mi] + '</span><span class="num">' + usd(v) + '</span><span class="num ' + (v >= pow ? 'up' : 'down') + '">' + (v >= pow ? '+' : '−') + usd(Math.abs(v - pow)) + '</span></div>').join('') + '</div>';
+    el.innerHTML = h;
+    const cal = leafCal(), c = $('hvCal');
+    if (c) c.textContent = 'Until you size a round, a leafy picking counts as about ' + ozStr(HV.leafOz.greens) + ' of greens, or ' + ozStr(HV.leafOz.herbs) + ' of an herb: a starting guess, not a measurement. ' + (cal.n >= 2 ? 'From the ' + cal.n + ' rounds you’ve sized, yours run about ' + (Math.round(cal.f * 10) / 10) + ' times that, so that’s what the unsized days use.' : 'Size two rounds on the picking round, by eye or on a kitchen scale, and the app goes by yours.');
   }
   function renderGreener() {
     const el = $('footprint');
@@ -637,7 +687,7 @@
       $('fTow').value = FOOT.towers; $('fKwh').value = FOOT.kwh; $('fRate').value = FOOT.rate;
       ['fTow', 'fKwh', 'fRate'].forEach(i => $(i).addEventListener('input', () => { FOOT.towers = Math.max(0, +$('fTow').value || 0); FOOT.kwh = Math.max(0, +$('fKwh').value || 0); FOOT.rate = Math.max(0, +$('fRate').value || 0); store.set('foot', FOOT); paintFoot(); }));
     }
-    paintFoot();
+    paintFoot(); renderHarvest();
     const ref = P.care.filter(c => /^refresh-/.test(c.id)), tank = P.greener.tank;
     const gal = ref.reduce((g, c) => g + tank * 30 / c.every, 0);
     $('waterCard').innerHTML = '<p style="margin:0"><b>About ' + Math.round(gal) + ' gallons a month</b> leave the towers at Tank Refresh time: ' + tank + ' gallons per Tank, ' + ref.map(c => esc(c.where.toLowerCase()) + ' every ' + everyText(c.every)).join(', ') + '.</p><p>' + esc(P.greener.water) + '</p>';
@@ -970,18 +1020,149 @@
   const PICK_EVERY = 7;
   const pickable = p => { if (!parse(cur(p))) return false; const pl = P.plants[p.p]; return !!pl && ['greens', 'herbs', 'flowers'].includes(pl.group); };
   function pickList() { const today = dayNum(todayISO()); return P.pods.filter(pickable).map(p => { const last = PICK[p.id] || null; const days = last ? today - dayNum(last) : null; return { p, last, days, due: days === null || days >= PICK_EVERY }; }); }
-  function setPicked(ids, on) { ids.forEach(id => { if (on) PICK[id] = todayISO(); else delete PICK[id]; }); store.set('pick', PICK); }
-  function pickSheet() {
+  function setPicked(ids, on) {
+    const today = todayISO();
+    ids.forEach(id => {
+      if (on) { PICK[id] = today; if (!HARV.some(h => h.k === 'leaf' && h.pod === id && h.d === today)) HARV.push({ d: today, pod: id, p: POD[id].p, k: 'leaf', n: 1 }); }
+      else {
+        HARV = HARV.filter(h => !(h.k === 'leaf' && h.pod === id && h.d === today));
+        const prev = HARV.filter(h => h.k === 'leaf' && h.pod === id).map(h => h.d).sort().pop();
+        if (prev) PICK[id] = prev; else delete PICK[id];
+      }
+    });
+    store.set('pick', PICK); saveHarv();
+  }
+
+  /* ----- The harvest log: leafy pickings, fruit and flowers, and what they'd cost at the store ----- */
+  const HV = P.harvest;
+  const MONTHS_LONG = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+  let HARV = store.get('harv', null);
+  if (!Array.isArray(HARV)) {   // first run: one picking for each pod's last logged pick, so this month isn't blank
+    HARV = []; Object.keys(PICK).forEach(id => { if (POD[id] && PICK[id]) HARV.push({ d: PICK[id], pod: id, p: POD[id].p, k: 'leaf', n: 1 }); });
+    if (HARV.length) store.raw('harv', HARV);
+  }
+  let HAMT = store.get('hamt', {});
+  let FLOW = store.get('flow', []);
+  const PRICE = {};
+  const priceDefaults = () => { HV.prices.forEach(x => { PRICE[x.id] = x.v; }); };
+  priceDefaults(); Object.assign(PRICE, store.get('hprice', {}));
+  const saveHarv = () => { HARV = HARV.slice(-6000); store.set('harv', HARV); };
+  const saveFlow = () => { FLOW = FLOW.slice(-3000); store.set('flow', FLOW); };
+  const saveHamt = () => store.set('hamt', HAMT);
+  function harvestChanged() { renderToday(); refreshSheet(); paintHarvest(); if (!$('view-towers').hidden && UI.lens === 'pick') renderTower(); }
+  const byD = (a, b) => a.d < b.d ? -1 : a.d > b.d ? 1 : 0;
+  const plural = (n, a, b) => n + ' ' + (n === 1 ? a : b);
+  const fw = (pid, n) => { const w = HV.fruitWord[pid] || ['fruit', 'fruit']; return n === 1 ? w[0] : w[1]; };
+  const ozStr = oz => (oz < 10 ? Math.round(oz * 4) / 4 : Math.round(oz)).toString().replace(/\.25$/, '¼').replace(/\.5$/, '½').replace(/\.75$/, '¾').replace(/^0(?=[¼½¾])/, '') + ' oz';
+  const boxWord = b => { const r = Math.round(b * 2) / 2; if (!r) return 'under half a box'; return (r === 0.5 ? '½' : String(r).replace(/\.5$/, '½')) + (r <= 1 ? ' box' : ' boxes'); };
+
+  /* Leafy pickings: a starting guess per pod, scaled to your own sizing once you've sized two rounds. */
+  const leafEst = h => (HV.leafOz[(P.plants[h.p] || {}).group] || HV.leafOz.greens) * (h.n || 1);
+  const dayEst = d => HARV.reduce((s, h) => s + (h.k === 'leaf' && h.d === d ? leafEst(h) : 0), 0);
+  function leafCal() {
+    let a = 0, b = 0, n = 0;
+    Object.keys(HAMT).forEach(d => { const est = dayEst(d); if (est > 0 && HAMT[d] > 0) { a += HAMT[d]; b += est; n++; } });
+    return { f: n >= 2 ? Math.min(4, Math.max(0.25, a / b)) : 1, n };
+  }
+  const leafDay = (d, f) => HAMT[d] != null ? HAMT[d] : dayEst(d) * f;
+  const ozPrice = () => (PRICE.greens || 0) / HV.boxOz;
+  function eachPrice(pid) { const c = HV.prices.find(x => x.id === pid), v = PRICE[pid]; if (!c || !(v > 0)) return 0; return c.count ? v / c.count : c.pkgG ? v / c.pkgG * c.g : 0; }
+  function monthEnd(ym) { const [y, m] = ym.split('-').map(Number); return ym + '-' + String(new Date(Date.UTC(y, m, 0)).getUTCDate()).padStart(2, '0'); }
+  const powerMonth = () => FOOT.towers * FOOT.kwh * FOOT.rate;
+  function tally(from, to) {
+    const f = leafCal().f, days = new Set(), byDay = {};
+    HARV.forEach(h => { if (h.k === 'leaf' && h.d >= from && h.d <= to) days.add(h.d); });
+    Object.keys(HAMT).forEach(d => { if (d >= from && d <= to) days.add(d); });
+    let leafOz = 0; days.forEach(d => { const oz = leafDay(d, f); leafOz += oz; byDay[d] = (byDay[d] || 0) + oz * ozPrice(); });
+    const fruit = {}; let fruitV = 0;
+    HARV.forEach(h => { if (h.k !== 'fruit' || h.d < from || h.d > to) return; const x = fruit[h.p] = fruit[h.p] || { n: 0, v: 0 }, v = h.n * eachPrice(h.p); x.n += h.n; x.v += v; fruitV += v; byDay[h.d] = (byDay[h.d] || 0) + v; });
+    const picks = HARV.filter(h => h.k === 'leaf' && h.d >= from && h.d <= to).length;
+    return { leafOz, leafV: leafOz * ozPrice(), fruit, fruitV, total: leafOz * ozPrice() + fruitV, picks, byDay };
+  }
+
+  /* Flowers to fruit. Each picked fruit is matched to the oldest logged flower that could have made it;
+     a flower past the "give" day without fruit didn't set. Three matches, and your own timing takes over. */
+  const median = a => { const s = a.slice().sort((x, y) => x - y), m = s.length >> 1; return s.length % 2 ? s[m] : Math.round((s[m - 1] + s[m]) / 2); };
+  function fruitModel(pid) {
+    const R = HV.ripe[pid] || {}, flowers = [], picks = [];
+    FLOW.filter(x => x.p === pid).sort(byD).forEach(x => { for (let i = 0; i < x.n; i++) flowers.push(x.d); });
+    HARV.filter(h => h.k === 'fruit' && h.p === pid).sort(byD).forEach(h => { for (let i = 0; i < h.n; i++) picks.push(h.d); });
+    const minLag = R.lo ? Math.max(3, Math.floor(R.lo / 2)) : 5, maxLag = R.give || 120;
+    const used = flowers.map(() => false), lags = [];
+    picks.forEach(pd => { const p = dayNum(pd); for (let i = 0; i < flowers.length; i++) { if (used[i]) continue; const lag = p - dayNum(flowers[i]); if (lag < minLag) break; if (lag > maxLag) continue; used[i] = true; lags.push(lag); break; } });
+    const mine = lags.length >= 3 ? median(lags) : null;
+    const win = mine ? { lo: Math.round(mine * 0.85), hi: Math.round(mine * 1.15), give: Math.max(R.give || 0, Math.round(mine * 1.6)), mid: mine } : R.lo ? { lo: R.lo, hi: R.hi, give: R.give, mid: Math.round((R.lo + R.hi) / 2) } : null;
+    const today = dayNum(todayISO());
+    const open = flowers.filter((d, i) => !used[i]).map(d => ({ d, age: today - dayNum(d) })).filter(x => x.age <= (win ? win.give : 120));
+    const now = win ? open.filter(x => x.age >= win.lo) : [];
+    const next = win && open.length ? addDays(open[0].d, win.mid) : null;
+    return { pid, R, win, mine, lags: lags.length, open, now, next };
+  }
+  function fruitPlants() {
+    const at = {}; P.pods.forEach(p => { const pl = P.plants[p.p], q = parse(cur(p)); if (pl && pl.group === 'fruit' && q) at[p.p] = Math.min(at[p.p] || 99, q.r); });
+    return Object.keys(at).sort((a, b) => at[a] - at[b]);
+  }
+  const ripeNow = () => fruitPlants().map(fruitModel).filter(m => m.now.length);
+  function fruitStatus(m) {
+    const fl = n => plural(n, 'flower', 'flowers');
+    if (m.now.length) return m.now.length + ' ' + fw(m.pid, m.now.length) + ' should be ripe' + (m.open.length > m.now.length ? ' · ' + (m.open.length - m.now.length) + ' more on the way' : '');
+    if (m.open.length && m.next) return fl(m.open.length) + ' on the way · first ripe about ' + fmtDate(m.next);
+    if (m.open.length) return fl(m.open.length) + ' since ' + fmtDate(m.open[0].d);
+    return 'No flowers logged';
+  }
+  const todayN = (arr, pid, k) => arr.reduce((s, x) => s + (x.p === pid && x.d === todayISO() && (!k || x.k === k) ? x.n : 0), 0);
+  function bump(kind, pid, by) {
+    const today = todayISO(), arr = kind === 'flower' ? FLOW : HARV;
+    let e = arr.find(x => x.p === pid && x.d === today && (kind === 'flower' || (x.k === 'fruit' && !x.pod)));
+    if (!e && by > 0) { e = kind === 'flower' ? { d: today, p: pid, n: 0 } : { d: today, p: pid, k: 'fruit', n: 0 }; arr.push(e); }
+    if (!e) return;
+    e.n = Math.max(0, e.n + by);
+    if (!e.n) arr.splice(arr.indexOf(e), 1);
+    if (kind === 'flower') saveFlow(); else saveHarv();
+  }
+  function stepper(kind, pid, n, label, aria) {
+    const a = esc(aria || label + ' today');
+    return '<span class="step' + (n ? ' on' : '') + '">' + (label ? '<span class="st-l">' + label + '</span>' : '') + '<button class="st-b" data-act="' + kind + 'Del" data-pid="' + pid + '" aria-label="' + a + ': one fewer"' + (n ? '' : ' disabled') + '>−</button><span class="st-v num">' + n + '</span><button class="st-b" data-act="' + kind + 'Add" data-pid="' + pid + '" aria-label="' + a + ': one more">+</button></span>';
+  }
+  function fruitRow(pid) {
+    const pl = P.plants[pid], m = fruitModel(pid);
+    return '<div class="fr"><button class="fr-n" data-open="plant" data-pid="' + pid + '"><span class="gwrap">' + plantGlyph(pl) + '</span><span class="fr-t"><b>' + esc(pl.name) + '</b><span class="small' + (m.now.length ? ' ripe' : '') + '">' + esc(fruitStatus(m)) + '</span></span></button>' +
+      '<span class="fr-b">' + stepper('flower', pid, todayN(FLOW, pid), 'Flowers') + stepper('fruit', pid, todayN(HARV, pid, 'fruit'), 'Picked') + '</span></div>';
+  }
+  function fruitBlock(pid) {
+    const m = fruitModel(pid), R = m.R, ym = todayISO().slice(0, 7);
+    const all = HARV.filter(h => h.k === 'fruit' && h.p === pid), month = all.filter(h => h.d.slice(0, 7) === ym).reduce((s, h) => s + h.n, 0), total = all.reduce((s, h) => s + h.n, 0);
+    let h = '<div class="block fruitblk"><h3>Flowers and fruit</h3><div class="fr solo"><span class="fr-t"><span class="small' + (m.now.length ? ' ripe' : '') + '">' + esc(fruitStatus(m)) + '</span></span><span class="fr-b">' + stepper('flower', pid, todayN(FLOW, pid), 'Flowers') + stepper('fruit', pid, todayN(HARV, pid, 'fruit'), 'Picked') + '</span></div>';
+    h += '<p class="small">' + (m.mine ? '<b>Your towers:</b> about ' + m.mine + ' days from flower to picking, from ' + m.lags + ' ' + fw(pid, m.lags) + '.' + (R.say ? ' The books say ' + esc(R.say) + '.' : '') : R.say ? '<b>Flower to ripe:</b> ' + esc(R.say) + '. ' + esc(R.src) + ' After three matched pickings, the app goes by your own.' : esc(R.sign || '')) + '</p>';
+    if (total) h += '<p class="small" style="margin-top:4px"><b>Picked:</b> ' + month + ' this month, ' + total + ' in all' + (eachPrice(pid) > 0 ? ', about ' + usd(total * eachPrice(pid)) + ' at the store.' : '.') + '</p>';
+    return h + '</div>';
+  }
+  function sizeBlock() {
+    const d = todayISO(), have = HAMT[d], est = dayEst(d), cal = leafCal();
+    if (!est && have == null) return '';
+    const said = have != null ? 'You said ' + ozStr(have) + '.' : 'Until you say, it’s counted as about ' + ozStr(est * cal.f) + (cal.n >= 2 ? ', going by the rounds you’ve sized.' : ', a starting guess.');
+    return '<div class="block size"><h3>How much came off today?</h3><p class="small">By eye, in 5-ounce boxes of salad greens. ' + said + '</p><div class="dchips">' + HV.sizes.map(b => '<button data-act="hSize" data-b="' + b + '" aria-pressed="' + (have != null && Math.abs(have - b * HV.boxOz) < 0.01) + '">' + boxWord(b) + '</button>').join('') + '</div><label class="last">Or weigh it <input id="hOz" type="number" min="0" max="400" step="0.1" inputmode="decimal" value="' + (have != null ? have : '') + '" aria-label="Today’s picking, in ounces"> oz' + (have != null ? ' <button class="btn small ghost" data-act="hSizeClear">Clear</button>' : '') + '</label></div>';
+  }
+  function tallyLine() {
+    const ym = todayISO().slice(0, 7), t = tally(ym + '-01', todayISO()), pow = powerMonth();
+    return '<b>' + MONTHS_LONG[+ym.slice(5) - 1] + ' so far: about ' + usd(t.total) + ' of groceries</b> from the towers, against ' + usd(pow) + ' of power for the month. <button class="linkish" data-go="diy" data-anchor="harvSec">Open the scoreboard</button>';
+  }
+  function pickSheet(focus) {
     const L = pickList(), today = todayISO();
     const order = x => { const q = parse(cur(x.p)); return (q.t === 'S' ? 0 : 100) + q.r * 3 + 'LCR'.indexOf(q.c); };
     L.sort((a, b) => order(a) - order(b));
-    let h = '<div><div class="eyebrow">Picking round</div><h2 id="sheetTitle">What to pick</h2><p class="small" style="margin:4px 0 0">A pick about once a week keeps leafy plants from bolting or crowding the pod two rows up. Walk the tower top to bottom and tick each one as you go. Fruit isn’t on this list: pick it when it’s ripe.</p></div>';
+    const fps = fruitPlants(), ripe = fps.map(fruitModel).filter(m => m.now.length);
+    let h = '<div><div class="eyebrow">Picking round</div><h2 id="sheetTitle">What to pick</h2><p class="small" style="margin:4px 0 0">A pick about once a week keeps leafy plants from bolting or crowding the pod two rows up. Walk the tower top to bottom and tick each one as you go; fruit gets counted below.</p></div>';
+    if (ripe.length) h += '<div class="callout ripe"><b>Should be ripe now:</b> ' + esc(ripe.map(m => m.now.length + ' ' + fw(m.pid, m.now.length)).join(', ')) + ', going by the flowers you logged. Color and feel decide.</div>';
     ['S', 'F'].forEach(t => {
       const rows = L.filter(x => parse(cur(x.p)).t === t); if (!rows.length) return;
       h += '<div class="block"><h3>' + esc(P.towers[t].name) + '</h3><div class="list picks">' + rows.map(x => { const pl = P.plants[x.p.p], done = x.last === today; return '<div class="pk' + (x.days !== null && x.days >= PICK_EVERY ? ' due' : '') + '"><span class="gwrap">' + plantGlyph(pl) + '</span><span class="pk-t"><b>' + esc(x.p.label) + '</b><span class="small">' + esc(seatName(cur(x.p))) + ' · ' + (done ? 'picked today' : x.last ? 'picked ' + (x.days === 1 ? 'yesterday' : x.days + ' days ago') : 'not logged') + '</span></span><button class="tick" data-act="pickToggle" data-pod="' + x.p.id + '" aria-pressed="' + done + '" aria-label="Picked ' + esc(x.p.label) + ' today"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></button></div>'; }).join('') + '</div></div>';
     });
-    h += L.length ? '<div class="btnrow"><button class="btn primary" data-act="pickAll">Picked them all today</button></div>' : '<div class="card small">Nothing leafy on the towers right now.</div>';
+    h += L.length ? '<div class="btnrow"><button class="btn primary" data-act="pickAll">Picked them all today</button></div>' + sizeBlock() : '<div class="card small">Nothing leafy on the towers right now.</div>';
+    if (fps.length) h += '<div class="block" id="fruitSec"><h3>Flowers and fruit</h3><p class="small">Count flowers as they open (the pollinating round is a good time) and fruit as you pick it. The app works out when each should be ripe, and learns your towers’ own timing.</p><div class="list fruits">' + fps.map(fruitRow).join('') + '</div></div>';
+    h += '<div class="callout tally">' + tallyLine() + '</div><div class="btnrow"><button class="btn small" data-act="shareCard">Share tonight’s picture</button></div>';
     showSheet(h, { kind: 'pick' });
+    if (focus === 'fruit' && $('fruitSec')) { const s = $('sheet'); s.scrollTop = Math.max(0, $('fruitSec').offsetTop - 12); }
   }
   const AGO = [[0, 'Today'], [3, 'A few days ago'], [7, 'A week ago'], [14, 'Two weeks ago'], [30, 'A month or more']];
   function catchSheet() {
@@ -1078,7 +1259,8 @@
     const box = $('newsBox'), seen = store.get('seenVersion', null);
     const returning = Object.keys(DONE).length || Object.keys(CARE).length || Object.keys(NOTES).length;
     if (!NEWS || seen === APP_VERSION || !returning) { store.set('seenVersion', APP_VERSION); box.hidden = true; return; }
-    box.innerHTML = '<b>New in the Plant Book</b><div class="small">' + NEWS + '</div><div class="btnrow"><button class="btn small" data-act="newsOk">Got it</button></div>';
+    const due = bkLevel(bkState());
+    box.innerHTML = '<b>New in the Plant Book</b><div class="small">' + NEWS + (due ? (LASTBK ? ' And a backup is due.' : ' Nothing here is backed up yet, so that’s the place to start.') : '') + '</div><div class="btnrow">' + (due ? '<button class="btn small primary" data-act="bkNow">Back up now</button>' : '') + '<button class="btn small' + (due ? ' ghost' : '') + '" data-act="newsOk">Got it</button></div>';
     box.hidden = false;
   }
 
@@ -1112,29 +1294,334 @@
     } catch (e) {}
   }
 
-  /* ----- Backup ----- */
-  function backup() {
-    const data = {}; KEYS.forEach(k => { data[k] = store.get(k, null); });
-    const txt = JSON.stringify({ app: 'plant-book', v: 1, at: new Date().toISOString(), data });
-    const fallback = () => { $('restoreBox').hidden = false; $('restoreText').value = txt; $('restoreText').select(); toast('Selected. Copy it from the box.'); };
-    try { navigator.clipboard.writeText(txt).then(() => toast('Backup copied. Paste it somewhere safe.'), fallback); } catch (e) { fallback(); }
+  /* ----- Backup: one file with everything, photos included, sent wherever the share sheet goes ----- */
+  const BK = { photos: null, gen: 0, packing: null, pending: null, cardPending: null, persist: null, parsed: null, busy: false };
+  let LASTBK = store.get('lastBackup', null);
+  const isSite = () => !!window.__STANDALONE_SITE__;
+  function snapshot() { const data = {}; KEYS.forEach(k => { data[k] = store.get(k, null); }); return data; }
+  function hasData() { for (const k of TRACKED) { const v = store.get(k, null); if (v && (typeof v !== 'object' || Object.keys(v).length)) return true; } return false; }
+  function earliestDate() { const t = todayISO(), d = snapshot(); delete d.care; const m = JSON.stringify(d).match(/20\d\d-[01]\d-[0-3]\d/g) || []; return m.filter(x => x <= t).sort()[0] || t; }   // care dates can be backdated, so they don't count
+  function bkState() {
+    const dirty = store.get('dirty', null), since = LASTBK ? LASTBK.d : dirty ? dirty.since : null;
+    return { dirty: !!(dirty && dirty.n), age: since ? dayNum(todayISO()) - dayNum(since) : 0, since, unsaved: dirty ? dirty.since : null };
   }
-  function restore() {
+  function bkLevel(s) {
+    if (!s.dirty) return null;
+    if (s.age >= 14) return 'firm';
+    if (!LASTBK) return s.age >= 1 ? 'never' : null;
+    return s.age >= 7 ? 'soft' : null;
+  }
+  const fmtWhen = iso => { const d = new Date(iso); if (isNaN(d)) return ''; const h = d.getHours(), mm = String(d.getMinutes()).padStart(2, '0'); return MONTHS[d.getMonth()] + ' ' + d.getDate() + ', ' + ((h % 12) || 12) + ':' + mm + (h < 12 ? ' am' : ' pm'); };
+  const sizeStr = b => b >= 1048576 ? (b / 1048576).toFixed(1) + ' MB' : Math.max(1, Math.round(b / 1024)) + ' KB';
+  function blobToB64(b) { return new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(String(r.result).split(',')[1] || ''); r.onerror = () => rej(r.error); r.readAsDataURL(b); }); }
+  function b64ToBlob(s, type) { const bin = atob(s), u = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i); return new Blob([u], { type: type || 'image/jpeg' }); }
+  const phPut = rec => phDB().then(d => new Promise((res, rej) => { const tx = d.transaction('photos', 'readwrite'); let id; const rq = tx.objectStore('photos').add(rec); rq.onsuccess = () => { id = rq.result; }; tx.oncomplete = () => res(id); tx.onerror = () => rej(tx.error); }));
+  /* Photos are packed ahead of time, so a tap on Back up goes straight to the share sheet. */
+  function packPhotos() {
+    if (!PH.ok) return Promise.resolve([]);
+    if (BK.photos) return Promise.resolve(BK.photos);
+    if (BK.packing) return BK.packing;
+    const gen = BK.gen;
+    BK.packing = phAll().then(async all => { const out = []; for (const x of all) { try { out.push({ pid: x.pid, d: x.d, t: x.t, type: x.blob.type || 'image/jpeg', b64: await blobToB64(x.blob) }); } catch (e) {} } if (gen === BK.gen) BK.photos = out; return out; }).catch(() => []).then(r => { BK.packing = null; return r; });
+    return BK.packing;
+  }
+  function download(file) { const u = URL.createObjectURL(file), a = document.createElement('a'); a.href = u; a.download = file.name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(u), 5000); }
+  function copyText(t, ok, fail) { const f = fail || (() => toast('Couldn’t copy it here.')); try { navigator.clipboard.writeText(t).then(ok, f); } catch (e) { f(); } }
+  function markBacked(meta) {
+    LASTBK = { at: meta.at || new Date().toISOString(), d: meta.d || todayISO(), how: meta.how, photos: meta.photos, bytes: meta.bytes };
+    store.raw('lastBackup', LASTBK); store.raw('dirty', null); store.raw('bkSnooze', null);
+    renderBackupNote(); renderNews(); if (!$('view-care').hidden) renderData();
+  }
+  async function backupNow() {
+    if (BK.busy) return;
+    if (!isSite()) return bkCopy();
+    if (BK.pending && Date.now() - BK.pending.t < 120000) { const p = BK.pending; BK.pending = null; return sendBackup(p.file, p.meta); }
+    BK.busy = true;
     try {
-      const o = JSON.parse($('restoreText').value); if (!o || o.app !== 'plant-book' || !o.data) throw new Error('not a backup');
-      KEYS.forEach(k => { if (o.data[k] != null) store.set(k, o.data[k]); });
-      DONE = store.get('done', {}); CARE = store.get('care', {}); CAMP = store.get('camp', {}); NOTES = store.get('notes', {}); TRAIL = store.get('trail', {});
-      PICK = store.get('pick', {}); VERD = store.get('verdict', {}); SCOUT = store.get('scout', {}); ATE = store.get('ate', []); Object.assign(FOOT, store.get('foot', {}));
-      PRINTS = store.get('prints', []); Object.assign(PSET, store.get('printer', {})); { const pz = store.get('podseats', {}); PODS.seats = pz.seats || {}; PODS.past = pz.past || 0; } Object.assign(FGS, store.get('fgame', {})); if ($('psW')) fillSet();
-      BOWL.splice(0, BOWL.length, ...store.get('bowl', []).filter(id => P.plants[id])); SAVED.splice(0, SAVED.length, ...store.get('bowls', [])); MGSEL.splice(0, MGSEL.length, ...store.get('mgsel', []));
-      $('restoreBox').hidden = true; renderAll(); renderCare(); toast('Restored.');
-    } catch (e) { toast('That doesn’t look like a Plant Book backup. Paste the whole thing.'); }
+      if (!BK.photos && PH.ok) toast('Packing the photos…');
+      const photos = await packPhotos();
+      const o = { app: 'plant-book', v: 2, at: new Date().toISOString(), d: todayISO(), version: APP_VERSION, data: snapshot(), photos };
+      const file = new File([JSON.stringify(o)], 'Plant Book backup ' + todayISO() + '.txt', { type: 'text/plain' });
+      await sendBackup(file, { at: o.at, d: o.d, photos: photos.length, bytes: file.size });
+    } catch (e) { toast('The backup couldn’t be made. Try Copy as text, under Other ways.'); }
+    finally { BK.busy = false; }
   }
+  async function sendBackup(file, meta) {
+    let can = false; try { can = !!(navigator.canShare && navigator.share && navigator.canShare({ files: [file] })); } catch (e) {}
+    if (can) {
+      try { await navigator.share({ files: [file], title: 'Plant Book backup' }); markBacked(Object.assign({ how: 'share' }, meta)); toast('Backed up.'); return; }
+      catch (e) {
+        if (e && e.name === 'AbortError') { toast('Closed without sending it anywhere.'); return; }
+        if (e && e.name === 'NotAllowedError') { BK.pending = { file, meta, t: Date.now() }; toast('Ready. Tap Back up now once more to send it.'); return; }
+      }
+    }
+    download(file); markBacked(Object.assign({ how: 'download' }, meta)); toast('Saved to Downloads. Send it to Drive or your email to keep it off the phone.');
+  }
+  function bkCopy() {
+    const o = { app: 'plant-book', v: 2, at: new Date().toISOString(), d: todayISO(), version: APP_VERSION, data: snapshot(), photos: [] }, txt = JSON.stringify(o);
+    copyText(txt, () => { markBacked({ at: o.at, d: o.d, how: 'copy', photos: 0, bytes: txt.length }); toast('Copied, without photos. Paste it somewhere safe.'); }, () => { const b = $('pasteBox'); if (b) { b.hidden = false; $('restoreText').value = txt; $('restoreText').select(); toast('Selected. Copy it from the box.'); } });
+  }
+  function parseBackup(txt) {
+    const s = String(txt || ''), a = s.indexOf('{'), b = s.lastIndexOf('}'); if (a < 0 || b <= a) return null;
+    let o; try { o = JSON.parse(s.slice(a, b + 1)); } catch (e) { return null; }
+    if (!o || o.app !== 'plant-book' || !o.data || typeof o.data !== 'object') return null;
+    o.photos = Array.isArray(o.photos) ? o.photos.filter(x => x && x.b64 && x.pid) : []; if (!o.at) o.at = new Date().toISOString(); if (!o.d) o.d = String(o.at).slice(0, 10);
+    return o;
+  }
+  function bkSummary(o) {
+    const d = o.data, n = x => x ? (Array.isArray(x) ? x.length : Object.keys(x).length) : 0;
+    const notes = d.notes ? Object.values(d.notes).reduce((s, l) => s + ((l || []).length || 0), 0) : 0;
+    const parts = [[n(d.care), 'care date', 'care dates'], [n(d.done), 'step done', 'steps done'], [notes, 'note', 'notes'], [n(d.harv) || n(d.pick), 'picking', 'pickings'], [n(d.flow), 'day of flowers', 'days of flowers'], [n(d.ate), 'bowl eaten', 'bowls eaten'], [n(d.prints), 'print', 'prints'], [n(d.seeds), 'seed entry', 'seed entries'], [o.photos.length, 'photo', 'photos']];
+    return parts.filter(p => p[0]).map(p => plural(p[0], p[1], p[2])).join(', ') || 'Nothing logged in it.';
+  }
+  function offerRestore(txt) {
+    const o = parseBackup(txt);
+    if (!o) { toast('That isn’t a Plant Book backup. It needs the whole file or the whole text.'); return; }
+    BK.parsed = o; showView('care', 'dataSec'); renderData();
+  }
+  function loadAll() {
+    DONE = store.get('done', {}); CARE = store.get('care', {}); CAMP = store.get('camp', {}); NOTES = store.get('notes', {}); TRAIL = store.get('trail', {});
+    PICK = store.get('pick', {}); VERD = store.get('verdict', {}); SCOUT = store.get('scout', {}); ATE = store.get('ate', []);
+    Object.assign(FOOT, { towers: 2, kwh: P.greener.kwh, rate: P.greener.rate }, store.get('foot', {}));
+    PRINTS = store.get('prints', []); Object.assign(PSET, { w: 75, kg: 20, yc: 5.99, plug: 0.21, casing: 4, wool: 4 }, store.get('printer', {}));
+    { const pz = store.get('podseats', {}); PODS.seats = pz.seats || {}; PODS.past = pz.past || 0; }
+    Object.assign(FGS, { best: null, plays: 0 }, store.get('fgame', {}));
+    BOWL.splice(0, BOWL.length, ...store.get('bowl', []).filter(id => P.plants[id])); SAVED.splice(0, SAVED.length, ...store.get('bowls', [])); MGSEL.splice(0, MGSEL.length, ...store.get('mgsel', []));
+    HARV = store.get('harv', []); HAMT = store.get('hamt', {}); FLOW = store.get('flow', []); SEEDS = store.get('seeds', []);
+    priceDefaults(); Object.assign(PRICE, store.get('hprice', {}));
+    Object.assign(UI, store.get('ui', {}));
+    if ($('psW')) fillSet(); if ($('fTow')) { $('fTow').value = FOOT.towers; $('fKwh').value = FOOT.kwh; $('fRate').value = FOOT.rate; } fillPrices();
+  }
+  async function doRestore() {
+    const o = BK.parsed; if (!o) return;
+    const before = { at: new Date().toISOString(), data: snapshot(), last: LASTBK, added: [] };
+    KEYS.forEach(k => { if (o.data[k] != null) store.set(k, o.data[k]); });
+    loadAll();
+    if (PH.ok && o.photos.length) {
+      try {
+        const have = new Set((await phAll()).map(x => x.pid + '|' + x.t));
+        for (const x of o.photos) { if (have.has(x.pid + '|' + x.t)) continue; try { before.added.push(await phPut({ pid: x.pid, d: x.d || todayISO(), t: x.t || Date.now(), blob: b64ToBlob(x.b64, x.type) })); } catch (e) {} }
+        BK.photos = null; BK.gen++;
+      } catch (e) {}
+    }
+    store.raw('preRestore', before);
+    LASTBK = { at: o.at, d: o.d, how: 'restored', photos: o.photos.length }; store.raw('lastBackup', LASTBK); store.raw('dirty', null);
+    BK.parsed = null;
+    renderAll(); renderCare(); renderData();
+    toast('Restored' + (before.added.length ? ', with ' + plural(before.added.length, 'photo', 'photos') : '') + '.');
+  }
+  async function undoRestore() {
+    const b = store.get('preRestore', null); if (!b || !b.data) return;
+    KEYS.forEach(k => { const v = b.data[k]; if (v == null) store.raw(k, null); else store.set(k, v); });
+    for (const id of (b.added || [])) { try { await phDel(id); } catch (e) {} }
+    LASTBK = b.last || null; store.raw('lastBackup', LASTBK); store.raw('preRestore', null); touched();
+    loadAll(); renderAll(); renderCare(); renderData(); toast('Undone: everything is as it was before the restore.');
+  }
+  function renderData() {
+    const el = $('dataCard'); if (!el) return;
+    const s = bkState(), lv = bkLevel(s), pre = store.get('preRestore', null);
+    if (isSite() && PH.ok && !BK.photos) packPhotos();
+    const when = !LASTBK ? '' : s.age <= 0 ? 'today' : s.age === 1 ? 'yesterday' : s.age + ' days ago';
+    const how = LASTBK ? { share: 'sent from the share sheet', download: 'saved to Downloads', copy: 'copied as text, no photos', restored: 'restored on this phone' }[LASTBK.how] || '' : '';
+    const meta = LASTBK ? [fmtWhen(LASTBK.at), how, LASTBK.photos ? plural(LASTBK.photos, 'photo', 'photos') : '', LASTBK.bytes ? sizeStr(LASTBK.bytes) : ''].filter(Boolean).join(' · ') + '. ' + (s.dirty ? 'You’ve logged more since.' : 'Nothing new since.') : 'Everything you’ve logged' + (s.unsaved ? ' since ' + fmtDate(s.unsaved) : '') + ' lives only on this phone.';
+    let h = '<div class="bk-stat ' + (lv === 'firm' ? 'firm' : lv || !LASTBK ? 'soft' : 'ok') + '"><span class="bk-dot" aria-hidden="true"></span><div><b>' + (LASTBK ? 'Last backup ' + when : 'Not backed up yet') + '</b><div class="small">' + esc(meta) + '</div></div></div>';
+    if (BK.parsed) {
+      const o = BK.parsed;
+      h += '<div class="restore-q"><b>Restore the backup from ' + esc(fmtWhen(o.at) || fmtDate(o.d)) + '?</b><p class="small">It holds ' + esc(bkSummary(o)) + '.</p><p class="small">What’s on this phone now is replaced by what’s in the backup; photos in it are added to the ones here. You can undo it afterward.</p><div class="btnrow"><button class="btn small primary" data-act="bkRestoreGo">Restore it</button><button class="btn small ghost" data-act="bkRestoreNo">Cancel</button></div></div>';
+    } else {
+      h += '<p class="small" style="margin:0">One file holds everything: ticks, dates, notes, harvests, bowls, prints and photos. Send it to Drive or your email; on a new phone, restore it here. Back up before uninstalling the app or clearing Chrome’s data: either can take everything here with it.</p>';
+      h += '<div class="btnrow"><button class="btn small primary" data-act="bkNow">Back up now</button><label class="btn small ghost">Restore from a file<input type="file" accept=".txt,.json,text/plain,application/json" data-restore hidden></label></div>';
+    }
+    if (pre && pre.at && Date.now() - new Date(pre.at).getTime() < 7 * 86400000 && !BK.parsed) h += '<div class="undo-r"><span class="small">Restored a backup ' + esc(fmtWhen(pre.at)) + '.</span><button class="btn small ghost" data-act="bkUndo">Undo the restore</button></div>';
+    if (BK.persist != null) h += '<p class="small muted" style="margin:0">' + (BK.persist ? 'Storage is marked to keep: Chrome won’t clear it on its own to make room.' : 'Chrome could clear this storage if the phone runs short of space. Installing the app usually protects it; a backup covers it either way.') + '</p>';
+    h += '<details class="pset"><summary>Other ways</summary><div class="stack"><p class="small" style="margin:0">As text, without the photos: copy it into a note or an email, and paste it back here.</p><div class="btnrow"><button class="btn small" data-act="bkCopy">Copy as text</button><button class="btn small ghost" data-act="bkPaste">Paste a backup</button></div><div id="pasteBox" class="stack" hidden><textarea id="restoreText" class="search" rows="3" aria-label="Paste a backup"></textarea><div class="btnrow"><button class="btn small primary" data-act="bkPasteGo">Check it</button></div></div></div></details>';
+    el.innerHTML = h;
+  }
+  function renderBackupNote() {
+    const box = $('bkBox'); if (!box) return;
+    const s = bkState(), lv = bkLevel(s), sn = store.get('bkSnooze', null);
+    if (!lv || (sn && sn > todayISO()) || !$('newsBox').hidden) { box.hidden = true; return; }
+    if (isSite() && PH.ok && !BK.photos) packPhotos();
+    const since = fmtDate(s.unsaved || s.since);
+    const T = {
+      never: ['Nothing here is backed up yet', 'Everything you’ve logged since ' + since + ' lives only on this phone. One tap sends a copy to Drive or your email, photos and all.'],
+      soft: ['Last backup: ' + s.age + ' days ago', 'You’ve logged more since. A fresh copy takes one tap.'],
+      firm: [LASTBK ? 'It’s been ' + s.age + ' days since a backup' : 'Two weeks, and still no backup', 'Everything since ' + since + ' lives only on this phone. If it’s lost or reset, that goes with it.']
+    }[lv];
+    box.className = 'note bk ' + lv;
+    box.innerHTML = '<div><b>' + esc(T[0]) + '</b><div class="small">' + esc(T[1]) + '</div></div><div class="btnrow"><button class="btn small primary" data-act="bkNow">Back up now</button><button class="btn small ghost" data-act="bkLater">Later</button></div>';
+    box.hidden = false;
+  }
+  function askPersist() {
+    try {
+      if (!isSite() || !navigator.storage || !navigator.storage.persisted) return;
+      navigator.storage.persisted().then(p => p || !navigator.storage.persist ? p : navigator.storage.persist()).then(p => { BK.persist = !!p; if (!$('view-care').hidden) renderData(); }).catch(() => {});
+    } catch (e) {}
+  }
+
+  /* ----- Tonight's picture: the bowl and what's ready, drawn for sending ----- */
+  const CARD = { paper: '#fbfcfa', band: '#1b3929', bandInk: '#f1f6f0', ink: '#142019', ink2: '#3c4d42', muted: '#66786d', line: '#cdd8cd', tile: '#e3e9e1', accent: '#a3205a', pink: '#ff8fbb' };
+  const GLC = { ink: '#22352a', seed: '#f7ecb8', leaf: '#5d9c4c', lime: '#a2c64a', beet: '#8d2352', red: '#d23c3c', yellow: '#efb926', pink: '#de6aa0', blue: '#5370d4', orange: '#ea7a24', gold: '#d6a42a', cocoa: '#6f4532', sage: '#8ea888', purple: '#7a4aa4', husk: '#d4b26a', bronze: '#9b5b3b', tile: '#e3e9e1' };
+  function glyphURL(kind, tint) {
+    const tc = GLC[{ sorrel: 'leaf', speckle: 'leaf' }[tint] || tint] || GLC.leaf, ink = GLC.ink, vein = tint === 'sorrel' ? GLC.beet : ink;
+    const S = { f: 'fill="' + tc + '" stroke="' + ink + '" stroke-width="1.3" stroke-linejoin="round"', f2: 'fill="' + GLC.leaf + '" stroke="' + ink + '" stroke-width="1.3" stroke-linejoin="round"', s: 'fill="none" stroke="' + ink + '" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"', v: 'fill="none" stroke="' + vein + '" stroke-width="1.5" stroke-linecap="round"', k: 'fill="none" stroke="' + tc + '" stroke-width="2.6" stroke-linecap="round"', kf: 'fill="none" stroke="' + tc + '" stroke-width="1.7" stroke-linecap="round"', kr: 'fill="none" stroke="' + GLC.beet + '" stroke-width="1.8" stroke-linecap="round"', k2: 'fill="none" stroke="' + GLC.lime + '" stroke-width="2" stroke-linecap="round"', s0: 'fill="' + ink + '"', s0b: 'fill="' + GLC.cocoa + '" stroke="' + ink + '" stroke-width="1.2"', seed: 'fill="' + GLC.seed + '"', dots: 'fill="' + GLC.beet + '"', fw: 'fill="#ffffff" stroke="' + ink + '" stroke-width="1"', cap1: 'fill="' + GLC.tile + '" stroke="' + ink + '" stroke-width="1.3"', cap2: 'fill="none" stroke="' + ink + '" stroke-width="1.3" stroke-linecap="round" opacity=".55"' };
+    const body = ((G[kind] || G.leaf) + (tint === 'speckle' ? SPECKLE : '')).replace(/class="([a-z0-9]+)"/g, (m, c) => S[c] || '');
+    return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="-1 -1 34 34" width="136" height="136">' + body + '</svg>');
+  }
+  const loadImg = src => new Promise((res, rej) => { const im = new Image(); im.onload = () => res(im); im.onerror = rej; im.src = src; });
+  function wrapText(g, text, x, y, maxW, lh, maxLines) {
+    const words = String(text).split(/\s+/); let line = '', lines = [];
+    words.forEach(w => { const t = line ? line + ' ' + w : w; if (g.measureText(t).width > maxW && line) { lines.push(line); line = w; } else line = t; });
+    if (line) lines.push(line);
+    if (maxLines && lines.length > maxLines) { lines = lines.slice(0, maxLines); let l = lines[maxLines - 1]; while (l && g.measureText(l + '…').width > maxW) l = l.slice(0, -1); lines[maxLines - 1] = l.replace(/[\s,;:.]+$/, '') + '…'; }
+    lines.forEach((l, i) => g.fillText(l, x, y + i * lh));
+    return y + lines.length * lh;
+  }
+  const listWords = a => a.length <= 1 ? a.join('') : a.slice(0, -1).join(', ') + ' and ' + a[a.length - 1];
+  function cardFacts() {
+    const today = todayISO(), bowl = BOWL.filter(id => P.plants[id]);
+    const picked = [...new Set(HARV.filter(h => h.d === today).map(h => h.p))].filter(id => P.plants[id]);
+    const due = [...new Set(pickList().filter(x => x.due && x.last).map(x => x.p.p))];
+    const fruitToday = {}; HARV.forEach(h => { if (h.d === today && h.k === 'fruit') fruitToday[h.p] = (fruitToday[h.p] || 0) + h.n; });
+    const leafOz = HAMT[today] != null ? HAMT[today] : dayEst(today) * leafCal().f;
+    const got = (leafOz > 0 ? ['about ' + ozStr(leafOz) + ' of greens'] : []).concat(Object.keys(fruitToday).map(pid => fruitToday[pid] + ' ' + fw(pid, fruitToday[pid])));
+    const ym = today.slice(0, 7);
+    return { bowl, picked, due, got, ripe: ripeNow(), t: tally(ym + '-01', today), bowls: bowlsThisMonth(), month: MONTHS_LONG[+ym.slice(5) - 1] };
+  }
+  function cardText() {
+    const f = cardFacts(), out = [];
+    if (f.bowl.length) { const d = dressingFor(bowlTotals()); out.push('Tonight’s bowl from the towers: ' + listWords(f.bowl.map(id => P.plants[id].name)) + '. Dressing: ' + d.name.toLowerCase() + '.'); }
+    if (f.got.length) out.push('Picked today: ' + listWords(f.got) + '.');
+    if (f.due.length) out.push('Ready to pick: ' + listWords(f.due.map(id => P.plants[id].name)) + '.');
+    if (f.ripe.length) out.push('Should be ripe: ' + listWords(f.ripe.map(m => m.now.length + ' ' + fw(m.pid, m.now.length))) + '.');
+    return out.join(' ') || 'From the towers on Swan’s Island: everything’s picked for now.';
+  }
+  async function makeCard() {
+    const W = 1080, H0 = 1700, c = document.createElement('canvas'); c.width = W; c.height = H0; const g = c.getContext('2d');
+    const FD = '"Barlow Semi Condensed", "Arial Narrow", Arial, sans-serif', FB = 'Literata, Georgia, serif';
+    try { await Promise.race([Promise.all(['700 54px "Barlow Semi Condensed"', '600 30px "Barlow Semi Condensed"', '600 74px Literata', 'italic 400 34px Literata', '400 38px Literata'].map(x => document.fonts.load(x))), new Promise(r => setTimeout(r, 1200))]); } catch (e) {}
+    const f = cardFacts(), now = new Date();
+    const mode = f.bowl.length ? 'bowl' : f.picked.length ? 'picked' : 'due';
+    const tiles = (mode === 'bowl' ? f.bowl : mode === 'picked' ? f.picked : f.due).slice(0, 8);
+    const imgs = await Promise.all(tiles.map(id => loadImg(glyphURL(P.plants[id].glyph, P.plants[id].tint)).catch(() => null)));
+    const track = px => { try { g.letterSpacing = px; } catch (e) {} };
+    g.fillStyle = CARD.paper; g.fillRect(0, 0, W, H0);
+    g.fillStyle = CARD.band; g.fillRect(0, 0, W, 214);
+    g.fillStyle = CARD.pink; g.fillRect(80, 186, 56, 6);
+    g.fillStyle = CARD.bandInk; g.globalAlpha = 0.78; g.font = '600 28px ' + FD; track('5px'); g.fillText('PLANT BOOK · SWAN’S ISLAND', 80, 84); track('0px'); g.globalAlpha = 1;
+    g.font = '700 56px ' + FD; g.fillText(DAYS[now.getDay()] + ', ' + MONTHS_LONG[now.getMonth()] + ' ' + now.getDate(), 80, 152);
+    g.fillStyle = CARD.ink; g.font = '600 74px ' + FB; g.fillText('Tonight from the towers', 80, 318);
+    let y = 396;
+    const eyebrow = txt => { g.fillStyle = CARD.muted; g.font = '600 28px ' + FD; track('4px'); g.fillText(txt.toUpperCase(), 80, y); track('0px'); y += 26; };
+    const rule = () => { g.fillStyle = CARD.line; g.fillRect(80, y - 4, W - 160, 2); y += 50; };
+    const para = (txt, lines) => { g.fillStyle = CARD.ink; g.font = '400 38px ' + FB; y = wrapText(g, txt, 80, y + 26, 920, 52, lines) + 30; };
+    if (tiles.length) {
+      eyebrow({ bowl: 'In the bowl', picked: 'Picked today', due: 'Ready to pick' }[mode]);
+      const cols = 4, tw = 232, th = 206;
+      tiles.forEach((id, i) => {
+        const x = 80 + (i % cols) * tw, ty = y + Math.floor(i / cols) * th;
+        g.fillStyle = CARD.tile; g.beginPath(); if (g.roundRect) g.roundRect(x, ty, 204, 132, 28); else g.rect(x, ty, 204, 132); g.fill();
+        if (imgs[i]) g.drawImage(imgs[i], x + 102 - 50, ty + 66 - 50, 100, 100);
+        g.fillStyle = CARD.ink; const nm = P.plants[id].name; let fs = 31; g.font = '600 31px ' + FD; while (fs > 24 && g.measureText(nm).width > 210) { fs -= 2; g.font = '600 ' + fs + 'px ' + FD; } wrapText(g, nm, x + 2, ty + 172, 210, 32, 1);
+      });
+      y += Math.ceil(tiles.length / cols) * th + 12;
+      const extra = { bowl: f.bowl, picked: f.picked, due: f.due }[mode].length - tiles.length;
+      if (extra > 0) { g.fillStyle = CARD.muted; g.font = '600 30px ' + FD; g.fillText('and ' + extra + ' more', 80, y + 4); y += 44; }
+    }
+    if (mode === 'bowl') { const d = dressingFor(bowlTotals()); g.fillStyle = CARD.ink2; g.font = 'italic 400 34px ' + FB; y = wrapText(g, 'Dressing: ' + d.name.toLowerCase() + '. ' + d.how, 80, y + 24, 920, 46, 3) + 34; }
+    if (mode === 'picked' && f.got.length) { g.fillStyle = CARD.ink2; g.font = 'italic 400 34px ' + FB; y = wrapText(g, listWords(f.got).replace(/^./, x => x.toUpperCase()) + '.', 80, y + 24, 920, 46, 2) + 34; }
+    const sections = [];
+    if (mode === 'bowl' && f.got.length) sections.push(['Picked today', listWords(f.got) + '.', 2]);
+    if (mode !== 'due' && f.due.length) sections.push(['Ready to pick', listWords(f.due.map(id => P.plants[id].name)) + '.', 3]);
+    if (f.ripe.length) sections.push(['Should be ripe', listWords(f.ripe.map(m => m.now.length + ' ' + fw(m.pid, m.now.length))) + ', by the flowers logged.', 2]);
+    sections.forEach(([k, txt, n], i) => { if (i === 0 && tiles.length) rule(); eyebrow(k); para(txt.replace(/^./, x => x.toUpperCase()), n); });
+    if (!tiles.length && !sections.length) { g.fillStyle = CARD.ink2; g.font = 'italic 400 38px ' + FB; y = wrapText(g, 'Everything’s picked for now. The towers are catching up.', 80, y + 20, 920, 52, 2) + 20; }
+    const H = Math.max(760, Math.min(H0, Math.round(y + 170)));
+    g.fillStyle = CARD.line; g.fillRect(80, H - 140, W - 160, 2);
+    g.fillStyle = CARD.ink2; g.font = '600 32px ' + FD;
+    const foot = [f.bowls ? plural(f.bowls, 'bowl', 'bowls') + ' from the towers' : '', f.t.total >= 1 ? 'about ' + usd(f.t.total) + ' of groceries' : ''].filter(Boolean);
+    wrapText(g, f.month + (foot.length ? ': ' + foot.join(', ') + '.' : ' on Swan’s Island.'), 80, H - 76, 920, 40, 1);
+    const out = document.createElement('canvas'); out.width = W; out.height = H; out.getContext('2d').drawImage(c, 0, 0);
+    return out;
+  }
+  async function shareCard() {
+    if (BK.cardBusy) return;
+    if (!isSite()) { const t = cardText(); copyText(t, () => toast('Copied tonight’s rundown. Paste it anywhere.'), () => toast(t)); return; }
+    if (BK.cardPending && Date.now() - BK.cardPending.t < 120000) { const f = BK.cardPending.file; BK.cardPending = null; return sendCard(f); }
+    BK.cardBusy = true;
+    try {
+      const c = await makeCard(), blob = await new Promise(r => c.toBlob(r, 'image/png'));
+      if (!blob) throw new Error('no image');
+      await sendCard(new File([blob], 'Tonight from the towers.png', { type: 'image/png' }));
+    } catch (e) { const t = cardText(); copyText(t, () => toast('Copied tonight’s rundown instead.'), () => toast(t)); }
+    finally { BK.cardBusy = false; }
+  }
+  async function sendCard(file) {
+    let can = false; try { can = !!(navigator.canShare && navigator.share && navigator.canShare({ files: [file] })); } catch (e) {}
+    if (can) {
+      try { await navigator.share({ files: [file], title: 'Tonight from the towers' }); return; }
+      catch (e) { if (e && e.name === 'AbortError') return; if (e && e.name === 'NotAllowedError') { BK.cardPending = { file, t: Date.now() }; toast('Ready. Tap Share once more to send it.'); return; } }
+    }
+    download(file); toast('Saved the picture to Downloads.');
+  }
+
+  /* ----- The seed box: yCubes, seed pads and packets on hand ----- */
+  let SEEDS = store.get('seeds', []);
+  const saveSeeds = () => store.set('seeds', SEEDS);
+  const KEEP = {}; Object.keys(HV.keep).forEach(k => HV.keep[k].ids.forEach(id => { KEEP[id] = HV.keep[k]; }));
+  const cubeWord = pid => P.plants[pid].status === 'micro' ? ['seed pad', 'seed pads'] : ['yCube', 'yCubes'];
+  const hasCubes = pid => !P.plants[pid].notGardyn;
+  const seedsOf = pid => SEEDS.filter(s => s.p === pid);
+  const cubeOf = pid => SEEDS.find(s => s.p === pid && s.kind === 'cube');
+  const seedOut = s => s.kind === 'cube' ? !(s.n > 0) : s.st === 'out';
+  const seedLow = s => s.kind === 'cube' ? !(s.n > 1) : s.st !== 'ok';
+  const seedOld = s => { const k = KEEP[s.p]; return s.kind === 'pack' && k && s.yr && (+todayISO().slice(0, 4) - s.yr) >= k.yrs; };
+  function seedLine(s) {   // HTML: the warnings stand out, not the whole line
+    const flag = t => ' · <span class="nudge">' + t + '</span>';
+    if (s.kind === 'cube') { const w = cubeWord(s.p); return esc(plural(s.n || 0, w[0], w[1])) + (s.n === 1 ? flag('the last one') : ''); }
+    return 'Packet' + esc((s.src ? ', ' + s.src : '') + (s.yr ? ', packed for ' + s.yr : '')) + (s.st === 'low' ? flag('running low') : s.st === 'out' ? flag('out') : '') + (seedOld(s) ? flag('getting old') : '');
+  }
+  function seedBlock(pid) {
+    const pl = P.plants[pid], c = cubeOf(pid), w = cubeWord(pid), packs = seedsOf(pid).filter(s => s.kind === 'pack');
+    let h = '<div class="block seedblk" id="seedBlk"><h3>In the seed box</h3><div class="list sb">';
+    if (hasCubes(pid)) h += '<div class="sb-row"><span><b>' + esc(/^y/.test(w[1]) ? w[1] : w[1].replace(/^./, x => x.toUpperCase())) + '</b><span class="small">' + (c && c.n > 1 ? 'on hand' : c && c.n === 1 ? 'the last one' : 'none on hand') + '</span></span>' + stepper('cube', pid, c ? c.n : 0, '', w[1] + ' on hand') + '</div>';
+    packs.forEach(s => { h += '<div class="sb-row"><span><b>Seed packet</b><span class="small">' + esc([s.src, s.yr ? 'packed for ' + s.yr : ''].filter(Boolean).join(', ') || 'no details') + (seedOld(s) ? ' · <span class="nudge">getting old</span>' : '') + '</span></span><span class="btnrow"><span class="seg sm" role="group" aria-label="How much is left">' + [['ok', 'Plenty'], ['low', 'Low'], ['out', 'Out']].map(([k, l]) => '<button data-act="packSt" data-id="' + s.id + '" data-st="' + k + '" aria-pressed="' + (s.st === k) + '">' + l + '</button>').join('') + '</span><button class="btn small ghost" data-act="packDel" data-id="' + s.id + '">Remove</button></span></div>'; });
+    h += '</div><div class="sb-add stack calc" id="packForm" hidden><div class="fields"><label for="pkSrc">From<input id="pkSrc" type="text" maxlength="40" placeholder="Baker Creek, saved seed, a friend" autocomplete="off"></label><label for="pkYr">Packed for<input id="pkYr" type="number" min="1990" max="2100" step="1" inputmode="numeric" value="' + todayISO().slice(0, 4) + '"></label></div><div class="btnrow"><button class="btn small primary" data-act="packAdd" data-pid="' + pid + '">Add the packet</button><button class="btn small ghost" data-act="packCancel">Cancel</button></div></div>';
+    h += '<div class="btnrow"><button class="btn small ghost" data-act="packOpen">Add a seed packet</button></div>';
+    if (KEEP[pid]) h += '<p class="small muted" style="margin:0">' + esc(KEEP[pid].say) + '</p>';
+    return h + '</div>';
+  }
+  function seedBuyList() {
+    const out = [], pids = [...new Set(SEEDS.map(s => s.p))].filter(id => P.plants[id]);
+    pids.forEach(pid => { const es = seedsOf(pid); if (es.length && es.every(seedLow)) out.push([pid, es.every(seedOut) ? 'out' : 'running low']); });
+    Object.keys(SCOUT).forEach(pid => { if (P.plants[pid] && !seedsOf(pid).some(s => !seedOut(s)) && !out.some(b => b[0] === pid)) out.push([pid, 'on your shortlist']); });
+    return out;
+  }
+  function renderSeedBox() {
+    const el = $('seedBox'); if (!el) return;
+    const pids = [...new Set(SEEDS.filter(s => !seedOut(s)).map(s => s.p))].filter(id => P.plants[id]).sort((a, b) => P.plants[a].name.localeCompare(P.plants[b].name));
+    const buy = seedBuyList();
+    $('seedCount').textContent = pids.length ? pids.length + ' on hand' : '';
+    const row = (pid, subHTML) => '<button class="prow" data-open="plant" data-pid="' + pid + '" data-seeds="1"><span class="gwrap">' + plantGlyph(P.plants[pid]) + '</span><span style="min-width:0"><span class="nm">' + esc(P.plants[pid].name) + '</span><span class="wh" style="display:block">' + subHTML + '</span></span></button>';
+    let h = pids.length ? '<div class="stack">' + pids.map(pid => row(pid, seedsOf(pid).filter(s => !seedOut(s)).map(seedLine).join(' · '))).join('') + '</div>' : '<p class="small" style="margin:0">Nothing logged yet. Every plant’s page has a seed box: yCubes and seed pads by count, packets with where they came from and the year.</p>';
+    if (buy.length) h += '<div class="sb-buy"><h4>To buy</h4><div class="stack">' + buy.map(([pid, why]) => row(pid, why === 'on your shortlist' ? esc(why) : '<span class="nudge">' + esc(why) + '</span>')).join('') + '</div><div class="btnrow"><button class="btn small" data-act="seedShare">Share the list</button></div></div>';
+    const opts = Object.keys(P.plants).filter(id => ['tower', 'micro', 'idea', 'dome', 'planned'].includes(P.plants[id].status)).sort((a, b) => P.plants[a].name.localeCompare(P.plants[b].name));
+    h += '<label class="last sb-pick">Add seeds for <select id="sbPick"><option value="">a plant…</option>' + opts.map(id => '<option value="' + id + '">' + esc(P.plants[id].name) + '</option>').join('') + '</select></label>';
+    el.innerHTML = h;
+  }
+  function seedShare() {
+    const buy = seedBuyList(); if (!buy.length) return;
+    const text = 'Seeds to buy: ' + buy.map(([pid, why]) => { const c = cubeOf(pid), what = c || (hasCubes(pid) && !seedsOf(pid).length) ? cubeWord(pid)[1] : 'seed'; return P.plants[pid].name + ' (' + what + ', ' + why + ')'; }).join('; ') + '.';
+    if (isSite() && navigator.share) navigator.share({ title: 'Seeds to buy', text }).catch(e => { if (!e || e.name !== 'AbortError') copyText(text, () => toast('Copied the list.'), () => toast(text)); });
+    else copyText(text, () => toast('Copied the list.'), () => toast(text));
+  }
+  function seedsChanged() { refreshSheet(); if (!$('view-ideas').hidden) renderSeedBox(); }
 
   /* ----- Wire up ----- */
   function openPod(podId) { const pod = POD[podId]; plantSheet(pod.p, podId); }
   function init() {
-    renderDate(); setupBoxes(); renderNews();
+    if (!LASTBK && hasData()) { const d = store.get('dirty', null), e = earliestDate(); if (!d || e < d.since) store.raw('dirty', { n: (d && d.n) || 1, since: e }); }
+    renderDate(); setupBoxes(); renderNews(); askPersist();
     const start = (location.hash || '').slice(1);
     showView(VIEWS.includes(start) ? start : 'towers');
     if (/^p-/.test(start) && P.plants[start.slice(2)]) { showView('plants'); plantSheet(start.slice(2)); }
@@ -1150,11 +1637,12 @@
     document.addEventListener('keydown', e => { if (e.key === 'Escape') { if (!$('lightbox').hidden) { $('lightbox').hidden = true; return; } if (sheetOpen()) hideSheet(); } });
     $('lightbox').addEventListener('click', e => { if (e.target === $('lightbox')) $('lightbox').hidden = true; });
     $('q').addEventListener('input', renderPlants);
-    $('backupBtn').addEventListener('click', backup);
-    $('restoreBtn').addEventListener('click', () => { $('restoreBox').hidden = !$('restoreBox').hidden; if (!$('restoreBox').hidden) { $('restoreText').value = ''; $('restoreText').focus(); } });
-    $('restoreGo').addEventListener('click', restore);
     let rz; window.addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(() => { if (!$('view-diy').hidden) renderTrail(); }, 150); });
     document.addEventListener('change', e => {
+      const rs = e.target.closest && e.target.closest('input[data-restore]');
+      if (rs) { const f = rs.files && rs.files[0]; rs.value = ''; if (!f) return; const r = new FileReader(); r.onload = () => offerRestore(r.result); r.onerror = () => toast('That file couldn’t be read.'); r.readAsText(f); return; }
+      if (e.target.id === 'hOz') { const v = parseFloat(e.target.value), d = todayISO(); if (isFinite(v) && v > 0) HAMT[d] = Math.min(400, Math.round(v * 10) / 10); else delete HAMT[d]; saveHamt(); harvestChanged(); return; }
+      if (e.target.id === 'sbPick') { const pid = e.target.value; e.target.value = ''; if (P.plants[pid]) { plantSheet(pid); setTimeout(() => { const b = $('seedBlk'); if (b) $('sheet').scrollTop = Math.max(0, b.offsetTop - 12); }, 60); } return; }
       const ph = e.target.closest && e.target.closest('input[data-photo]');
       if (ph) { const f = ph.files && ph.files[0], pid = ph.dataset.photo; ph.value = ''; if (!f) return; toast('Saving the photo…'); shrink(f).then(b => phAdd(pid, b)).then(() => { toast('Photo saved on this phone.'); paintPhotos(pid); }).catch(() => toast('That photo couldn’t be saved.')); return; }
       const inp = e.target.closest && e.target.closest('input[data-care-date]'); if (!inp) return;
@@ -1170,12 +1658,12 @@
       const jump = t.closest('[data-jump]'); if (jump) { const el = $(jump.dataset.jump); if (el) window.scrollTo({ top: Math.max(0, el.getBoundingClientRect().top + window.scrollY - 70), behavior: 'smooth' }); return; }
       const md = t.closest('[data-mode]'); if (md) { UI.mode = md.dataset.mode; saveUI(); renderTower(); return; }
       const fl = t.closest('[data-filter]'); if (fl) { UI.filter = fl.dataset.filter; saveUI(); $('q').value = ''; renderPlants(); return; }
-      const go = t.closest('[data-go]'); if (go) { showView(go.dataset.go, go.dataset.anchor); return; }
+      const go = t.closest('[data-go]'); if (go) { if (sheetOpen()) hideSheet(true); showView(go.dataset.go, go.dataset.anchor); return; }
       const pd = t.closest('.pod'); if (pd) { if (pd.dataset.pod) openPod(pd.dataset.pod); else seatSheet(pd.dataset.slot); return; }
       const op = t.closest('[data-open]');
       if (op) {
         const k = op.dataset.open;
-        if (k === 'plant') { if (op.dataset.pod) openPod(op.dataset.pod); else plantSheet(op.dataset.pid); }
+        if (k === 'plant') { if (op.dataset.pod) openPod(op.dataset.pod); else plantSheet(op.dataset.pid); if (op.dataset.seeds) setTimeout(() => { const b = $('seedBlk'); if (b) $('sheet').scrollTop = Math.max(0, b.offsetTop - 12); }, 60); }
         else if (k === 'pod') openPod(op.dataset.pod);
         else if (k === 'fix') fixSheet(op.dataset.id);
         else if (k === 'stop') stopSheet(op.dataset.id);
@@ -1198,7 +1686,27 @@
       else if (act === 'bowlDel') { SAVED.splice(+a.dataset.i, 1); store.set('bowls', SAVED); renderSaved(); }
       else if (act === 'mgPick') { const id = a.dataset.pid; const i = MGSEL.indexOf(id); if (i >= 0) MGSEL.splice(i, 1); else MGSEL.push(id); store.set('mgsel', MGSEL); renderPlanner(); }
       else if (act === 'bowlAte') { const ids = P.pods.filter(p => BOWL.includes(p.p) && pickable(p)).map(p => p.id); setPicked(ids, true); ATE.push({ d: todayISO(), p: BOWL.slice() }); ATE = ATE.slice(-300); store.set('ate', ATE); renderToday(); renderBowl(); toast('Counted' + (ids.length ? ', and ' + ids.length + (ids.length === 1 ? ' pod' : ' pods') + ' logged as picked today.' : '.')); }
-      else if (act === 'bowlShare') { const d = dressingFor(bowlTotals()); const text = 'Tonight’s bowl from the towers: ' + BOWL.map(id => P.plants[id].name).join(', ') + '. Dressing: ' + d.name.toLowerCase() + ', ' + d.how.replace(/\.$/, '').toLowerCase() + '.'; const copy = () => { try { navigator.clipboard.writeText(text).then(() => toast('Copied. Paste it anywhere.'), () => toast(text)); } catch (e) { toast(text); } }; if (navigator.share) navigator.share({ title: 'Tonight’s bowl', text }).catch(e => { if (!e || e.name !== 'AbortError') copy(); }); else copy(); }
+      else if (act === 'bowlShare' || act === 'shareCard') shareCard();
+      else if (act === 'bkNow') backupNow();
+      else if (act === 'bkLater') { const lv = bkLevel(bkState()); store.raw('bkSnooze', addDays(todayISO(), lv === 'firm' ? 1 : lv === 'soft' ? 3 : 2)); $('bkBox').hidden = true; toast(lv === 'firm' ? 'Tomorrow, then.' : 'Later, then.'); }
+      else if (act === 'bkCopy') bkCopy();
+      else if (act === 'bkPaste') { const b = $('pasteBox'); b.hidden = !b.hidden; if (!b.hidden) { $('restoreText').value = ''; $('restoreText').focus(); } }
+      else if (act === 'bkPasteGo') offerRestore($('restoreText').value);
+      else if (act === 'bkRestoreGo') doRestore();
+      else if (act === 'bkRestoreNo') { BK.parsed = null; renderData(); }
+      else if (act === 'bkUndo') { if (!a.dataset.armed) { a.dataset.armed = '1'; a.textContent = 'Tap again to undo it'; return; } undoRestore(); }
+      else if (act === 'flowerAdd' || act === 'flowerDel' || act === 'fruitAdd' || act === 'fruitDel') { const kind = /^flower/.test(act) ? 'flower' : 'fruit'; bump(kind, a.dataset.pid, /Add$/.test(act) ? 1 : -1); harvestChanged(); }
+      else if (act === 'fruitRound') pickSheet('fruit');
+      else if (act === 'hSize') { HAMT[todayISO()] = +a.dataset.b * HV.boxOz; saveHamt(); harvestChanged(); }
+      else if (act === 'hSizeClear') { delete HAMT[todayISO()]; saveHamt(); harvestChanged(); }
+      else if (act === 'hpReset') { priceDefaults(); store.set('hprice', {}); fillPrices(); paintHarvest(); toast('Back to the USDA prices.'); }
+      else if (act === 'cubeAdd' || act === 'cubeDel') { const pid = a.dataset.pid; let c = cubeOf(pid); if (!c && act === 'cubeAdd') { c = { id: Date.now().toString(36), p: pid, kind: 'cube', n: 0 }; SEEDS.push(c); } if (c) { c.n = Math.max(0, (c.n || 0) + (act === 'cubeAdd' ? 1 : -1)); saveSeeds(); seedsChanged(); } }
+      else if (act === 'packOpen') { const f = $('packForm'); if (f) { f.hidden = false; a.hidden = true; $('pkSrc').focus(); } }
+      else if (act === 'packCancel') { refreshSheet(); }
+      else if (act === 'packAdd') { const yr = parseInt($('pkYr').value, 10); SEEDS.push({ id: Date.now().toString(36), p: a.dataset.pid, kind: 'pack', src: ($('pkSrc').value || '').trim().slice(0, 40), yr: yr >= 1990 && yr <= 2100 ? yr : null, st: 'ok' }); saveSeeds(); seedsChanged(); toast('In the seed box.'); }
+      else if (act === 'packSt') { const s = SEEDS.find(x => x.id === a.dataset.id); if (s) { s.st = a.dataset.st; saveSeeds(); seedsChanged(); } }
+      else if (act === 'packDel') { if (!a.dataset.armed) { a.dataset.armed = '1'; a.textContent = 'Tap again'; return; } SEEDS = SEEDS.filter(x => x.id !== a.dataset.id); saveSeeds(); seedsChanged(); }
+      else if (act === 'seedShare') seedShare();
       else if (act === 'scoutStar') { const id = a.dataset.pid; if (SCOUT[id]) delete SCOUT[id]; else SCOUT[id] = todayISO(); store.set('scout', SCOUT); if (!$('view-ideas').hidden) renderIdeas(); if (SHEET) refreshSheet(); toast(SCOUT[id] ? 'On the shortlist.' : 'Off the shortlist.'); }
       else if (act === 'doctor') doctorSheet(a.dataset.id);
       else if (act === 'photoOpen') openLight(+a.dataset.id, a.dataset.src, a.dataset.d);
@@ -1221,13 +1729,13 @@
       else if (act === 'plogCancel') $('plForm').hidden = true;
       else if (act === 'plogDel') { if (!a.dataset.armed) { a.dataset.armed = '1'; a.textContent = 'Tap again'; return; } PRINTS = PRINTS.filter(e => e.id !== a.dataset.id); store.set('prints', PRINTS); paintLogSum(); paintOff(); paintFoot(); }
       else if (act === 'pickRound') pickSheet();
-      else if (act === 'pickToggle') { const id = a.dataset.pod; setPicked([id], PICK[id] !== todayISO()); renderToday(); refreshSheet(); }
-      else if (act === 'pickAll') { setPicked(pickList().map(x => x.p.id), true); renderToday(); refreshSheet(); toast('Picking round logged.'); }
+      else if (act === 'pickToggle') { const id = a.dataset.pod; setPicked([id], PICK[id] !== todayISO()); harvestChanged(); }
+      else if (act === 'pickAll') { setPicked(pickList().map(x => x.p.id), true); harvestChanged(); toast('Picking round logged. Say how much came off, if you like.'); }
       else if (act === 'catchUp') catchSheet();
       else if (act === 'catchSet') { CARE[a.dataset.id] = addDays(todayISO(), -(+a.dataset.d)); store.set('care', CARE); renderCare(); renderToday(); refreshSheet(); }
       else if (act === 'copyLink') copyLink(a.dataset.slot);
       else if (act === 'verdict') { const id = a.dataset.pid, v = a.dataset.v; if ((VERD[id] || {}).v === v) delete VERD[id]; else VERD[id] = { v, d: todayISO() }; store.set('verdict', VERD); if (!$('view-salad').hidden) renderFlights(); if (!$('view-plants').hidden) renderPlants(); if (SHEET) refreshSheet(); }
-      else if (act === 'newsOk') { store.set('seenVersion', APP_VERSION); $('newsBox').hidden = true; }
+      else if (act === 'newsOk') { store.set('seenVersion', APP_VERSION); $('newsBox').hidden = true; renderBackupNote(); }
     });
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
