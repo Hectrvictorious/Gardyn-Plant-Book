@@ -3,6 +3,7 @@
 
   python3 tools/build.py            -> site/index.html and site/sw.js (the installable app on GitHub Pages)
   python3 tools/build.py --artifact -> also artifact/plant-book.html (the same page, no head, for a claude.ai preview)
+                                      and artifact/plant-book-offline.html (a whole document to open from a folder)
 
 src/body.html holds the page; its /*@@CSS@@*/, /*@@DATA@@*/ and /*@@APP@@*/ markers are filled from
 src/style.css, src/data.js + taste.js + explore.js + forbidden.js + printer.js + harvest.js, and src/app.js. Every build gets a new BUILD stamp, which is how installed
@@ -47,7 +48,22 @@ with open(os.path.join(site, 'sw.js'), 'w', encoding='utf-8') as fh:
 
 if '--artifact' in sys.argv:
     os.makedirs(os.path.join(ROOT, 'artifact'), exist_ok=True)
+    stamped = page.replace("/* Swan's Island Plant Book: the app.", "window.__BUILD__ = '%s';\n/* Swan's Island Plant Book: the app." % BUILD, 1)
     with open(os.path.join(ROOT, 'artifact', 'plant-book.html'), 'w', encoding='utf-8') as fh:
-        fh.write(page.replace("/* Swan's Island Plant Book: the app.", "window.__BUILD__ = '%s';\n/* Swan's Island Plant Book: the app." % BUILD, 1))
+        fh.write(stamped)
+    # The same page as a whole document, for opening straight from a folder on a computer
+    # (Josh's PC copy): it needs its own doctype and the hidden rule the claude.ai host adds.
+    s2 = stamped.index('<header class="mast">')
+    OFFLINE = """<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" type="image/png" sizes="32x32" href="https://hectrvictorious.github.io/Gardyn-Plant-Book/favicon-v3-32.png">
+<style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#1b3929;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style>
+"""
+    with open(os.path.join(ROOT, 'artifact', 'plant-book-offline.html'), 'w', encoding='utf-8') as fh:
+        fh.write(OFFLINE + stamped[:s2].strip() + '\n</head>\n<body>\n' + stamped[s2:].strip() + '\n</body>\n</html>\n')
 
 print('built', BUILD, '(%d KB)' % (len(page.encode('utf-8')) // 1024))
