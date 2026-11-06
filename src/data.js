@@ -4,7 +4,7 @@
    (Help Center plant articles); seats and notes come from Josh's maps v4/v5 (salad) and v8/v9 (fruiting).
    Slot codes: tower letter + row + column, e.g. S3L = salad tower, row 3, left; F10C = fruiting, row 10, center. */
 window.PB = {
-version: '2026.11.06b',
+version: '2026.11.06c',
 
 /* ---------- The book ---------- */
 groups: { greens: 'Leafy green', herbs: 'Herb', flowers: 'Edible flower', fruit: 'Fruiting plant' },
@@ -245,7 +245,7 @@ plants: {
   harvest: [`Pick at 3–6 inches, dark green, once the yellow flower has dropped off the tip.`, `Cut each fruit at its own stem; overgrown ones turn bitter.`],
   care: [`Remove the lowest five flowers, then keep no more than five fruits on the plant.`, `Trim the main stem to keep it inside the light.`, `Trellis and Plant Belts; keep the Tank above 60% and top off weekly.`],
   pests: 'Thrips',
-  yours: [`Both are fading; you cut them back on Oct 27.`, `Their exit is planned: when the bean seedlings have true leaves, both come out, the Tank gets a Refresh and HydroBoost with the center Column empty, and the beans go in.`, `Gardyn's cucumber only comes as a seeded yCube.`],
+  yours: [`Both are fading; you cut them back on Oct 27.`, `Staying: on Nov 6 you vetoed pulling them. A good crisp cucumber is too central to your salads to give up. When these give out, fresh cucumbers take the same pods: Gardyn's again, or a type that fits a Gardyn better.`, `Gardyn's cucumber only comes as a seeded yCube.`],
   src: [['Gardyn Help: Cucumbers', 'https://help.mygardyn.com/en/articles/1785537']] },
 
 'green-beans': { name: 'Green Beans', latin: 'Phaseolus vulgaris', group: 'fruit', glyph: 'pod', tint: 'leaf', status: 'planned', tags: [],
@@ -256,7 +256,7 @@ plants: {
   harvest: [`Pick pods about 5 inches long and pencil-thick while still tender, usually 1–2 weeks after flowering.`, `It sets most of its crop at once but keeps going if you pick regularly. Overgrown pods tell it to quit.`],
   care: [`Germinate off the unit with the Soak Method: 5-minute soak to the top of the plastic, into the Nursery with no extra water, lid on, apart from other germinating seeds.`, `Seat the seed about an inch down in the rockwool.`, `Flowers 4–6 weeks after sprouting: shake or swirl to pollinate.`, `Trellis and Plant Belts; keep leaves dry.`],
   pests: 'Aphids, mites',
-  yours: [`All three rotted on Oct 27: each sat below a tomato's root mat, beans (like strawberries) are rated salt-sensitive, and one hung in the humidifier plume.`, `The rule since: nothing salt-sensitive sits in an outer pod of rows 3–6 while the tomato above it stands. The strawberries in rows 7–9 already live under the tomatoes and do well; the beans and the cucamelon stay in the center Column.`, `Bean lane: center rows 3 and 4 after the cucumbers, row 2 center as the staggered third.`, `Seed saving: leave pods on until brown and rattling. Gardyn's bush variety is bred for the Columns; store-bought beans aren't a substitute.`],
+  yours: [`All three rotted on Oct 27: each sat below a tomato's root mat, beans (like strawberries) are rated salt-sensitive, and one hung in the humidifier plume.`, `The rule since: nothing salt-sensitive sits in an outer pod of rows 3–6 while the tomato above it stands. The strawberries in rows 7–9 already live under the tomatoes and do well; the beans and the cucamelon stay in the center Column.`, `One bean growing as of Nov 6, and the cucumbers are staying, so the old bean lane (center rows 3 and 4 after the cucumbers) is off. Row 2 center, the staggered third bean's seat on the v9 map, is still open: your call.`, `Seed saving: leave pods on until brown and rattling. Gardyn's bush variety is bred for the Columns; store-bought beans aren't a substitute.`],
   src: [['Gardyn Help: Green Beans', 'https://help.mygardyn.com/en/articles/1785665'], ['Gardyn: How to grow green beans indoors', 'https://mygardyn.com/pages/grow-green-beans']] },
 
 'ground-cherry': { name: 'Ground Cherry', latin: 'Physalis pruinosa', group: 'fruit', glyph: 'lantern', tint: 'husk', status: 'tower', tags: [], notGardyn: true,
@@ -450,8 +450,8 @@ pods: [
   // Fruiting tower (v9)
   { id: 'tom-2', p: 'yellow-cherry-tomato', label: 'Tomato #2', now: 'F1R', plan: 'F1R', seat: 'A corner seat with nothing above it; the vine is belted down the right light bar into the bright band.' },
   { id: 'tom-1', p: 'yellow-cherry-tomato', label: 'Tomato #1', now: 'F2L', plan: 'F2L', seat: 'A corner seat leaning off the tower; the vine is belted down the left light bar into the bright band.' },
-  { id: 'cuke-1', p: 'cucumber', label: 'Cucumber #1', now: 'F3C', plan: 'out', fading: true, note: 'Fading. Green Bean 1 takes this pod next.' },
-  { id: 'cuke-2', p: 'cucumber', label: 'Cucumber #2', now: 'F4C', plan: 'out', fading: true, note: 'Fading. Green Bean 2 takes this pod next.' },
+  { id: 'cuke-1', p: 'cucumber', label: 'Cucumber #1', now: 'F3C', plan: 'F3C', fading: true, note: 'Fading, and staying (your call, Nov 6). When it gives out, a fresh cucumber takes this pod.' },
+  { id: 'cuke-2', p: 'cucumber', label: 'Cucumber #2', now: 'F4C', plan: 'F4C', fading: true, note: 'Fading, and staying (your call, Nov 6). When it gives out, a fresh cucumber takes this pod.' },
   { id: 'tam-1', p: 'tam-jalapeno', label: 'TAM Jalapeño', now: 'F4R', plan: 'F4R', was: 'S7C' },
   { id: 's1', p: 'strawberry', label: 'Strawberry 1', now: 'F7L', plan: 'F7L' },
   { id: 's2', p: 'strawberry', label: 'Strawberry 2', now: 'F7C', plan: 'F7C' },
@@ -466,12 +466,10 @@ pods: [
   { id: 's11', p: 'strawberry', label: 'Strawberry 11', now: 'F8C', plan: 'F8C', was: 'F10R', note: 'If a strawberry comes out, this seat goes back to air.' },
   { id: 'gcherry', p: 'ground-cherry', label: 'Ground Cherry', now: 'F6L', plan: 'F6L', was: 'dome' },
   { id: 'cucamelon', p: 'cucamelon', label: 'Cucamelon', now: 'F10C', plan: 'F10C', was: 'dome', seat: 'Gardyn’s vine seat: it starts low and climbs the Trellis up the face of the tower toward the high light.' },
-  { id: 'bean-1', p: 'green-beans', label: 'Green Bean 1', now: 'sow', plan: 'F3C' },
-  { id: 'bean-2', p: 'green-beans', label: 'Green Bean 2', now: 'sow', plan: 'F4C' },
-  { id: 'bean-3', p: 'green-beans', label: 'Green Bean 3', now: 'sow', plan: 'F2C' }
+  { id: 'bean-1', p: 'green-beans', label: 'Green Bean', now: 'dome', plan: 'tbd', note: 'The one bean growing (Nov 6). Its seat is yours to choose; row 2 center is the bean seat still open from the v9 map.' }
 ],
 
-/* Empty seats with a job (the same today and after the bean swap). */
+/* Empty seats with a job. */
 holds: {
   now: {
     S1L: { cap: true, note: 'Cap: headroom for the spinach at row 3 left' },
@@ -480,7 +478,7 @@ holds: {
     S7R: { cap: true, note: 'Cap: headroom for the borage at row 9 right' },
     F1L: { tag: 'low light', note: 'Open: low light at the top of the tower' },
     F1C: { tag: 'low light', note: 'Open: low light at the top of the tower' },
-    F2C: { tag: 'Bean 3', note: 'Open: Green Bean 3’s seat, 3–4 weeks after the first two beans' },
+    F2C: { tag: 'bean seat', note: 'Open: the bean seat left on the v9 map, in the center Column the salt rule asks for. Your one bean could go here: your call.' },
     F2R: { tag: 'headroom', note: 'Open: headroom for the TAM at row 4 right' },
     F3L: { tag: 'canopy', note: 'Open: tomato canopy and root zone' },
     F3R: { tag: 'canopy', note: 'Open: tomato canopy and root zone' },
@@ -495,21 +493,13 @@ holds: {
 
 /* The steps still to come. kind: move (a plant changes seat), cap (a Cap goes on), out (a plant comes out), task (a job, no seat change). */
 moves: [
-  { phase: 'now', kind: 'task', id: 'sow-beans', text: 'Sow Green Beans 1 and 2 in the Nursery by the Soak Method: soak, then drain the base. A drained Nursery leaves microgreen wicks dry, so no pads alongside' },
-  { phase: 'beans', kind: 'out', pod: 'cuke-1' },
-  { phase: 'beans', kind: 'out', pod: 'cuke-2' },
-  { phase: 'beans', kind: 'task', id: 'refresh-empty', text: 'Tank Refresh and HydroBoost on the fruiting tower while the center Column is empty' },
-  { phase: 'beans', kind: 'move', pod: 'bean-1' },
-  { phase: 'beans', kind: 'move', pod: 'bean-2' },
-  { phase: 'later', kind: 'task', id: 'sow-bean-3', text: 'Sow Green Bean 3 in the Nursery, 3–4 weeks after the first two' },
-  { phase: 'later', kind: 'move', pod: 'bean-3' }
+  { phase: 'beans', kind: 'task', id: 'bean-seat', text: 'Choose the bean’s seat once it has true leaves. The cucumbers are staying; row 2 center is the bean seat still open from the v9 map' }
 ],
 phases: {
-  now: { title: 'Now', sub: 'The bean swap starts in the Nursery.' },
-  beans: { title: 'When the beans have true leaves', sub: 'About 2–3 weeks after sowing. The cucumbers come out and the center Column gets a clean start.', gate: 'bean seedlings with true leaves' },
-  later: { title: 'The staggered third bean', sub: 'So the beans come in waves instead of all at once.', gate: '3–4 weeks after the first beans' }
+  now: { title: 'Now', sub: '' },
+  beans: { title: 'When the bean has true leaves', sub: 'About 2–3 weeks after sowing. The cucumbers stay put (your call, Nov 6).', gate: 'a bean seedling with true leaves' }
 },
-phaseOrder: ['now', 'beans', 'later'],
+phaseOrder: ['beans'],
 done: { date: 'Nov 5', text: 'The Nov 2 re-seating is done: 22 salad moves, every dome plant planted, the TAM over to the fruiting tower, strawberries 9–11 out of row 10, and the Caps on.' },
 
 /* ---------- Care rhythm ---------- */

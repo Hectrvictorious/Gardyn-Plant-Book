@@ -24,6 +24,8 @@ Plant Doctor and Care. On iPhone: Share → Add to Home Screen.
   ready as an image to send.
 - **Plants**: a Gardyn-style page for every plant on the towers, the microgreens, the planned
   plants, the ideas and the retired ones: a tasting note, "Before you eat it", a cat check (ASPCA),
+  how it gives (*keeps giving*, *for a while*, *one harvest*, or a microgreen's *quick cut*, and what
+  earns a plant that doesn't keep giving its seat),
   taste and texture, pairings, your verdict, growing basics, harvest, care, origin, your notes, a
   journal with photos, a seed box (yCubes or seed pads on hand, packets with source and year,
   flagged when low or getting old), sources.
@@ -33,8 +35,10 @@ Plant Doctor and Care. On iPhone: Share → Add to Home Screen.
 - **Care**: a catch-up sheet for jobs with no date yet, the rhythm with due dates, the campaigns,
   the next steps, a **Plant Doctor** (what you see → what Gardyn says it usually is and what to do),
   and your fixes.
-- **Ideas**: 32 plants to try, 24 of them researched for this round (Gardyn's catalog plus ice
-  plant, oyster leaf and miner's lettuce), with filters and a starred shortlist; gear, open
+- **Ideas**: the house rule at the top (grow what keeps giving; one-harvest crops are better bought
+  unless they earn a seat another way, and which plants on the towers are the exceptions); 32 plants
+  to try, 24 of them researched for this round (Gardyn's catalog plus ice plant, oyster leaf and
+  miner's lettuce), with filters (including *Keeps giving*) and a starred shortlist; gear, open
   questions, the watch list; **the seed box** (what's on hand, and a to-buy list from low packets
   and the shortlist, ready to share); and the door to the Forbidden Shelf.
 - **The Forbidden Shelf** (`#forbidden`): 42 plants on six shelves (controlled plants, legal ones

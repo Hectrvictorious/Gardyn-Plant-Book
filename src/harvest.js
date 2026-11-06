@@ -45,6 +45,60 @@ P.harvest = {
       ids: ['cucumber', 'green-beans', 'fairytale-eggplant'] }
   },
 
+  /* How each plant gives. Josh's rule (Nov 6, 2026): grow what keeps giving; one-harvest crops are better
+     bought unless they earn a seat another way. keeps: pickings for months; while: several pickings, then it
+     bolts, flowers out or tires; once: one cut; microgreens are a quick cut on a seed pad. A plant missing here
+     makes no claim either way. Notes come from each plant's Gardyn harvest guidance. */
+  rule: {
+    title: 'Your rule: grow what keeps giving',
+    text: 'Pickings for months beat one big cut. One-harvest crops are better bought: kohlrabi (great, but cut and done), broccoli (it never headed here), cauliflower, cabbage and the root crops. The exception is a plant that earns its seat another way, as a garnish or as something your salads can’t do without.',
+    micro: 'Microgreens are one cut too, but in a week or two, on a seed pad rather than a tower seat.'
+  },
+  givesWord: { keeps: 'keeps giving', while: 'for a while', once: 'one harvest', quick: 'quick cut' },
+  givesGroup: {
+    greens: 'Pick outer leaves, leave a third, and it keeps coming until it bolts. Cutting the whole head ends it.',
+    herbs: 'Cut above a node and it branches and keeps coming.',
+    flowers: 'Pick or deadhead the flowers and more buds follow.',
+    fruit: 'Picking keeps it setting more.',
+    micro: 'One cut, in a week or two, on a seed pad. Start a fresh pad for the next round.'
+  },
+  gives: {
+    keeps: {
+      'bulls-blood': 'Pick outer leaves and it keeps coming. Gardyn’s one-time option, cutting every leaf with the little root, ends it.',
+      buttercrunch: '', butterhead: '', 'flashy-trout-back': '', 'green-salanova': '', 'lollo-rossa': '', romaine: '', breen: '', 'rouge-dhiver': '', 'monte-carlo': '', muir: '',
+      'green-tatsoi': 'Outer leaves until it bolts. Cutting the whole rosette ends it.', 'red-tatsoi': 'Outer leaves until it bolts. Cutting the whole rosette ends it.',
+      'tokyo-bekana': '', 'wasabi-greens': '', watercress: '', 'red-amaranth': 'Young leaves, a third at a time, until it flowers.', 'green-mustard': '',
+      'hon-tsai-tai': 'Outer leaves, then flower shoots, again and again.',
+      'perpetual-spinach': 'Months of outer leaves: it’s in the name.',
+      'pink-celery': 'Take the big outer stalks and leave a third; new ones keep coming from the middle.',
+      purslane: 'Pinch it often and it stays compact and keeps coming.',
+      'red-sorrel': 'A perennial: outer leaves for months, even years.',
+      mint: 'A perennial: cut it back and it comes back harder.', 'chocolate-mint': 'A perennial: cut it back and it comes back harder.',
+      'salad-burnet': 'A perennial: tender new leaves, again and again.',
+      dill: 'Cut from the top and pinch the flowers, and it keeps going for months.',
+      nasturtium: 'Leaves and flowers, often, for months.',
+      'italian-parsley': '', 'lemon-balm': 'A perennial.', lemongrass: 'A perennial: stalks, one at a time, as they thicken.', 'lime-basil': '', 'thai-basil': '', shiso: '', stevia: '', thyme: '', 'garlic-chives': 'Cut to an inch or two and it regrows in a week or two.',
+      chives: 'Cut to an inch or two and it regrows.', 'bunching-onions': 'Cut two inches above the base and it grows back in a week or two.', catnip: 'Cut often; it comes back bushier.', 'oyster-leaf': 'A perennial.',
+      calendula: 'Deadhead and it keeps blooming.', viola: 'Pinch faded flowers and it keeps blooming.',
+      strawberry: 'Day-neutral: it keeps flowering and fruiting, flush after flush.', 'yellow-mini-strawberry': 'Keeps flowering and fruiting through the year.',
+      'yellow-cherry-tomato': 'Keeps setting trusses for months while it’s picked.', 'tam-jalapeno': 'Keeps setting peppers for months; picking pushes more.',
+      'lemon-pepper': '', shishito: '', 'banana-pepper': '', 'fairytale-eggplant': '',
+      'ground-cherry': 'Fruits over a long season, dropping each one as it ripens.', cucamelon: 'Fruits all season; a perennial with tuberous roots.'
+    },
+    while: {
+      borage: ['An annual whose flowers come in a run of several weeks, then it’s spent: growers sow it every four weeks to keep flowers coming. The big leaves are bristly and not for salads.', 'the flowers, as a garnish. If you aren’t using them, the seat would do more with something that keeps giving.', 'worth its seat if you use the flowers'],
+      cucumber: ['Fruits for weeks, then tires; a fresh plant in the same pod keeps cucumbers coming.', 'a crisp cucumber, too central to your salads to give up.', 'staying: a crisp cucumber is too central to your salads'],
+      'green-beans': ['Sets most of its crop at once; regular picking keeps a few more coming.'],
+      arugula: ['A few cuttings, then it bolts.'], chervil: ['Best young; it bolts once it flowers.'], cilantro: ['A few cuttings before it bolts.'],
+      'miners-lettuce': ['Regrows up to three times.'], peas: ['Weeks of picking every few days, then it’s done.'], wheatgrass: ['Grows back after a cut, a couple of times.'],
+      cornflower: ['An annual: weeks of flowers if you deadhead it.', 'the flowers, as a garnish.'], 'purple-bok-choy': ['Outer leaves for a few weeks before it bolts, or the whole head at once.'],
+      sunflower: ['Deadheading brings more buds for a while.', 'the flowers.']
+    },
+    once: {
+      'mini-broccoli': ['One small head, then a few side shoots. Here it never headed.']
+    }
+  },
+
   src: [
     ['USDA AMS National Retail Report, Oct 23, 2026', 'https://www.ams.usda.gov/mnreports/fvwretail.pdf'],
     ['USDA FoodData Central', 'https://fdc.nal.usda.gov/'],
@@ -54,7 +108,9 @@ P.harvest = {
     ['Michigan State Extension: When will my vegetables be ready to harvest?', 'https://www.canr.msu.edu/news/when_will_my_vegetables_be_ready_to_harvest'],
     ['Seminis: Cucumber harvest and storage', 'https://seminisus.s3.amazonaws.com/app/uploads/2019/08/7057_SE_S1_Cucumber-Harvest-and-Storage.pdf'],
     ['Penn State Extension: Growing ground cherries', 'https://extension.psu.edu/growing-ground-cherries'],
-    ['University of Delaware: Storage conditions for carryover seed (2025)', 'https://sites.udel.edu/weeklycropupdate/?p=27183']
+    ['University of Delaware: Storage conditions for carryover seed (2025)', 'https://sites.udel.edu/weeklycropupdate/?p=27183'],
+    ['University of Maryland Extension: Borage', 'https://extension.umd.edu/resource/borage'],
+    ['NC State Extension: Borago officinalis', 'https://plants.ces.ncsu.edu/plants/borago-officinalis/common-name/borage/']
   ]
 };
 })();

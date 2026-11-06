@@ -5,7 +5,7 @@
   const $ = id => document.getElementById(id);
   const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const APP_VERSION = P.version;
-  const NEWS = 'Backups are one tap now, photos and all. The picking round keeps a harvest log, counts flowers and fruit on the fruiting tower and says when they should ripen, and the Greener tab weighs the harvest against the power bill. Plus a picture of tonight to send, and a seed box on the Ideas tab.'; // shown once to returning users
+  const NEWS = 'Every plant now says how it gives: keeps giving, for a while, or one harvest, with your rule at the top of the Ideas tab. The cucumbers stay, and the one bean’s seat is yours to pick. From earlier today: one-tap backups with photos, a harvest log that says when fruit should ripen, harvest against the power bill, a picture of tonight to send, and a seed box.'; // shown once to returning users
 
   /* ----- Storage (this phone only) ----- */
   const store = {
@@ -40,7 +40,7 @@
   function parse(s) { const m = /^([SF])(\d+)([LCR])$/.exec(s || ''); return m ? { t: m[1], r: +m[2], c: m[3] } : null; }
   function zoneOf(s) { const p = parse(s); if (!p) return null; const { r, c } = p; if (r === 1 || r === 10) return 'low'; if (r === 2 || r === 9) return 'medium'; if (c === 'C') return 'high'; if (c === 'L') return r % 2 ? 'high' : 'medium'; return r % 2 ? 'medium' : 'high'; }
   function facing(s) { return parse(s).r % 2 ? 'right' : 'left'; }
-  function seatName(s, tower) { const p = parse(s); if (!p) return s === 'dome' ? 'the dome' : s === 'sow' ? 'not sown yet' : s === 'out' ? 'comes out' : s; const base = 'row ' + p.r + ' ' + COL[p.c]; return tower ? (p.t === 'S' ? 'salad ' : 'fruiting ') + base : base; }
+  function seatName(s, tower) { const p = parse(s); if (!p) return s === 'dome' ? 'the dome' : s === 'sow' ? 'not sown yet' : s === 'out' ? 'comes out' : s === 'tbd' ? 'a seat you’ll choose' : s; const base = 'row ' + p.r + ' ' + COL[p.c]; return tower ? (p.t === 'S' ? 'salad ' : 'fruiting ') + base : base; }
   function seatTitle(s) { const p = parse(s); return (p.t === 'S' ? 'Salad tower' : 'Fruiting tower') + ', row ' + p.r + ' ' + COL[p.c]; }
   function leanText(s) {
     const { r, c } = parse(s); const out = r % 2 ? 'R' : 'L';
@@ -151,7 +151,7 @@
     $('towerName').textContent = P.towers[t].name;
     $('towerCount').textContent = planted + ' planted' + (caps ? ' · ' + caps + (caps === 1 ? ' Cap' : ' Caps') : '') + ' · ' + (30 - planted - caps) + ' open';
     $('towerSub').textContent = mode === 'plan'
-      ? 'After the steps still to come: the cucumbers out and a bean lane up the center column.'
+      ? 'After the steps still to come, with each plant in the seat it moves to.'
       : (pending ? 'The tower as it stands: the Nov 2 map, in place as of Nov 5. A pink mark means a step is still to come.' : 'The tower as it stands: the Nov 2 map, in place as of Nov 5. Tap any pod.');
     if (UI.lens === 'pick') $('towerSub').textContent = mode === 'plan' ? 'Picking shows on the Now map.' : 'Colored by picking: about once a week keeps leafy plants from bolting. Fruit shows when the flowers you’ve logged should ripen. Tap a pod to log it, or open the picking round from the Today strip.';
     else if (UI.lens === 'flavor') $('towerSub').textContent = 'Colored by what each plant brings to a salad. The word on each pod is its taste, or a heads-up marked ! before you eat it. Tap a pod for texture and pairings.';
@@ -310,7 +310,7 @@
       if (pod.was && UI.mode === 'now') lines.push(pod.was === 'dome' ? 'Planted from the dome in the Nov 2 re-seating.' : 'Moved here from ' + seatName(pod.was, parse(pod.was).t !== parse(here).t) + ' in the Nov 2 re-seating.');
       h += '<ul>' + lines.filter(Boolean).map(x => '<li>' + esc(x) + '</li>').join('') + '</ul>';
     } else {
-      h += '<h3>' + (here === 'dome' ? 'In the dome' : here === 'sow' ? 'Not sown yet' : 'Out') + '</h3>';
+      h += '<h3>' + (here === 'dome' ? 'In the dome' : here === 'sow' ? 'Not sown yet' : here === 'tbd' ? 'Seat to choose' : 'Out') + '</h3>';
     }
     if (pod.unsure) h += '<p class="small" style="margin:0"><b>To confirm:</b> ' + esc(pod.unsure) + '</p>';
     if (pod.note) h += '<p class="small" style="margin:0">' + esc(pod.note) + '</p>';
@@ -335,6 +335,7 @@
     const pet = P.pets[pid]; if (pet && pet.toxic) h += '<div class="petnote"><b>For the cat.</b> ' + esc(pet.text) + ' <a href="' + esc(pet.src) + '" target="_blank" rel="noopener">Source</a></div>';
     if (podId && POD[podId]) h += seatCard(POD[podId]);
     if (pl.group === 'fruit' && fruitPlants().includes(pid)) h += fruitBlock(pid);
+    h += givesBlock(pid);
     if (pl.why) h += '<div class="callout"><b>Why it’s on the list.</b> ' + esc(pl.why) + (pl.status === 'idea' ? '<div class="btnrow" style="margin-top:8px"><button class="btn small' + (SCOUT[pid] ? ' ghost' : ' primary') + '" data-act="scoutStar" data-pid="' + pid + '">' + (SCOUT[pid] ? '★ On your shortlist · remove' : '☆ Add to your shortlist') + '</button></div>' : '') + '</div>';
     if (P.audition[pid] && P.plants[P.audition[pid]]) h += '<div class="callout"><b>Taste it first.</b> Gardyn’s ' + esc(P.plants[P.audition[pid]].name) + ' pad is the same plant, ready in ' + esc(P.plants[P.audition[pid]].gb.mature) + ' days in the Sprout Nursery. If you love it, it earns a yPod. <button class="btn small" style="margin-top:6px" data-open="plant" data-pid="' + P.audition[pid] + '">Open the pad</button></div>';
     const aud = Object.keys(P.audition).find(k => P.audition[k] === pid); if (aud && P.plants[aud]) h += '<div class="callout"><b>An audition.</b> ' + esc(P.plants[aud].name) + ' is on your Ideas list for a yPod. This pad lets you taste it first, in under two weeks.</div>';
@@ -458,7 +459,7 @@
     const list = ids.filter(id => (q ? true : inFilter(P.plants[id], UI.filter)) && match(id));
     const order = { tower: 0, micro: 1, dome: 2, planned: 2, idea: 3, retired: 4 };
     list.sort((a, b) => (order[P.plants[a].status] - order[P.plants[b].status]) || P.plants[a].name.localeCompare(P.plants[b].name));
-    $('plist').innerHTML = list.length ? list.map(id => { const pl = P.plants[id]; const g = pl.gb || {}; const where = plantWhere(id); return '<button class="prow" data-open="plant" data-pid="' + id + '"><span class="gwrap">' + plantGlyph(pl) + '</span><span style="min-width:0"><span class="nm">' + esc(pl.name) + (tagStr(pl) ? ' <span class="muted" style="font-size:13px">' + tagStr(pl) + '</span>' : '') + '</span>' + (pl.flav ? '<span class="fw" style="display:block">' + esc(pl.flav.flavor.join(', ')) + (pl.flav.texture && pl.flav.texture[0] ? ' · ' + esc(pl.flav.texture[0]) : '') + '</span>' : '<span class="lt" style="display:block">' + esc(pl.latin) + '</span>') + (where ? '<span class="wh" style="display:block">' + esc(where) + '</span>' : pl.status === 'micro' ? '<span class="wh" style="display:block">Microgreens Kit · Sprout Nursery</span>' : pl.why ? '<span class="wh" style="display:block">An idea to try</span>' : pl.gone ? '<span class="wh" style="display:block">Retired</span>' : '') + '</span><span class="rt">' + (g.zone ? '<span class="chip z-' + g.zone + '">' + g.zone + '</span>' : '') + (/\d/.test(g.mature || '') ? '<span class="days">' + esc(g.mature) + ' days</span>' : '') + (pl.flav && pl.flav.flag ? '<span class="flag">' + esc(pl.flav.flag) + '</span>' : '') + (VERD[id] ? '<span class="vd vd-' + VERD[id].v + '">' + VNAME[VERD[id].v] + '</span>' : '') + '</span></button>'; }).join('') : '<div class="card small">No plant matches “' + esc(q) + '”. Try a pest, a light zone, or part of a name.</div>';
+    $('plist').innerHTML = list.length ? list.map(id => { const pl = P.plants[id]; const g = pl.gb || {}; const where = plantWhere(id); return '<button class="prow" data-open="plant" data-pid="' + id + '"><span class="gwrap">' + plantGlyph(pl) + '</span><span style="min-width:0"><span class="nm">' + esc(pl.name) + (tagStr(pl) ? ' <span class="muted" style="font-size:13px">' + tagStr(pl) + '</span>' : '') + (() => { const gv = pl.status === 'micro' ? null : givesOf(id); return gv && gv.k !== 'keeps' ? ' ' + givesPill(gv) : ''; })() + '</span>' + (pl.flav ? '<span class="fw" style="display:block">' + esc(pl.flav.flavor.join(', ')) + (pl.flav.texture && pl.flav.texture[0] ? ' · ' + esc(pl.flav.texture[0]) : '') + '</span>' : '<span class="lt" style="display:block">' + esc(pl.latin) + '</span>') + (where ? '<span class="wh" style="display:block">' + esc(where) + '</span>' : pl.status === 'micro' ? '<span class="wh" style="display:block">Microgreens Kit · Sprout Nursery</span>' : pl.why ? '<span class="wh" style="display:block">An idea to try</span>' : pl.gone ? '<span class="wh" style="display:block">Retired</span>' : '') + '</span><span class="rt">' + (g.zone ? '<span class="chip z-' + g.zone + '">' + g.zone + '</span>' : '') + (/\d/.test(g.mature || '') ? '<span class="days">' + esc(g.mature) + ' days</span>' : '') + (pl.flav && pl.flav.flag ? '<span class="flag">' + esc(pl.flav.flag) + '</span>' : '') + (VERD[id] ? '<span class="vd vd-' + VERD[id].v + '">' + VNAME[VERD[id].v] + '</span>' : '') + '</span></button>'; }).join('') : '<div class="card small">No plant matches “' + esc(q) + '”. Try a pest, a light zone, or part of a name.</div>';
   }
 
   /* ----- Care ----- */
@@ -592,18 +593,18 @@
 
   /* ----- Ideas ----- */
   let SCOUT = store.get('scout', {});
-  const inScout = (id, pl, f) => f === 'all' ? true : f === 'short' ? !!SCOUT[id] : f === 'outside' ? !!pl.notGardyn : (pl.fit || []).includes(f);
+  const inScout = (id, pl, f) => f === 'all' ? true : f === 'short' ? !!SCOUT[id] : f === 'outside' ? !!pl.notGardyn : f === 'keeps' ? (givesOf(id) || {}).k === 'keeps' : (pl.fit || []).includes(f);
   function ideaCard(id, pl) {
     const g = pl.gb || {}, on = !!SCOUT[id], pet = P.pets[id], fv = pl.flav;
     return '<div class="idea' + (on ? ' starred' : '') + '"><button class="idea-main" data-open="plant" data-pid="' + id + '"><span class="gwrap">' + plantGlyph(pl) + '</span><span style="min-width:0"><h4>' + esc(pl.name) + (pl.notGardyn ? ' <span class="og">outside Gardyn</span>' : '') + '</h4>' +
       (fv ? '<span class="fw">' + esc(fv.flavor.join(', ')) + (fv.texture && fv.texture[0] ? ' · ' + esc(fv.texture[0]) : '') + '</span>' : '') + '<p>' + esc(pl.why || '') + '</p><span class="chips">' +
-      (g.zone ? '<span class="chip z-' + g.zone + '">' + ZONE[g.zone] + '</span>' : '') + (/\d/.test(g.mature || '') ? '<span class="chip">' + esc(g.mature) + ' days</span>' : '') + (g.size && g.size !== '—' ? '<span class="chip">' + esc(g.size) + '</span>' : '') +
+      (() => { const gv = givesOf(id); return gv ? '<span class="chip gv-' + gv.k + '">' + HV.givesWord[gv.k] + '</span>' : ''; })() + (g.zone ? '<span class="chip z-' + g.zone + '">' + ZONE[g.zone] + '</span>' : '') + (/\d/.test(g.mature || '') ? '<span class="chip">' + esc(g.mature) + ' days</span>' : '') + (g.size && g.size !== '—' ? '<span class="chip">' + esc(g.size) + '</span>' : '') +
       (pet ? '<span class="chip ' + (pet.toxic ? 'wait' : 'ok') + '">' + (pet.toxic ? 'cat: careful' : 'cat-safe') + '</span>' : '') + '</span></span></button>' +
       '<button class="star" data-act="scoutStar" data-pid="' + id + '" aria-pressed="' + on + '" aria-label="' + (on ? 'Take ' + esc(pl.name) + ' off the shortlist' : 'Add ' + esc(pl.name) + ' to the shortlist') + '">' + (on ? '★' : '☆') + '</button></div>';
   }
   function renderIdeas() {
     const ideas = Object.entries(P.plants).filter(([, pl]) => pl.status === 'idea');
-    const f = UI.scout || 'all';
+    const f = P.scoutFilters.some(([k]) => k === UI.scout) ? UI.scout : 'all';
     const starred = ideas.filter(([id]) => SCOUT[id]).length;
     $('scoutFilters').innerHTML = P.scoutFilters.map(([k, l]) => { const n = ideas.filter(([id, pl]) => inScout(id, pl, k)).length; return (k === 'short' && !n && f !== 'short') ? '' : '<button data-scout="' + k + '" aria-pressed="' + (f === k) + '">' + l + '<span class="n">' + n + '</span></button>'; }).join('');
     $('scoutCount').textContent = starred ? starred + ' starred' : ideas.length + ' ideas';
@@ -614,7 +615,7 @@
     $('questions').innerHTML = P.questions.map(q => '<div><b>' + esc(q.q) + '</b><p>' + esc(q.a) + '</p></div>').join('');
     $('watch').innerHTML = P.watch.map(w => '<div><b>' + esc(w.title) + '</b><p>' + esc(w.text) + '</p></div>').join('');
     $('aboutVersion').textContent = 'Version ' + APP_VERSION + (window.__BUILD__ ? ' · build ' + window.__BUILD__ : '');
-    renderSeedBox();
+    renderSeedBox(); renderGiveRule();
   }
 
   /* ----- DIY ----- */
@@ -1563,6 +1564,27 @@
       catch (e) { if (e && e.name === 'AbortError') return; if (e && e.name === 'NotAllowedError') { BK.cardPending = { file, t: Date.now() }; toast('Ready. Tap Share once more to send it.'); return; } }
     }
     download(file); toast('Saved the picture to Downloads.');
+  }
+
+  /* ----- How a plant gives: Josh grows for perpetual harvests ----- */
+  function givesOf(pid) {
+    const pl = P.plants[pid], G = HV.gives; if (!pl) return null;
+    if (pl.status === 'micro') return { k: 'quick', note: HV.givesGroup.micro };
+    if (pid in G.keeps) return { k: 'keeps', note: G.keeps[pid] || HV.givesGroup[pl.group] || '' };
+    const x = G.while[pid] || G.once[pid]; if (!x) return null;
+    return { k: G.while[pid] ? 'while' : 'once', note: x[0], earns: x[1], short: x[2] };
+  }
+  const givesPill = g => g ? '<span class="gv gv-' + g.k + '">' + HV.givesWord[g.k] + '</span>' : '';
+  function givesBlock(pid) {
+    const g = givesOf(pid); if (!g) return '';
+    return '<div class="gives">' + givesPill(g) + '<p class="small">' + esc(g.note) + (g.earns ? ' <b>Earns its seat:</b> ' + esc(g.earns) : g.k === 'once' ? ' By your rule, better bought, unless it earns a seat another way.' : '') + '</p></div>';
+  }
+  function renderGiveRule() {
+    const el = $('giveRule'); if (!el) return;
+    const ex = Object.keys(P.plants).filter(id => P.plants[id].status === 'tower').map(id => [id, givesOf(id)]).filter(([, g]) => g && g.k !== 'keeps');
+    el.innerHTML = '<b>' + esc(HV.rule.title) + '</b><p class="small">' + esc(HV.rule.text) + '</p>' +
+      '<p class="small"><b>On the towers now,</b> ' + (ex.length ? 'everything keeps giving except ' + esc(listWords(ex.map(([id, g]) => { const n = P.pods.filter(x => x.p === id && parse(cur(x))).length, nm = n > 1 && HV.fruitWord[id] ? fw(id, 2) : P.plants[id].name.toLowerCase(); return 'the ' + nm + (g.short ? ' (' + g.short + ')' : ''); }))) + '.' : 'everything keeps giving.') + '</p>' +
+      '<p class="small muted">' + esc(HV.rule.micro) + '</p>';
   }
 
   /* ----- The seed box: yCubes, seed pads and packets on hand ----- */

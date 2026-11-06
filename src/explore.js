@@ -246,7 +246,7 @@ S('miners-lettuce', { name: 'Miner’s Lettuce', latin: 'Claytonia perfoliata', 
 /* The older ideas get scout tags too, so the filters work on the whole list */
 const FIT = { arugula: ['salad'], 'wasabi-greens': ['salad'], breen: ['salad'], watercress: ['salad'], cilantro: ['salad', 'herb'], chervil: ['salad', 'herb'], catnip: ['herb', 'fun'], 'lemon-balm': ['herb'] };
 Object.keys(FIT).forEach(id => { if (P.plants[id]) P.plants[id].fit = FIT[id]; });
-P.scoutFilters = [['all', 'All'], ['short', 'Shortlist'], ['salad', 'Salad tower'], ['herb', 'Herbs'], ['flower', 'Edible flowers'], ['fruit', 'Fruiting tower'], ['regrows', 'Grows back'], ['fun', 'Just for fun'], ['outside', 'Outside Gardyn']];
+P.scoutFilters = [['all', 'All'], ['short', 'Shortlist'], ['salad', 'Salad tower'], ['herb', 'Herbs'], ['flower', 'Edible flowers'], ['fruit', 'Fruiting tower'], ['keeps', 'Keeps giving'], ['fun', 'Just for fun'], ['outside', 'Outside Gardyn']];
 
 /* ---------- More cat checks ---------- */
 Object.assign(P.pets, {

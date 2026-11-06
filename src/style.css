@@ -684,3 +684,16 @@ td .small { display: block; margin-top: 2px; }
 .sb-buy h4 { font-size: 13px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
 .sb-pick select { font: inherit; font-size: 15px; font-weight: 500; padding: 4px 8px; border-radius: 8px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); min-width: 0; max-width: 100%; }
 #seedBox .prow { width: 100%; }
+
+/* ---------- How a plant gives (Josh's rule: grow what keeps giving) ---------- */
+.gv { display: inline-block; vertical-align: 1px; font: 600 11.5px/1 var(--font-display); letter-spacing: .04em; text-transform: uppercase; padding: 4px 7px 3px; border-radius: 999px; white-space: nowrap; border: 1px solid transparent; }
+.gv-keeps { color: var(--good); background: color-mix(in srgb, var(--good) 12%, var(--surface)); border-color: color-mix(in srgb, var(--good) 30%, transparent); }
+.gv-while { color: var(--warn); background: color-mix(in srgb, var(--warn) 12%, var(--surface)); border-color: color-mix(in srgb, var(--warn) 32%, transparent); }
+.gv-once { color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, var(--surface)); border-color: color-mix(in srgb, var(--accent) 32%, transparent); }
+.gv-quick { color: var(--muted); background: var(--surface-2); border-color: var(--line); }
+.chip.gv-keeps, .chip.gv-while, .chip.gv-once, .chip.gv-quick { font-weight: 600; }
+.gives { display: grid; gap: 6px; justify-items: start; padding: 10px 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); }
+.gives .small { margin: 0; justify-self: stretch; }
+.rule-card { display: grid; gap: 4px; padding: 12px 14px; border-radius: 14px; border: 1px solid color-mix(in srgb, var(--good) 35%, var(--line)); background: color-mix(in srgb, var(--good) 6%, var(--surface)); }
+.rule-card > b { font-family: var(--font-display); font-size: 17px; color: var(--good); }
+.rule-card .small { margin: 0; }
