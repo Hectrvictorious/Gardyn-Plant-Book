@@ -3,3 +3,5 @@ site/index.html
 site/sw.js
 artifact/
 __pycache__/
+server.log
+*.log
