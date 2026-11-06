@@ -32,7 +32,7 @@
     <div class="switches">
       <div class="seg" role="group" aria-label="Tower"><button data-tower="S" aria-pressed="true">Salad</button><button data-tower="F" aria-pressed="false">Fruiting</button></div>
       <div class="seg" role="group" aria-label="Layout"><button data-mode="now" aria-pressed="true">Now</button><button data-mode="plan" aria-pressed="false">Next</button></div>
-      <div class="seg" role="group" aria-label="Color the map by"><button data-lens="light" aria-pressed="true">Light</button><button data-lens="flavor" aria-pressed="false">Flavor</button><button data-lens="pick" aria-pressed="false">Picking</button></div>
+      <div class="seg" role="group" aria-label="Color the map by"><button data-lens="light" aria-pressed="true">Light</button><button data-lens="flavor" aria-pressed="false">Flavor</button><button data-lens="pick" aria-pressed="false">Picking</button><button data-lens="pods" aria-pressed="false">Pods</button></div>
     </div>
     <div class="tower-head"><h3 id="towerName">Salad tower</h3><span class="small muted" id="towerCount"></span></div>
     <p class="small" id="towerSub" style="margin:-8px 0 0"></p>
@@ -42,6 +42,7 @@
       <span><i class="sw" style="background:var(--surface);box-shadow:inset -3px 0 0 color-mix(in srgb,var(--ink) 26%,transparent)"></i>dark edge: the way the pod faces (► ◄ on the right bar)</span><span>★ salad favorite</span><span>▲ giant</span><span>✿ blooms</span></span>
       <span class="lgset" id="legendFlavor" hidden></span>
       <span class="lgset" id="legendPick" hidden></span>
+      <span class="lgset" id="legendPods" hidden></span>
       <span id="legendMove"></span>
     </div>
     <div class="sec" id="domeSec"><h3 id="domeTitle">In the dome</h3><div class="dome" id="dome"></div></div>
@@ -141,19 +142,40 @@
     </div>
   </section>
 
+  <section class="view wrap" id="view-forbidden" hidden>
+    <div class="view-head">
+      <button class="backlink" data-go="ideas">‹ Ideas</button>
+      <div class="eyebrow">Just for fun</div>
+      <h2>The Forbidden Shelf</h2>
+      <p id="forbIntro"></p>
+    </div>
+    <div class="card fgame" id="fgame" aria-live="polite"></div>
+    <div class="jumps" id="forbJumps"></div>
+    <div id="forbShelves" class="forbshelves"></div>
+    <p class="src" id="forbNote" style="margin:0"></p>
+  </section>
+
   <section class="view wrap" id="view-diy" hidden>
     <div class="view-head">
       <div class="eyebrow">Greener</div>
       <h2>Grow more, waste less</h2>
-      <p>What two towers cost in power and water, what to do with spent yCubes, the seeds and plants you can keep for free, and the trail from rockwool to a reusable printed pod.</p>
+      <p>What two towers cost in power and water, what leaves the house, where a printer earns its keep, and the seeds and plants you can keep for free.</p>
     </div>
+    <div class="jumps"><button data-jump="footSec">Footprint</button><button data-jump="wasteSec">Waste</button><button data-jump="printSec">The printer</button><button data-jump="trailSec">Beyond the yCube</button><button data-jump="seedSec">Seeds</button></div>
     <div class="sec" id="footSec"><h3>The footprint</h3><div class="card calc" id="footprint"></div></div>
     <div class="sec"><h3>Water</h3><div class="card prose" id="waterCard"></div></div>
-    <div class="sec"><h3>Less waste</h3><div class="list" id="wasteList"></div></div>
-    <div class="sec"><h3>Seeds you can save</h3><div class="list" id="seedList"></div></div>
-    <div class="sec"><h3>Plants that keep giving</h3><div class="list" id="regrowList"></div></div>
-    <p class="src" id="greenSrc" style="margin:0"></p>
-    <div class="sec"><h3>Beyond the yCube</h3><p class="small" style="margin:-2px 0 0">The trail from rockwool to a reusable printed pod: what to fill it with for each crop, what it costs, and how to print it. Tap a stop to open it.</p><div class="card"><div class="trail" id="trail"></div></div></div>
+    <div class="sec" id="wasteSec"><h3>Less waste</h3><div class="list" id="wasteList"></div></div>
+    <div class="sec" id="printSec"><h3>The printer</h3>
+      <p class="small" style="margin:-2px 0 0">A printer is only as green as what it replaces. Every print has to earn its plastic back, and here’s how to tell, with your own numbers.</p>
+      <div class="rules3" id="printRules"></div>
+      <p class="small" id="printSkip" style="margin:0"></p>
+    </div>
+    <div class="sec" id="offSec"><h3>Off rockwool</h3><div class="card offrock" id="offRock"></div></div>
+    <div class="sec"><h3>Worth printing</h3><div class="list parts" id="printParts"></div></div>
+    <div class="sec" id="logSec"><h3>Print log <span class="count" id="logCount"></span></h3><div class="card calc plog" id="printLog"></div></div>
+    <div class="sec"><h3>Habits that keep it green</h3><div class="list" id="printHabits"></div></div>
+    <div class="sec"><h3>Scrap and spools</h3><div class="list" id="printScrap"></div><p class="small" id="printNot" style="margin:0"></p><p class="src" id="printSrc" style="margin:0"></p></div>
+    <div class="sec" id="trailSec"><h3>Beyond the yCube</h3><p class="small" style="margin:-2px 0 0">The trail from rockwool to a reusable printed pod: what to fill it with for each crop, what it costs, and how to print it. Tap a stop to open it.</p><div class="card"><div class="trail" id="trail"></div></div></div>
     <div class="sec"><h3>Why move off rockwool</h3><div class="why" id="why"></div></div>
     <div class="sec"><h3>What goes in the pod</h3><div class="list" id="fillList"></div></div>
     <div class="sec"><h3>What it costs</h3><div class="card calc" id="calc"></div></div>
@@ -162,7 +184,10 @@
     <div class="sec"><h3>Growing media compared</h3><div class="list" id="mediaList"></div></div>
     <div class="sec"><h3>Models and shops</h3><div class="list" id="models"></div></div>
     <div class="sec"><h3>Also on the workbench</h3><div class="list" id="bench"></div></div>
-    <p class="foot">The printed-pod trail is from the Oct 30 report "yCube Alternatives: Media and Printed Pod" in your Gardyn project. Prices as read on Oct 30.</p>
+    <div class="sec" id="seedSec"><h3>Seeds you can save</h3><div class="list" id="seedList"></div></div>
+    <div class="sec"><h3>Plants that keep giving</h3><div class="list" id="regrowList"></div></div>
+    <p class="src" id="greenSrc" style="margin:0"></p>
+    <p class="foot">The printed-pod trail and the payback figures are from the Oct 30 report "yCube Alternatives: Media and Printed Pod" in your Gardyn project. Prices as read on Oct 30; printer power from Bambu Lab’s own measurements.</p>
   </section>
 </div>
 

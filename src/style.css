@@ -29,6 +29,8 @@
   /* Salad roles and flavor axes */
   --r-base: #8fc56c; --r-crunch: #83bcd6; --r-pepper: #ee9a52; --r-tang: #e2cc45; --r-herb: #5fb795; --r-sweet: #ef8aa5; --r-color: #ad84d4; --r-topper: #c4ab80; --r-earthy: #ad8462; --r-cool: #93bde8;
   --shadow: 0 10px 28px rgba(20, 32, 25, .12);
+  /* On the dark band (dark in both themes): the game's right and wrong */
+  --band-good: #8fdcaa; --band-good-ink: #0b2414; --band-bad: #ffa3c2; --band-soft: rgba(241, 246, 240, .1); --band-edge: rgba(241, 246, 240, .3);
   --font-display: "Barlow Semi Condensed", "Arial Narrow", "Helvetica Neue", Arial, sans-serif;
   --font-body: "Literata", Georgia, "Times New Roman", serif;
 }
@@ -531,3 +533,82 @@ td .small { display: block; margin-top: 2px; }
 .lb-bar { display: flex; align-items: center; justify-content: space-between; gap: 8px; color: #eef5ef; font-family: var(--font-display); }
 /* Verdict marks on the Flavor view */
 .vb { font-family: var(--font-display); font-weight: 700; font-size: 12px; }
+
+/* ---------- The Forbidden Shelf page ---------- */
+.backlink { justify-self: start; border: 0; background: none; padding: 2px 0 4px; color: var(--accent); font-family: var(--font-display); font-weight: 600; font-size: 15px; cursor: pointer; }
+.forbshelves { display: grid; gap: 16px; }
+.flist { display: grid; gap: 6px; }
+.frow { width: 100%; display: grid; grid-template-columns: 42px minmax(0, 1fr) auto; gap: 11px; align-items: center; padding: 10px 12px; border-radius: 13px; border: 1px solid var(--line); background: var(--surface); text-align: left; cursor: pointer; font: inherit; color: var(--ink); }
+.frow:active { background: var(--surface-2); }
+.frow .gwrap { width: 42px; height: 42px; border-radius: 11px; background: var(--surface-2); display: grid; place-items: center; }
+.frow .gwrap .gl { width: 29px; height: 29px; }
+.frow .ft { display: grid; gap: 1px; min-width: 0; justify-items: start; }
+.frow b { font-family: var(--font-display); font-size: 17px; line-height: 1.15; }
+.frow .latin { font-size: 12.5px; color: var(--muted); }
+.frow .chip, .fchip { white-space: normal; text-transform: none; letter-spacing: .01em; font-size: 12.5px; text-align: left; }
+.frow .chip { margin-top: 5px; }
+.frow .go { font-family: var(--font-display); font-size: 20px; color: var(--muted); }
+.fchip { font-size: 13px; }
+.fnav { justify-content: space-between; }
+.fun { margin: 0; color: var(--ink-2); font-style: italic; }
+.forblinks { display: flex; flex-wrap: wrap; gap: 6px; }
+.forblink { display: inline-flex; align-items: baseline; gap: 7px; padding: 7px 12px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface-2); cursor: pointer; font: inherit; color: var(--ink); }
+.forblink .eyebrow { font-size: 10.5px; }
+.forblink b { font-family: var(--font-display); font-size: 14.5px; }
+
+/* Legal in Maine? */
+.fgame { display: grid; gap: 11px; background: var(--band); color: var(--band-ink); border-color: color-mix(in srgb, var(--band-ink) 14%, var(--band)); padding: 16px; }
+.fgame .eyebrow, .fg-meta { color: var(--band-ink); opacity: .72; }
+.fg-top { display: flex; align-items: baseline; justify-content: space-between; gap: 4px 10px; flex-wrap: wrap; }
+.fg-q { margin: 0; font-family: var(--font-display); font-size: 23px; font-weight: 700; line-height: 1.16; text-wrap: balance; }
+.fg-a { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.fg-b { font-family: var(--font-display); font-weight: 600; font-size: 15.5px; line-height: 1.2; padding: 12px 10px; border-radius: 11px; border: 1px solid var(--band-edge); background: var(--band-soft); color: var(--band-ink); cursor: pointer; }
+.fg-b:disabled { cursor: default; opacity: .45; }
+.fg-b.right { opacity: 1; background: var(--band-good); border-color: var(--band-good); color: var(--band-good-ink); }
+.fg-b.wrong { opacity: 1; background: transparent; border-color: var(--band-bad); color: var(--band-bad); text-decoration: line-through; }
+.fg-r { margin: 0; font-size: 14.5px; line-height: 1.5; }
+.fg-r b { font-family: var(--font-display); font-size: 16.5px; }
+.fg-r.ok b { color: var(--band-good); }
+.fg-r.no b { color: var(--band-bad); }
+.fgame .btn { border-color: var(--band-edge); }
+.fgame .btn.ghost { color: var(--band-ink); background: transparent; }
+.fgame .btn.primary { background: var(--band-good); border-color: var(--band-good); color: var(--band-good-ink); }
+.fgame :focus-visible { outline-color: var(--band-good); }
+
+/* ---------- The printer ---------- */
+.rules3 { display: grid; gap: 8px; counter-reset: rule; }
+.rules3 .card { display: grid; grid-template-columns: 30px minmax(0, 1fr); column-gap: 10px; padding: 12px 14px; }
+.rules3 .card::before { counter-increment: rule; content: counter(rule); grid-row: span 2; width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; background: color-mix(in srgb, var(--good) 15%, var(--surface)); color: var(--good); font: 700 14px/1 var(--font-display); }
+.rules3 h4 { font-size: 16.5px; }
+.rules3 p { margin: 3px 0 0; font-size: 14px; color: var(--ink-2); }
+.offrock { display: grid; gap: 10px; }
+.or-head, .cbal { display: grid; gap: 6px; }
+.or-bar { height: 10px; border-radius: 5px; background: var(--surface-2); overflow: hidden; }
+.or-bar i { display: block; height: 100%; min-width: 3px; background: var(--good); border-radius: 5px; transition: width .3s; }
+.or-bar.c i { background: var(--c-sage); }
+.parts .part { display: grid; gap: 3px; }
+.parts .part p { margin: 0; }
+.parts .pay { font-family: var(--font-display); font-size: 14.5px; font-weight: 500; color: var(--ink); }
+.parts .how { color: var(--muted); }
+.parts .btnrow { margin-top: 4px; }
+.chip.rep { background: color-mix(in srgb, var(--c-blue) 14%, var(--surface-2)); color: var(--c-blue); }
+.plog .plform { display: grid; gap: 10px; border-top: 1px solid var(--line); padding-top: 12px; }
+.plog .plist:empty { display: none; }
+.plog .plist > .plrow { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; align-items: center; padding: 8px 12px; }
+.plrow > span { display: grid; min-width: 0; }
+.plrow b { font-family: var(--font-display); font-size: 15.5px; }
+.plrow .small { color: var(--muted); }
+.plrow.bad b { color: var(--muted); text-decoration: line-through; }
+.pset { border-top: 1px solid var(--line); padding-top: 10px; }
+.pset summary { cursor: pointer; font-family: var(--font-display); font-weight: 600; font-size: 15px; color: var(--ink-2); }
+.pset[open] { display: grid; gap: 10px; }
+.pset[open] summary { margin-bottom: 2px; }
+.podrow { display: flex; align-items: center; justify-content: space-between; gap: 6px 8px; flex-wrap: wrap; border-top: 1px dashed var(--line); padding-top: 8px; }
+.seat > .podrow:first-child { border-top: 0; padding-top: 0; }
+.podrow.on b { color: var(--good); font-family: var(--font-display); font-size: 15px; }
+.pod.k-printed { background: color-mix(in srgb, var(--good) 20%, var(--surface)); border-color: color-mix(in srgb, var(--good) 60%, transparent); }
+.pod.open.k-printed { border-style: solid; color: var(--good); }
+.pod.k-rock { background: var(--surface); }
+.sw.k-printed { background: color-mix(in srgb, var(--good) 32%, var(--surface)); border-color: color-mix(in srgb, var(--good) 60%, transparent) !important; }
+.sw.k-rock { background: var(--surface); }
+@media (prefers-reduced-motion: reduce) { .or-bar i { transition: none; } }

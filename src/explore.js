@@ -271,65 +271,7 @@ P.island.push(
 );
 P.islandSources = [['Wikipedia: Green sauce', 'https://en.wikipedia.org/wiki/Green_sauce'], ['Wikipedia: Tropaeolum majus', 'https://en.wikipedia.org/wiki/Tropaeolum_majus']];
 
-/* ---------- The Forbidden Shelf ---------- */
-P.forbidden = {
-  intro: 'Behind black iron gates at Alnwick Garden in England, the Duchess of Northumberland grows about a hundred plants that can kill, cannabis and coca among them, to teach children about drugs without them noticing they’re being taught. This is the island version: history and law, not a grow guide. None of it goes in a Gardyn.',
-  items: [
-    { name: 'Cannabis', latin: 'Cannabis sativa', glyph: 'blades', tint: 'leaf', status: 'Legal in Maine for adults, with limits',
-      law: 'Maine lets adults 21 and over grow up to 6 mature plants, 12 immature plants and any number of seedlings. They have to be out of view from a public way, kept from anyone under 21, and each plant tagged with the grower’s name and ID number. Federally it’s still a controlled substance: an April 2026 rule moved FDA-approved and state-licensed medical marijuana to Schedule III, and the broader move was paused in late September 2026.',
-      gardyn: 'Gardyn says it can’t offer guidance on growing cannabis. It’s a poor fit anyway: most cannabis flowers only when its nights get long, and Gardyn’s own seed guide warns that other light throws short-day plants off, while your towers run 14–16 hours a day for the greens.',
-      fun: 'Its closest relative is the hop vine that makes beer bitter.' },
-    { name: 'Opium poppy', latin: 'Papaver somniferum', glyph: 'star', tint: 'red', status: 'A federal gray area',
-      law: 'The poppy seeds on a bagel are legal. Federal law defines the plant itself, everything but the seed, as a controlled substance, so gardeners who grow it as an ornamental are in a gray area, and growing it for anything else is a crime.',
-      gardyn: 'A tall outdoor annual, not a yPod plant.',
-      fun: 'The same species gives morphine and codeine to medicine and seeds to a lemon poppy seed muffin.' },
-    { name: 'Coca', latin: 'Erythroxylum coca', glyph: 'leaf', tint: 'leaf', status: 'Illegal to grow in the US',
-      law: 'Coca leaves are a Schedule II controlled substance.',
-      gardyn: 'A tropical shrub, and not legal to grow here.',
-      fun: 'The Alnwick Poison Garden grows it under license. In the Andes the leaves have been chewed and brewed as tea for thousands of years.' },
-    { name: 'Peyote', latin: 'Lophophora williamsii', glyph: 'round', tint: 'sage', status: 'Schedule I, with a religious exemption',
-      law: 'Federal law protects its sacramental use by the Native American Church. For everyone else it’s Schedule I.',
-      gardyn: 'A slow desert cactus that would hate the Columns.',
-      fun: 'A spineless, button-shaped cactus.' },
-    { name: 'Khat', latin: 'Catha edulis', glyph: 'leaf', tint: 'lime', status: 'Controlled: Schedules I and IV',
-      law: 'Its two stimulants are controlled separately: cathinone in Schedule I, cathine in Schedule IV.',
-      gardyn: 'An East African shrub that grows into a tree.',
-      fun: 'In Yemen and the Horn of Africa, chewing fresh leaves together is an afternoon social ritual.' },
-    { name: 'Salvia divinorum', latin: 'Salvia divinorum', glyph: 'mint', tint: 'leaf', status: 'Legal for adults in Maine',
-      law: 'Not federally controlled. Maine made selling or giving it to anyone under 18 a crime in 2007; adults can buy it.',
-      gardyn: 'A cousin of the sage in your spice rack, from the cloud forests of Oaxaca.',
-      fun: 'The one on this shelf that’s legal here but sounds like it shouldn’t be.' },
-    { name: 'Tobacco', latin: 'Nicotiana tabacum', glyph: 'leaf', tint: 'husk', status: 'Legal',
-      law: 'Legal to grow. Nicotine is in every leaf, and the ASPCA lists tobacco as toxic to cats and dogs.',
-      gardyn: 'A nightshade, like your tomatoes, that grows several feet tall.',
-      fun: 'Columbus’s crew saw it smoked in the Caribbean in 1492.' },
-    { name: 'Hops', latin: 'Humulus lupulus', glyph: 'round', tint: 'lime', status: 'Legal',
-      law: 'Legal, and cannabis’s closest relative: the two share a family. The ASPCA lists hops as toxic to dogs.',
-      gardyn: 'A vine that climbs 20 feet in a summer.',
-      fun: 'Hops are why beer is bitter, and why it keeps.' },
-    { name: 'Wormwood', latin: 'Artemisia absinthium', glyph: 'sprig', tint: 'sage', status: 'Legal; its drink was banned for 95 years',
-      law: 'Absinthe, named for wormwood, was banned in the US in 1912 and allowed back in 2007, as long as it’s essentially thujone-free (under 10 parts per million).',
-      gardyn: 'A silver perennial for a dry, sunny bed.',
-      fun: 'The name comes from the Greek word for wormwood, apsinthion.' },
-    { name: 'Catnip', latin: 'Nepeta cataria', glyph: 'mint', tint: 'sage', status: 'Legal, and on your Ideas list',
-      law: 'The cat’s controlled substance. The ASPCA counts it as toxic to cats in quantity: vomiting and diarrhea, and it sedates some cats and winds up others.',
-      gardyn: 'Gardyn sells it as a low-light yCube.',
-      fun: 'The only plant on this shelf the cat would vote for.' }
-  ],
-  src: [
-    ['Smithsonian: The Alnwick Poison Garden', 'https://www.smithsonianmag.com/travel/step-inside-worlds-most-dangerous-garden-if-you-dare-180952635/'],
-    ['Maine statute 28-B §1502: home cultivation', 'https://autodiscover.legislature.maine.gov/statutes/28-B/title28-Bsec1502.html'],
-    ['Regulatory Oversight: rescheduling put on hold (Oct 2026)', 'https://www.regulatoryoversight.com/2026/10/pending-marijuana-rescheduling-put-on-hold/'],
-    ['Gardyn Help: Plant Portfolio FAQs', GH(1782017)],
-    ['Gardyn Help: Choosing your own seeds', GH(1778945)],
-    ['21 U.S.C. 802: definitions', 'https://www.law.cornell.edu/uscode/text/21/802'],
-    ['21 CFR 1308: schedules of controlled substances', 'https://govinfo.gov/content/pkg/CFR-2023-title21-vol9/pdf/CFR-2023-title21-vol9-part1308.pdf'],
-    ['21 CFR 1307.31: Native American Church', 'https://www.govinfo.gov/content/pkg/CFR-2011-title21-vol9/pdf/CFR-2011-title21-vol9-sec1307-31.pdf'],
-    ['Wikipedia: Salvia divinorum legal status', 'https://en.wikipedia.org/wiki/Legal_status_of_Salvia_divinorum_in_the_United_States'],
-    ['ASPCA: Tobacco', ASPCA + 'tobacco'], ['ASPCA: Hops', ASPCA + 'hops'], ['ASPCA: Catnip', ASPCA + 'catnip'],
-    ['Wikipedia: Absinthe', 'https://en.wikipedia.org/wiki/Absinthe']
-  ]
-};
+/* The Forbidden Shelf lives in forbidden.js. */
 
 /* ---------- Plant Doctor: what you see → what Gardyn says to do ---------- */
 P.doctor = [
@@ -395,7 +337,7 @@ P.greener = {
     ['yCube casings', 'Gardyn makes them from corn-based plastic and is moving to tapioca. Both compost only in industrial composters, so on the island they’re trash.'],
     ['Rockwool', 'Not compostable, but Gardyn says it adds nothing harmful and you can work spent rockwool straight into the ground, where it holds water.'],
     ['Never-sprouted yCubes', 'The rockwool can go into houseplant pots. Once it has touched soil it never goes back in the Gardyn.'],
-    ['The real fix', 'Reusable printed pods: the trail below.']
+    ['The real fix', 'Reusable printed pods: see The printer and Beyond the yCube, below.']
   ],
   seeds: [
     ['The easy four', 'Beans, peas, lettuce and tomatoes pollinate themselves, so their seed comes true. Skip hybrids: their seed may not.'],
@@ -451,7 +393,12 @@ P.tips = [
   { t: 'Frankfurt green sauce takes seven herbs, and you already grow three of them.', go: { view: 'salad' } },
   { t: 'Microgreen cover paper comes off when it’s ready. Gardyn: “If you have to tug, it’s not ready!”', go: { view: 'salad' } },
   { t: 'Bunching onions grow back a week or two after each cut: scallions from one yCube, on repeat.', go: { plant: 'bunching-onions' } },
-  { t: 'A bowl from the towers is a clamshell of greens that didn’t have to ride the ferry. Tap “We ate this” to count it.', go: { view: 'salad' } }
+  { t: 'A bowl from the towers is a clamshell of greens that didn’t have to ride the ferry. Tap “We ate this” to count it.', go: { view: 'salad' } },
+  { t: 'All of Hancock County is inside Maine’s blister rust quarantine: no currants or gooseberries on Swan’s Island.', go: { forb: 'currants' } },
+  { t: 'Lilies and daylilies can kill a cat, even the pollen or the water in the vase.', go: { forb: 'lilies' } },
+  { t: 'Your purslane carries more oxalic acid, by weight, than rhubarb leaves. The dose makes the poison.', go: { forb: 'oxalic' } },
+  { t: 'An A1 mini left on for a month uses about as much power as printing all 70 pods. Switch it off between runs.', go: { view: 'diy', anchor: 'printSec' } },
+  { t: 'A printed pod pays back its price at the first planting, its trash by the second, its carbon after about eleven.', go: { view: 'diy', anchor: 'printSec' } }
 ];
 P.tipSources = [['Gardyn Help: Soak Method', GH(1778497)]];
 })();

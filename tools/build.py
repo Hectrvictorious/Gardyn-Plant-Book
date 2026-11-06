@@ -5,7 +5,7 @@
   python3 tools/build.py --artifact -> also artifact/plant-book.html (the same page, no head, for a claude.ai preview)
 
 src/body.html holds the page; its /*@@CSS@@*/, /*@@DATA@@*/ and /*@@APP@@*/ markers are filled from
-src/style.css, src/data.js + src/taste.js + src/explore.js, and src/app.js. Every build gets a new BUILD stamp, which is how installed
+src/style.css, src/data.js + taste.js + explore.js + forbidden.js + printer.js, and src/app.js. Every build gets a new BUILD stamp, which is how installed
 phones notice an update (see src/sw.js)."""
 import datetime, os, sys
 
@@ -14,7 +14,7 @@ src = lambda n: open(os.path.join(ROOT, 'src', n), encoding='utf-8').read()
 BUILD = os.environ.get('BUILD') or datetime.datetime.now(datetime.timezone.utc).strftime('%Y%m%dT%H%M')
 
 page = src('body.html')
-for marker, names in (('/*@@CSS@@*/', ['style.css']), ('/*@@DATA@@*/', ['data.js', 'taste.js', 'explore.js']), ('/*@@APP@@*/', ['app.js'])):
+for marker, names in (('/*@@CSS@@*/', ['style.css']), ('/*@@DATA@@*/', ['data.js', 'taste.js', 'explore.js', 'forbidden.js', 'printer.js']), ('/*@@APP@@*/', ['app.js'])):
     assert page.count(marker) == 1, marker
     page = page.replace(marker, '\n'.join(src(n).strip() for n in names))
 

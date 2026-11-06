@@ -8,9 +8,10 @@ Plant Doctor and Care. On iPhone: Share → Add to Home Screen.
 
 - **Towers**: both towers drawn as they stand, every yPod a button. *Now* is the Nov 2 maps
   (salad v5, fruiting v9), in place as of Nov 5, plus any steps ticked off; *Next* appears while a
-  tower still has steps to come (the bean swap). Three views: *Light* (Gardyn's zones), *Flavor*
+  tower still has steps to come (the bean swap). Four views: *Light* (Gardyn's zones), *Flavor*
   (what each plant brings to a salad, one-word heads-ups like bristly or stringy, and your taste-test
-  verdicts) and *Picking* (days since each leafy pod was picked). The Today strip counts care jobs
+  verdicts), *Picking* (days since each leafy pod was picked) and *Pods* (which seats hold a printed
+  pod, and how many plantings each has had). The Today strip counts care jobs
   due, steps ready now and pods due a picking, with a tip a day underneath.
 - **Plants**: a Gardyn-style page for every plant on the towers, the microgreens, the planned
   plants, the ideas and the retired ones: a tasting note, "Before you eat it", a cat check (ASPCA),
@@ -23,19 +24,27 @@ Plant Doctor and Care. On iPhone: Share → Add to Home Screen.
   the next steps, a **Plant Doctor** (what you see → what Gardyn says it usually is and what to do),
   and your fixes.
 - **Ideas**: 32 plants to try, 24 of them researched for this round (Gardyn's catalog plus ice
-  plant, oyster leaf and miner's lettuce), with filters and a starred shortlist; the **Forbidden
-  Shelf** (cannabis, coca, opium poppy and seven more: the law, and why none belong in a Gardyn);
-  gear, open questions, the watch list.
+  plant, oyster leaf and miner's lettuce), with filters and a starred shortlist; gear, open
+  questions, the watch list; and the door to the Forbidden Shelf.
+- **The Forbidden Shelf** (`#forbidden`): 42 plants on six shelves (controlled plants, legal ones
+  with a reputation, the dark side of the plants already on the towers, a poison cabinet with the
+  cat in mind, what Maine and the USDA ban, and plants that were once banned), each with the law,
+  the Gardyn angle and sources, plus *Legal in Maine?*, a ten-card game that keeps your best score.
+  History and law only, never a grow guide. Plant pages link to their shelf entries.
 - **Greener**: what the towers cost in power at your rate and what they use in water, yCube and
-  rockwool end of life, seed saving, plants that keep giving, then *Beyond the yCube*: the trail from
-  rockwool to a printed PETG pod.
+  rockwool end of life, then **the printer**: three rules for when a print is actually green, an
+  *Off rockwool* card (seats in printed pods, plantings, money, trash and a carbon balance), parts
+  worth printing with their payback, a print log with your own numbers, the habits that keep a
+  printer green, scrap and spools. Then *Beyond the yCube* (the trail from rockwool to a printed PETG
+  pod), seed saving and plants that keep giving.
 
-Ticks, dates, picks, verdicts, stars, bowls and notes are stored on the phone (Care → Your data makes a
-backup to paste back). Photos stay in the phone's storage and aren't in the backup.
+Ticks, dates, picks, verdicts, stars, bowls, notes, printed-pod seats, the print log and the game
+score are stored on the phone (Care → Your data makes a backup to paste back). Photos stay in the
+phone's storage and aren't in the backup.
 
 **Links into the app**: `#seat-S9R` opens that seat (S salad or F fruiting, row, column); `#p-borage`
-opens a plant page; `#pick` the picking round; `#doctor` the Plant Doctor; `#salad`, `#care` and the
-other tab names open a tab. **`site/tags.html`** is a printable sheet of QR tags for all 60 seats;
+opens a plant page; `#pick` the picking round; `#doctor` the Plant Doctor; `#forbidden` the Forbidden
+Shelf; `#salad`, `#care` and the other tab names open a tab. **`site/tags.html`** is a printable sheet of QR tags for all 60 seats;
 regenerate it with `pip install segno && python3 tools/tags.py`.
 
 ## Editing
@@ -46,7 +55,9 @@ The page is built from `src/`:
 |---|---|
 | `src/data.js` | Everything about the towers: plants, pod seats (`pods`), Caps and seat notes (`holds`), the step list, the care rhythm, fixes, ideas, the printed-pod trail |
 | `src/taste.js` | Flavor, texture, pairings and heads-ups for each plant; the microgreens; house salads, island plates, dressings, taste tests, cautions and the cat check |
-| `src/explore.js` | The plant scout, more cat checks, the Forbidden Shelf, the Plant Doctor, the Greener figures and the tips |
+| `src/explore.js` | The plant scout, more cat checks, the Plant Doctor, the Greener figures and the tips |
+| `src/forbidden.js` | The Forbidden Shelf: six shelves, 42 plants with law, sources and links to the towers, and the Legal in Maine? cards |
+| `src/printer.js` | The printer on the Greener tab: the rules, payback factors, parts worth printing, habits, scrap and spools |
 | `src/app.js` | The app itself |
 | `src/style.css` | The look |
 | `src/body.html` | The page skeleton |

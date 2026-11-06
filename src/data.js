@@ -4,7 +4,7 @@
    (Help Center plant articles); seats and notes come from Josh's maps v4/v5 (salad) and v8/v9 (fruiting).
    Slot codes: tower letter + row + column, e.g. S3L = salad tower, row 3, left; F10C = fruiting, row 10, center. */
 window.PB = {
-version: '2026.11.05d',
+version: '2026.11.05e',
 
 /* ---------- The book ---------- */
 groups: { greens: 'Leafy green', herbs: 'Herb', flowers: 'Edible flower', fruit: 'Fruiting plant' },
@@ -655,10 +655,8 @@ shop: [
   ['Bambu filament', 'https://us.store.bambulab.com/collections/bambu-lab-3d-printer-filament', 'PETG HF from $19.99/kg on Oct 30']
 ],
 bench: [
-  { title: 'Standoff cover', text: 'An opaque disc on three short legs that shades the wool 5–8 mm above it, with a stem slot and an air gap. It does what a yCover does without trapping moisture against the crown.' },
-  { title: 'Water-level alarm', text: 'Both units’ level sensors are gone. Three ways around it: ask Gardyn support (support@mygardyn.com) for a replacement part; a dipstick marked at full and 60% for each Tank Top-off; or a reed float switch in the Tank wired to a small microcontroller that beeps or pings your phone.' },
-  { title: 'QR tags for the yPods', text: 'A small printed tag on each yPod whose QR code opens that seat in this app. The link is the app’s address plus #seat- and the seat, like hectrvictorious.github.io/Gardyn-Plant-Book/#seat-S9R for the borage (S for salad, F for fruiting, then row and column). Every seat page has a Copy link button, and the printable sheet below has a code for all 60 seats.' },
-  { title: 'Caps for open pods', text: 'jhalye’s yCube Cap prints in the same opaque PETG and seats in the mouth: Caps for the four headroom seats on the salad plan.' }
+  { title: 'Water-level alarm', text: 'Both units’ level sensors are gone. Three ways around it: ask Gardyn support (support@mygardyn.com) for a replacement part; a printed dipstick marked at full and at the Tank Top-off line; or a printed float read by a reed switch outside the Tank, wired to a small microcontroller that beeps or pings your phone. The two printed ones are under Worth printing.' },
+  { title: 'QR tags for the yPods', text: 'A small printed tag on each yPod whose QR code opens that seat in this app. The link is the app’s address plus #seat- and the seat, like hectrvictorious.github.io/Gardyn-Plant-Book/#seat-S9R for the borage (S for salad, F for fruiting, then row and column). Every seat page has a Copy link button, and the printable sheet below has a code for all 60 seats.' }
 ],
 why: [
   ['Wet to the top', 'Every plug medium Gardyn’s cascade was built around (rockwool, foam, coir, peat) holds 60–86% water right to its surface. A crown resting on it is rewetted at every watering cycle. Coarse pebbles hold 21–35% and dry on top between cycles.'],

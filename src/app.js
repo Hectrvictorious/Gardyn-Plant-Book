@@ -5,14 +5,14 @@
   const $ = id => document.getElementById(id);
   const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const APP_VERSION = P.version;
-  const NEWS = 'A new icon, a Plant Doctor on the Care tab, 24 more plants to try on the Ideas tab (star the ones you like), the Forbidden Shelf, a Greener tab with what the towers cost in power and water, and a Picking view on the map.'; // shown once to returning users
+  const NEWS = 'The Forbidden Shelf is now its own page: six shelves, 42 plants, the cat’s list, the plants Maine bans, and a Legal in Maine? game. On the Greener tab, the printer gets a ledger: log your prints, mark printed pods on the map (the new Pods view), and watch each one earn its plastic back.'; // shown once to returning users
 
   /* ----- Storage (this phone only) ----- */
   const store = {
     get(k, d) { try { const v = localStorage.getItem('pb:' + k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } },
     set(k, v) { try { localStorage.setItem('pb:' + k, JSON.stringify(v)); } catch (e) { /* storage off: the page still works */ } }
   };
-  const KEYS = ['done', 'care', 'camp', 'notes', 'trail', 'ui', 'seenVersion', 'installLater', 'bowl', 'bowls', 'mgsel', 'pick', 'verdict', 'scout', 'ate', 'foot'];
+  const KEYS = ['done', 'care', 'camp', 'notes', 'trail', 'ui', 'seenVersion', 'installLater', 'bowl', 'bowls', 'mgsel', 'pick', 'verdict', 'scout', 'ate', 'foot', 'podseats', 'prints', 'printer', 'fgame'];
   let DONE = store.get('done', {});
   let CARE = store.get('care', {});
   let CAMP = store.get('camp', {});
@@ -111,6 +111,14 @@
     blades: '<path class="k" d="M16 29 10 6M16 29 14 4M16 29l3-24M16 29l7-21"/><path class="fw" d="M19 1.5l.9 1.9 2 .3-1.5 1.4.4 2-1.8-1-1.8 1 .4-2-1.5-1.4 2-.3Z"/>',
     sprig: '<path class="s" d="M7 29C11 21 17 12 25 5"/><g class="f"><ellipse cx="8.2" cy="23.5" rx="2" ry="1.2" transform="rotate(-30 8.2 23.5)"/><ellipse cx="12.4" cy="24" rx="2" ry="1.2" transform="rotate(30 12.4 24)"/><ellipse cx="11.6" cy="18" rx="2" ry="1.2" transform="rotate(-30 11.6 18)"/><ellipse cx="15.8" cy="18.6" rx="2" ry="1.2" transform="rotate(30 15.8 18.6)"/><ellipse cx="15.3" cy="12.6" rx="2" ry="1.2" transform="rotate(-30 15.3 12.6)"/><ellipse cx="19.6" cy="13.2" rx="2" ry="1.2" transform="rotate(30 19.6 13.2)"/><ellipse cx="19.4" cy="7.6" rx="2" ry="1.2" transform="rotate(-30 19.4 7.6)"/><ellipse cx="23.4" cy="8.6" rx="2" ry="1.2" transform="rotate(30 23.4 8.6)"/></g>',
     micro: '<path class="s" d="M4.5 28.5h23"/><path class="s" d="M8.5 28.5V19.6M16 28.5V13.4M23.5 28.5V19.6"/><g class="f"><ellipse cx="5.9" cy="18.3" rx="3" ry="1.65" transform="rotate(32 5.9 18.3)"/><ellipse cx="11.1" cy="18.3" rx="3" ry="1.65" transform="rotate(-32 11.1 18.3)"/><ellipse cx="13.4" cy="12.1" rx="3" ry="1.65" transform="rotate(32 13.4 12.1)"/><ellipse cx="18.6" cy="12.1" rx="3" ry="1.65" transform="rotate(-32 18.6 12.1)"/><ellipse cx="20.9" cy="18.3" rx="3" ry="1.65" transform="rotate(32 20.9 18.3)"/><ellipse cx="26.1" cy="18.3" rx="3" ry="1.65" transform="rotate(-32 26.1 18.3)"/></g>',
+    umbel: '<path class="s" d="M16 30V15M16 15 7 9.4M16 15l-4.4-7.6M16 15V6.6M16 15l4.4-7.6M16 15l9-5.6"/><g class="f"><circle cx="6.6" cy="8.8" r="2.3"/><circle cx="11.2" cy="6.4" r="2.3"/><circle cx="16" cy="5.4" r="2.3"/><circle cx="20.8" cy="6.4" r="2.3"/><circle cx="25.4" cy="8.8" r="2.3"/></g><path class="f2" d="M16 25.5c-3.8.4-6.8-1.2-8.2-4.2 3.8-.5 6.8 1.1 8.2 4.2Z"/>',
+    bell: '<path class="s" d="M13 30V3.5"/><g class="f"><ellipse cx="17.6" cy="8.2" rx="4.2" ry="2.6" transform="rotate(28 17.6 8.2)"/><ellipse cx="18.4" cy="14.4" rx="4.7" ry="2.9" transform="rotate(28 18.4 14.4)"/><ellipse cx="19.2" cy="20.8" rx="5.1" ry="3.1" transform="rotate(28 19.2 20.8)"/></g><g class="s0"><circle cx="19.6" cy="9.4" r=".75"/><circle cx="20.7" cy="15.8" r=".75"/><circle cx="21.7" cy="22.4" r=".75"/></g><path class="f2" d="M13 27.5c-3.6-.1-6.2-1.9-7.3-4.9 3.6 0 6.2 1.8 7.3 4.9Z"/>',
+    nberry: '<path class="s" d="M16 10.5c0-3 1.4-5.2 4.2-6.6"/><path class="f2" d="M16 9.6 17.9 12.4 21.3 11.9 19.2 14.6 21.3 17.3 17.9 16.8 16 19.6 14.1 16.8 10.7 17.3 12.8 14.6 10.7 11.9 14.1 12.4Z"/><circle class="f" cx="16" cy="19" r="7.2"/><circle class="fw" cx="13.4" cy="16.6" r="1.5"/>',
+    palmate: '<path class="s" d="M16 19v11"/><path class="f" d="M15.6 19.2 9.8 27.3 10.1 20.7 3.8 18.8 9 14.7 6.5 8.6 13 10.1 16 4.2 19 10.1 25.5 8.6 23 14.7 28.2 18.8 21.9 20.7 22.2 27.3 16.4 19.2Z"/><path class="s" stroke-opacity=".5" d="M16 16.6 11.8 23.9M16 16.6 7.7 18.1M16 16.6 9.6 11.2M16 16.6V8.2M16 16.6l6.4-5.4M16 16.6l8.3 1.5M16 16.6l4.2 7.3"/>',
+    glory: '<path class="s" d="M5.5 30c2.5-2.6 4.8-6.2 6.7-11.2"/><circle class="f" cx="18.5" cy="12.5" r="9"/><path class="s" stroke-opacity=".45" d="M18.5 12.5V3.5M18.5 12.5l8.6-2.8M18.5 12.5l5.3 7.3M18.5 12.5l-5.3 7.3M18.5 12.5 9.9 9.7"/><circle class="fw" cx="18.5" cy="12.5" r="2.4"/><path class="f2" d="M8.8 26c-2.8.3-4.9-1.1-5.4-3.4 1.3-1 3.2-.9 4.1.4.2-1.6 1.9-2.6 3.4-2 .2 2.5-.6 4.4-2.1 5Z"/>',
+    lily: '<g class="f"><ellipse cx="16" cy="7.6" rx="2.7" ry="6.2" transform="rotate(0 16 14)"/><ellipse cx="16" cy="7.6" rx="2.7" ry="6.2" transform="rotate(60 16 14)"/><ellipse cx="16" cy="7.6" rx="2.7" ry="6.2" transform="rotate(120 16 14)"/><ellipse cx="16" cy="7.6" rx="2.7" ry="6.2" transform="rotate(180 16 14)"/><ellipse cx="16" cy="7.6" rx="2.7" ry="6.2" transform="rotate(240 16 14)"/><ellipse cx="16" cy="7.6" rx="2.7" ry="6.2" transform="rotate(300 16 14)"/></g><path class="s" d="M16 14 12.6 9.8M16 14l3.4-4.2M16 14v-5.6"/><g class="s0"><circle cx="12.4" cy="9.5" r="1"/><circle cx="19.6" cy="9.5" r="1"/><circle cx="16" cy="8.2" r="1"/></g><circle class="s0b" cx="16" cy="14" r="1.7"/>',
+    lotus: '<g class="f"><path d="M16 23c-4.8-1-8.6-3.8-10.8-7.8 4.6.3 8.4 3 10.8 7.8Z"/><path d="M16 23c4.8-1 8.6-3.8 10.8-7.8-4.6.3-8.4 3-10.8 7.8Z"/><path d="M16 23c-3.6-2.6-6-7-6.6-11.6 3.6 2.2 6 6.6 6.6 11.6Z"/><path d="M16 23c3.6-2.6 6-7 6.6-11.6-3.6 2.2-6 6.6-6.6 11.6Z"/><path d="M16 23c-2.2-5-2-11.5 0-17 2 5.5 2.2 12 0 17Z"/></g><path class="s" d="M3.5 27c4-1.6 8.3-1.6 12.5 0s8.5 1.6 12.5 0"/>',
+    cactus: '<path class="f" d="M12.8 21H9.6A2.6 2.6 0 0 1 7 18.4v-4.6a1.8 1.8 0 0 1 3.6 0v3.6h2.2Z"/><path class="f" d="M19.2 18h2.6a1.8 1.8 0 0 0 1.8-1.8v-4.4a1.8 1.8 0 0 1 3.6 0v5.2a4.6 4.6 0 0 1-4.6 4.6h-3.4Z"/><path class="f" d="M12.8 29V8.4a3.2 3.2 0 0 1 6.4 0V29Z"/><path class="s" d="M16 9.5V28M5 29.2h22"/>',
     cap: '<circle class="cap1" cx="16" cy="16" r="9.5"/><path class="cap2" d="M10.5 13.5a6.5 6.5 0 0 1 6.5-5"/>'
   };
   const SPECKLE = '<g class="dots"><circle cx="14.2" cy="13" r=".95"/><circle cx="17.6" cy="17" r=".95"/><circle cx="14.6" cy="21.2" r=".95"/><circle cx="10" cy="18.4" r=".85"/><circle cx="22" cy="19.4" r=".85"/><circle cx="17" cy="9.5" r=".8"/></g>';
@@ -141,6 +149,7 @@
       : (pending ? 'The tower as it stands: the Nov 2 map, in place as of Nov 5. A pink mark means a step is still to come.' : 'The tower as it stands: the Nov 2 map, in place as of Nov 5. Tap any pod.');
     if (UI.lens === 'pick') $('towerSub').textContent = mode === 'plan' ? 'Picking shows on the Now map.' : 'Colored by picking: about once a week keeps leafy plants from bolting. Tap a pod to log it, or open the picking round from the Today strip.';
     else if (UI.lens === 'flavor') $('towerSub').textContent = 'Colored by what each plant brings to a salad. The word on each pod is its taste, or a heads-up marked ! before you eat it. Tap a pod for texture and pairings.';
+    else if (UI.lens === 'pods') { const n = Object.keys(PODS.seats).filter(x => x[0] === t).length; $('towerSub').textContent = mode === 'plan' ? 'Printed pods show on the Now map.' : n + ' of 30 seats on this tower ' + (n === 1 ? 'is' : 'are') + ' in a printed pod. Tap a pod to mark one, or to count a replanting.'; }
     let pods = '';
     for (let r = 1; r <= 10; r++) for (const c of ['L', 'C', 'R']) pods += podHTML(t + r + c, L[t + r + c], mode);
     let bars = ''; for (let r = 1; r <= 10; r++) bars += '<span>' + r + '</span>';
@@ -151,7 +160,8 @@
       '<div class="tank"><b>Tank</b><span>' + (t === 'S' ? 'Salad Tank · Refresh monthly' : 'Fruiting Tank · Refresh every two weeks') + '</span></div></div>';
     document.querySelectorAll('[data-lens]').forEach(b => b.setAttribute('aria-pressed', b.dataset.lens === (UI.lens || 'light') ? 'true' : 'false'));
     const lensNow = UI.lens || 'light';
-    $('legendLight').hidden = lensNow !== 'light'; $('legendFlavor').hidden = lensNow !== 'flavor'; $('legendPick').hidden = lensNow !== 'pick';
+    $('legendLight').hidden = lensNow !== 'light'; $('legendFlavor').hidden = lensNow !== 'flavor'; $('legendPick').hidden = lensNow !== 'pick'; $('legendPods').hidden = lensNow !== 'pods';
+    if (lensNow === 'pods') $('legendPods').innerHTML = '<span><i class="sw k-printed"></i>printed pod (× plantings)</span><span><i class="sw k-rock"></i>yCube</span><span><i class="sw k-none" style="border-style:dashed"></i>open</span>';
     if (lensNow === 'pick') $('legendPick').innerHTML = '<span><i class="sw k-fresh"></i>picked this week</span><span><i class="sw k-due"></i>due a picking</span><span><i class="sw k-none"></i>not logged</span><span><i class="sw k-fruit"></i>fruit: pick when ripe</span>';
     if (UI.lens === 'flavor') $('legendFlavor').innerHTML = P.roleOrder.filter(r => r !== 'topper').map(r => '<span><i class="sw ax-' + r + '"></i>' + esc(P.roles[r].name) + '</span>').join('') + '<span><b class="flagk" aria-hidden="true">!</b>a heads-up before you eat it</span>';
     const pendKind = k => P.pods.some(p => { const m = MOVE_BY_POD[p.id]; return m && m.kind === k && !isDone(m) && parse(cur(p)) && parse(cur(p)).t === t; });
@@ -176,11 +186,13 @@
       const lens = UI.lens === 'flavor' && pl.flav;
       if (lens) cls.push('r-' + pl.flav.roles[0]);
       const pk = UI.lens === 'pick' && mode === 'now';
+      const pz = UI.lens === 'pods' && mode === 'now';
       let pkTag = '';
+      if (pz) { const ps = PODS.seats[slot]; cls.push(ps ? 'k-printed' : 'k-rock'); pkTag = ps ? (ps.n ? 'printed ×' + ps.n : 'printed') : ''; }
       if (pk) { if (!pickable(pod)) { cls.push('k-fruit'); pkTag = 'fruit'; } else { const last = PICK[pod.id], d = last ? dayNum(todayISO()) - dayNum(last) : null; cls.push(d === null ? 'k-none' : d >= PICK_EVERY ? 'k-due' : 'k-fresh'); pkTag = d === null ? 'not logged' : d === 0 ? 'today' : d >= PICK_EVERY ? d + 'd · due' : d + 'd ago'; } }
-      const tg = pk ? esc(pkTag) : lens ? esc(pl.flav.flag || (pl.flav.flavor.find(x => x !== 'mild' && x.length <= 9) || pl.flav.flavor.find(x => x !== 'mild') || pl.flav.flavor[0]).replace(/ \(.*\)/, '')) : tagStr(pl);
+      const tg = (pk || pz) ? esc(pkTag) : lens ? esc(pl.flav.flag || (pl.flav.flavor.find(x => x !== 'mild' && x.length <= 9) || pl.flav.flavor.find(x => x !== 'mild') || pl.flav.flavor[0]).replace(/ \(.*\)/, '')) : tagStr(pl);
       const vd = lens && VERD[pod.p] ? VERD[pod.p].v : '';
-      inner = '<span class="top">' + plantGlyph(pl) + '<span class="t' + (pk ? ' fwt' : lens ? ' fwt' + (pl.flav.flag ? ' flagged' : '') : '') + '">' + tg + (cell.pods.length > 1 ? ' +' + (cell.pods.length - 1) : '') + '</span></span><span class="n">' + esc(pod.label) + (vd ? ' <span class="vb vd-' + vd + '" title="Your verdict: ' + VNAME[vd] + '">' + ({ keep: '✓', retry: '↻', retire: '✕' })[vd] + '</span>' : '') + '</span>' + badge;
+      inner = '<span class="top">' + plantGlyph(pl) + '<span class="t' + ((pk || pz) ? ' fwt' : lens ? ' fwt' + (pl.flav.flag ? ' flagged' : '') : '') + '">' + tg + (cell.pods.length > 1 ? ' +' + (cell.pods.length - 1) : '') + '</span></span><span class="n">' + esc(pod.label) + (vd ? ' <span class="vb vd-' + vd + '" title="Your verdict: ' + VNAME[vd] + '">' + ({ keep: '✓', retry: '↻', retire: '✕' })[vd] + '</span>' : '') + '</span>' + badge;
       label = where + ': ' + cell.pods.map(x => x.label).join(' and ') + (badge ? (mode === 'now' ? ', move waiting' : ', moved here') : '');
       return '<button class="' + cls.join(' ') + '" data-slot="' + slot + '" data-pod="' + pod.id + '" aria-label="' + esc(label) + '">' + inner + '</button>';
     }
@@ -194,6 +206,7 @@
       if (cell.next && cell.next.length) txt = 'next: <i>' + esc(cell.next[0].label) + '</i>';
       else if (cell.capNext) txt = 'open · <i>Cap next</i>';
       else if (cell.hold && (cell.hold.tag || cell.hold.note)) { txt = esc(cell.hold.tag || cell.hold.note.split(':')[0].toLowerCase()); if (cell.hold.free) cls.push('free'); }
+      if (UI.lens === 'pods' && mode === 'now' && PODS.seats[slot]) { cls.push('k-printed'); txt = 'printed pod'; }
       inner = '<span class="n">' + txt + '</span>';
       label = where + ': ' + txt.replace(/<[^>]+>/g, '');
     }
@@ -294,7 +307,7 @@
     }
     if (pod.unsure) h += '<p class="small" style="margin:0"><b>To confirm:</b> ' + esc(pod.unsure) + '</p>';
     if (pod.note) h += '<p class="small" style="margin:0">' + esc(pod.note) + '</p>';
-    if (onTower && UI.mode !== 'plan') { const pk = pickable(pod), last = PICK[pod.id], td = last === todayISO(); h += '<div class="pickrow">' + (pk ? '<span class="small">' + (td ? 'Picked today' : last ? 'Last picked ' + fmtDate(last) : 'No picking logged yet') + '</span>' : '<span></span>') + '<span class="btnrow">' + (pk ? '<button class="btn small' + (td ? ' ghost' : '') + '" data-act="pickToggle" data-pod="' + pod.id + '">' + (td ? 'Undo' : 'Picked today') + '</button>' : '') + '<button class="btn small ghost" data-act="copyLink" data-slot="' + here + '">Copy link</button></span></div>'; }
+    if (onTower && UI.mode !== 'plan') { const pk = pickable(pod), last = PICK[pod.id], td = last === todayISO(); h += '<div class="pickrow">' + (pk ? '<span class="small">' + (td ? 'Picked today' : last ? 'Last picked ' + fmtDate(last) : 'No picking logged yet') + '</span>' : '<span></span>') + '<span class="btnrow">' + (pk ? '<button class="btn small' + (td ? ' ghost' : '') + '" data-act="pickToggle" data-pod="' + pod.id + '">' + (td ? 'Undo' : 'Picked today') + '</button>' : '') + '<button class="btn small ghost" data-act="copyLink" data-slot="' + here + '">Copy link</button></span></div>' + podRow(here); }
     if (m) {
       const done = isDone(m);
       const dest = m.kind === 'out' ? 'Comes out' : 'Moves to ' + seatName(pod.plan, true);
@@ -319,6 +332,8 @@
     const aud = Object.keys(P.audition).find(k => P.audition[k] === pid); if (aud && P.plants[aud]) h += '<div class="callout"><b>An audition.</b> ' + esc(P.plants[aud].name) + ' is on your Ideas list for a yPod. This pad lets you taste it first, in under two weeks.</div>';
     if (pl.gone) h += '<div class="callout"><b>Why it’s retired.</b> ' + esc(pl.gone) + '</div>';
     if (fv) h += tasteBlock(pid, pl);
+    const fb = P.forbidden.items.filter(x => (x.plants || []).includes(pid));
+    if (fb.length) h += '<div class="forblinks">' + fb.map(x => '<button class="forblink" data-act="forbItem" data-id="' + x.id + '"><span class="eyebrow">Forbidden Shelf</span><b>' + esc(x.name) + '</b><span aria-hidden="true">›</span></button>').join('') + '</div>';
     h += '<div class="block"><h3>Growing basics</h3>' + statTiles(pl) + (pl.gb && pl.gb.zoneNote ? '<p class="small">' + esc(pl.gb.zoneNote) + '</p>' : '') + (pl.gb && pl.gb.note ? '<p class="small">' + esc(pl.gb.note) + '</p>' : '') + '</div>';
     if (pods.length) {
       h += '<div class="block"><h3>On your towers</h3><ul>' + pods.map(p => { const c = cur(p), m = MOVE_BY_POD[p.id]; const now = parse(c) ? seatName(c, true) : seatName(c); const plan = p.plan === 'out' ? 'comes out' : seatName(p.plan, true); return '<li><button class="btn small ghost" data-open="pod" data-pod="' + p.id + '">' + esc(p.label) + '</button> ' + esc(now) + (m && !isDone(m) ? ' → ' + esc(plan) : '') + '</li>'; }).join('') + '</ul></div>';
@@ -402,6 +417,7 @@
     h += '<li>' + esc(leanText(slot)) + '</li><li>' + esc(twoUp(slot, mode)) + '</li></ul></div>';
     const fits = Object.entries(P.plants).filter(([id, pl]) => pl.status === 'idea' && pl.gb && pl.gb.zone && (pl.group === 'fruit') === (parse(slot).t === 'F') && Math.abs(ZRANK[pl.gb.zone] - ZRANK[z]) <= (z === 'low' ? 0 : 1)).slice(0, 4);
     if (fits.length && !cell.hold?.cap) h += '<div class="block"><h3>Ideas that suit this light</h3><div class="dome">' + fits.map(([id, pl]) => '<button data-open="plant" data-pid="' + id + '">' + plantGlyph(pl) + esc(pl.name) + '</button>').join('') + '</div></div>';
+    if (mode !== 'plan' && !(cell.hold && cell.hold.cap)) h += '<div class="seat">' + podRow(slot) + '</div>';
     h += '<div class="btnrow"><button class="btn small ghost" data-act="copyLink" data-slot="' + slot + '">Copy a link to this seat</button></div>';
     showSheet(h, { kind: 'seat', slot });
   }
@@ -510,13 +526,58 @@
     if (d.src && d.src.length) h += '<p class="src">Sources: ' + d.src.map(x => '<a href="' + esc(x[1]) + '" target="_blank" rel="noopener">' + esc(x[0]) + '</a>').join(' · ') + '</p>';
     showSheet(h, { kind: 'doctor', id });
   }
-  function forbiddenSheet() {
-    const F = P.forbidden;
-    const cls = st => /Illegal|Schedule|Controlled/.test(st) ? 'due' : /gray/i.test(st) ? 'wait' : 'ok';
-    let h = '<div><div class="eyebrow">Just for fun</div><h2 id="sheetTitle">The Forbidden Shelf</h2><p class="small" style="margin:4px 0 0">' + esc(F.intro) + '</p></div>';
-    h += F.items.map(x => '<div class="card forb"><div class="forb-h"><span class="gwrap">' + glyph(x.glyph, x.tint) + '</span><div style="min-width:0"><h4>' + esc(x.name) + '</h4><div class="latin small">' + esc(x.latin) + '</div></div></div><span class="chip ' + cls(x.status) + '">' + esc(x.status) + '</span><p><b>The law.</b> ' + esc(x.law) + '</p><p><b>In a Gardyn?</b> ' + esc(x.gardyn) + '</p><p class="small muted">' + esc(x.fun) + '</p></div>').join('');
-    h += '<p class="src">Not legal advice. Sources: ' + F.src.map(x => '<a href="' + esc(x[1]) + '" target="_blank" rel="noopener">' + esc(x[0]) + '</a>').join(' · ') + '</p>';
-    showSheet(h, { kind: 'forbidden' });
+  /* ----- The Forbidden Shelf: its own page, a sheet per plant, and a game ----- */
+  const FB = P.forbidden;
+  const FBI = {}; FB.items.forEach(x => { FBI[x.id] = x; });
+  function frow(x) {
+    return '<button class="frow" data-act="forbItem" data-id="' + x.id + '"><span class="gwrap">' + glyph(x.glyph, x.tint) + '</span><span class="ft"><b>' + esc(x.name) + '</b><span class="latin">' + esc(x.latin) + '</span><span class="chip ' + x.tone + '">' + esc(x.status) + '</span></span><span class="go" aria-hidden="true">›</span></button>';
+  }
+  function renderForbidden() {
+    $('forbIntro').textContent = FB.intro;
+    $('forbJumps').innerHTML = FB.shelves.map(sh => '<button data-jump="shelf-' + sh.id + '">' + esc(sh.name) + '</button>').join('');
+    $('forbShelves').innerHTML = FB.shelves.map(sh => { const items = FB.items.filter(x => x.shelf === sh.id); return '<div class="sec" id="shelf-' + sh.id + '"><h3>' + esc(sh.name) + ' <span class="count">' + items.length + '</span></h3><p class="small" style="margin:-2px 0 0">' + esc(sh.blurb) + '</p><div class="flist">' + items.map(frow).join('') + '</div></div>'; }).join('');
+    $('forbNote').textContent = FB.note;
+    renderGame();
+  }
+  const WHY_LABEL = { towers: 'What’s going on', history: 'The story', poison: 'Why it’s on the shelf', maine: 'Why', glass: 'Why it’s on the shelf', reputation: 'Why it’s on the shelf' };
+  function forbSheet(id) {
+    const x = FBI[id]; if (!x) return;
+    const sh = FB.shelves.find(v => v.id === x.shelf);
+    const blk = (k, v) => v ? '<div class="block"><h3>' + k + '</h3><p>' + esc(v) + '</p></div>' : '';
+    let h = '<div class="ph"><div class="gwrap">' + glyph(x.glyph, x.tint) + '</div><div><div class="eyebrow">Forbidden Shelf · ' + esc(sh.name) + '</div><h2 id="sheetTitle">' + esc(x.name) + '</h2><div class="latin">' + esc(x.latin) + '</div></div></div>';
+    h += '<div><span class="chip fchip ' + x.tone + '">' + esc(x.status) + '</span></div>';
+    h += blk('The law', x.law) + blk(WHY_LABEL[x.shelf], x.why) + blk('In a Gardyn?', x.gardyn);
+    if (x.cat) h += '<div class="petnote"><b>For the cat.</b> ' + esc(x.cat) + '</div>';
+    if (x.fun) h += '<p class="small fun">' + esc(x.fun) + '</p>';
+    const pl = (x.plants || []).filter(q => P.plants[q]);
+    if (pl.length) h += '<div class="block"><h3>' + (pl.some(q => P.plants[q].status === 'tower') ? 'On your towers' : 'In the Plant Book') + '</h3><div class="dome">' + pl.map(q => '<button data-open="plant" data-pid="' + q + '">' + plantGlyph(P.plants[q]) + esc(P.plants[q].name) + '</button>').join('') + '</div></div>';
+    const list = FB.items.filter(i => i.shelf === x.shelf), k = list.indexOf(x);
+    h += '<div class="btnrow fnav">' + (k > 0 ? '<button class="btn small ghost" data-act="forbItem" data-id="' + list[k - 1].id + '">‹ ' + esc(list[k - 1].name) + '</button>' : '<span></span>') + (k < list.length - 1 ? '<button class="btn small ghost" data-act="forbItem" data-id="' + list[k + 1].id + '">' + esc(list[k + 1].name) + ' ›</button>' : '') + '</div>';
+    h += '<p class="src">' + esc(FB.note) + (x.src && x.src.length ? ' Sources: ' + x.src.map(v => '<a href="' + esc(v[1]) + '" target="_blank" rel="noopener">' + esc(v[0]) + '</a>').join(' · ') : '') + '</p>';
+    showSheet(h, { kind: 'forb', id });
+  }
+  /* Legal in Maine? Ten cards a round, four answers, the best score kept on this phone. */
+  const FGS = Object.assign({ best: null, plays: 0 }, store.get('fgame', {}));
+  let FG = null;
+  function fgRound() { const idx = FB.game.map((_, i) => i); for (let i = idx.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [idx[i], idx[j]] = [idx[j], idx[i]]; } FG = { q: idx.slice(0, 10), i: 0, score: 0, pick: null }; }
+  const fgRight = (c, k) => k === c.a || (c.also || []).includes(k);
+  function renderGame() {
+    if (!FG) fgRound();
+    const el = $('fgame'), A = FB.answers, L = {}; A.forEach(([k, l]) => { L[k] = l; });
+    const best = FGS.best != null ? 'best ' + FGS.best + ' of 10' : 'ten cards a round';
+    if (FG.i >= FG.q.length) {
+      const v = FB.verdicts.find(([n]) => FG.score >= n);
+      el.innerHTML = '<div class="fg-top"><span class="eyebrow">Legal in Maine?</span><span class="small fg-meta">' + esc(best) + '</span></div><p class="fg-q">' + FG.score + ' of ' + FG.q.length + ' right.</p><p class="fg-r">' + esc(v ? v[1] : '') + '</p><div class="btnrow"><button class="btn primary" data-act="fgNew">Deal ten more</button></div>';
+      return;
+    }
+    const c = FB.game[FG.q[FG.i]];
+    let h = '<div class="fg-top"><span class="eyebrow">Legal in Maine? · ' + (FG.i + 1) + ' of ' + FG.q.length + '</span><span class="small fg-meta">' + FG.score + ' right · ' + esc(best) + '</span></div>';
+    h += '<p class="fg-q">' + esc(c.q) + '</p><div class="fg-a" role="group" aria-label="Your answer">' + A.map(([k, l]) => { let cls = 'fg-b'; if (FG.pick) { if (fgRight(c, k)) cls += ' right'; else if (k === FG.pick) cls += ' wrong'; } return '<button class="' + cls + '" data-act="fgPick" data-k="' + k + '"' + (FG.pick ? ' disabled' : '') + '>' + esc(l) + '</button>'; }).join('') + '</div>';
+    if (FG.pick) {
+      const ok = fgRight(c, FG.pick);
+      h += '<p class="fg-r ' + (ok ? 'ok' : 'no') + '"><b>' + (ok ? (FG.pick === c.a ? 'Right.' : 'Close enough: ' + esc(L[c.a].toLowerCase()) + '.') : 'Not quite: ' + esc(L[c.a].toLowerCase()) + '.') + '</b> ' + esc(c.why) + '</p><div class="btnrow"><button class="btn small primary" data-act="fgNext">' + (FG.i === FG.q.length - 1 ? 'See your score' : 'Next card') + '</button><button class="btn small ghost" data-act="forbItem" data-id="' + c.item + '">Read the shelf entry</button></div>';
+    }
+    el.innerHTML = h;
   }
 
   /* ----- Ideas ----- */
@@ -538,7 +599,7 @@
     $('scoutCount').textContent = starred ? starred + ' starred' : ideas.length + ' ideas';
     const list = ideas.filter(([id, pl]) => inScout(id, pl, f)).sort((a, b) => ((SCOUT[b[0]] ? 1 : 0) - (SCOUT[a[0]] ? 1 : 0)) || a[1].name.localeCompare(b[1].name));
     $('ideaPlants').innerHTML = list.length ? list.map(([id, pl]) => ideaCard(id, pl)).join('') : '<div class="card small">Nothing starred yet. Tap ☆ on any idea to shortlist it.</div>';
-    $('shelfCard').innerHTML = '<button class="fshelf" data-act="forbidden"><span class="fs-glyphs" aria-hidden="true">' + P.forbidden.items.slice(0, 5).map(x => glyph(x.glyph, x.tint)).join('') + '</span><span class="fs-t"><b>The Forbidden Shelf</b><span>Cannabis, coca, opium poppy and seven more: what Maine and federal law say, and why none of them belong in a Gardyn.</span></span><span class="go" aria-hidden="true">›</span></button>';
+    $('shelfCard').innerHTML = '<button class="fshelf" data-go="forbidden"><span class="fs-glyphs" aria-hidden="true">' + ['cannabis', 'foxglove', 'currants', 'lettuce', 'blue-lotus'].map(id => { const x = FBI[id]; return glyph(x.glyph, x.tint); }).join('') + '</span><span class="fs-t"><b>The Forbidden Shelf</b><span>' + FB.items.length + ' plants on six shelves: the controlled ones, the poison cabinet, what Maine bans, and what’s hiding on your own towers. Plus a game: Legal in Maine?</span></span><span class="go" aria-hidden="true">›</span></button>';
     $('gear').innerHTML = P.gear.map(g => '<div><b>' + esc(g.title) + '</b><p>' + esc(g.why) + '</p></div>').join('');
     $('questions').innerHTML = P.questions.map(q => '<div><b>' + esc(q.q) + '</b><p>' + esc(q.a) + '</p></div>').join('');
     $('watch').innerHTML = P.watch.map(w => '<div><b>' + esc(w.title) + '</b><p>' + esc(w.text) + '</p></div>').join('');
@@ -565,6 +626,7 @@
     const kwh = FOOT.towers * FOOT.kwh, m = kwh * FOOT.rate, n = bowlsThisMonth();
     $('footOut').innerHTML = '<div class="stats"><div><span class="k">Electricity</span><span class="v">' + Math.round(kwh) + ' <small>kWh a month</small></span></div><div><span class="k">Costs</span><span class="v">$' + m.toFixed(2) + ' <small>a month</small></span></div><div><span class="k">A year</span><span class="v">$' + Math.round(m * 12) + '</span></div></div>' +
       '<p class="small" style="margin:0">' + esc(P.greener.heat) + '</p>' +
+      (PRINTS.length ? (() => { const t = printTotals(); return '<p class="small" style="margin:0"><b>The printer so far:</b> ' + t.kwh.toFixed(2) + ' kWh, ' + usd(t.pow) + '. Switched off between runs, it stays that small.</p>'; })() : '') +
       '<p class="small" style="margin:0"><b>' + n + (n === 1 ? ' bowl' : ' bowls') + ' from the towers this month</b>' + (n ? ', each one a clamshell of greens that didn’t have to ride the ferry.' : '. Tap “We ate this” on the Salad tab and they’ll count here.') + '</p>';
   }
   function renderGreener() {
@@ -585,6 +647,7 @@
   }
   function renderDIY() {
     renderGreener();
+    renderPrinter();
     renderTrail();
     $('why').innerHTML = P.why.map(([t, x]) => '<div class="card"><h4>' + esc(t) + '</h4><p>' + esc(x) + '</p></div>').join('');
     $('fillList').innerHTML = P.fill.map(f => '<div><div class="rowtop"><b>' + esc(f.crop) + '</b><span class="chip">' + esc(f.cost) + ' each</span></div><p><span class="fillname">' + esc(f.fill) + '.</span> ' + esc(f.note) + '</p></div>').join('');
@@ -619,6 +682,137 @@
     $('cBars').innerHTML = bar('First year', ycYear, ppYear1) + bar('Five years', yc5, pp5);
     $('cSave').innerHTML = 'Saves about <span>$' + Math.round(ycYear - ppYear1).toLocaleString() + '</span> the first year and <span>$' + Math.round(ycYear - plugsYear).toLocaleString() + '</span> a year after';
     $('cNote').textContent = 'Two towers, 60 pods, ' + plantings + ' plantings a year. Printed pods: 70 pods at 15 g of $20/kg PETG ($21 once, $5 of reprints over five years), ' + (ber ? 'one $12 bag of clay pebbles for the strawberries, ' : '') + 'and plugs for the other ' + (CALC.slots - ber) + ' pods. Seeds not counted on either side; the membership also buys Smart Watering.';
+  }
+  /* ----- The printer: a ledger where every print has to earn its plastic back ----- */
+  const PR = P.printer;
+  const PSET = Object.assign({ w: 75, kg: 20, yc: 5.99, plug: 0.21, casing: 4, wool: 4 }, store.get('printer', {}));
+  let PRINTS = store.get('prints', []);
+  const PODS = { seats: {}, past: 0 }; { const pz = store.get('podseats', {}); PODS.seats = pz.seats || {}; PODS.past = pz.past || 0; }
+  const savePods = () => store.set('podseats', { seats: PODS.seats, past: PODS.past });
+  const usd = n => (n < -0.005 ? '−$' : '$') + Math.abs(n).toFixed(Math.abs(n) >= 100 ? 0 : 2);
+  const carbon = k => k < 1 ? Math.round(k * 1000) + ' g' : k.toFixed(k < 10 ? 2 : 1) + ' kg';
+  const partCost = p => p.g / 1000 * PSET.kg + p.min / 60 * PSET.w / 1000 * FOOT.rate;
+  const partCarbon = (p, ef) => p.g / 1000 * ef + p.min / 60 * PSET.w / 1000 * PR.grid;
+  function printTotals() {
+    const t = { g: 0, gBad: 0, kwh: 0, co2: 0, parts: 0, failed: 0, covers: 0, unknown: 0 };
+    PRINTS.forEach(e => {
+      const gg = e.n * e.g; t.g += gg; t.kwh += e.n * e.min / 60 * PSET.w / 1000;
+      if (e.ok) { t.parts += e.n; if (e.part === 'cover') t.covers += e.n; } else { t.gBad += gg; t.failed += e.n; }
+      const ef = PR.ef[e.mat]; if (ef == null) t.unknown += gg; else t.co2 += gg / 1000 * ef;
+    });
+    t.co2 += t.kwh * PR.grid; t.fil = t.g / 1000 * PSET.kg; t.pow = t.kwh * FOOT.rate; t.cost = t.fil + t.pow;
+    return t;
+  }
+  function podTotals() { const s = Object.keys(PODS.seats); return { seats: s.length, S: s.filter(x => x[0] === 'S').length, F: s.filter(x => x[0] === 'F').length, plantings: PODS.past + s.reduce((a, x) => a + (PODS.seats[x].n || 0), 0) }; }
+  function partPayback(p) {
+    const cost = partCost(p);
+    if (p.kind === 'ycube') {
+      const save = PSET.yc - PSET.plug, m = save > 0 ? Math.max(1, Math.ceil(cost / save)) : '—', tr = Math.max(1, Math.ceil(p.g / Math.max(0.5, PSET.casing + PSET.wool)));
+      return 'About ' + usd(cost) + ' to print. Money back at planting ' + m + ', trash by planting ' + tr + ', carbon at about planting ' + Math.ceil(partCarbon(p, PR.ef.petg) / PR.netPerPlanting) + ' (' + Math.ceil(partCarbon(p, PR.ef.rpetg) / PR.netPerPlanting) + ' in recycled PETG).';
+    }
+    if (p.kind === 'cap') return 'About ' + usd(cost) + ' to print, against ' + usd(PR.capEach) + ' for a Gardyn Cap ($29.99 for five): it pays back the day it goes in.';
+    if (p.kind === 'repair') return 'About ' + usd(cost) + ' to print. It pays back by keeping a tower running: no overfilled Tank, no pump run dry.';
+    return 'About ' + usd(cost) + ' to print, with nothing to replace.';
+  }
+  function podRow(slot) {
+    const ps = PODS.seats[slot];
+    if (!ps) return '<div class="podrow"><span class="small">In a yCube.</span><button class="btn small ghost" data-act="podMark" data-slot="' + slot + '">It’s in a printed pod</button></div>';
+    return '<div class="podrow on"><span class="small"><b>Printed pod</b> since ' + esc(fmtDate(ps.since)) + ' · ' + ps.n + (ps.n === 1 ? ' planting' : ' plantings') + '</span><span class="btnrow"><button class="btn small" data-act="podReplant" data-slot="' + slot + '">Replanted +1</button>' + (ps.n > 0 ? '<button class="btn small ghost" data-act="podUndo" data-slot="' + slot + '" aria-label="Take one planting off">−1</button>' : '') + '<button class="btn small ghost" data-act="podOut" data-slot="' + slot + '">Take it out</button></span></div>';
+  }
+  function podChanged() { if (!$('view-towers').hidden) renderTower(); if (!$('view-diy').hidden) paintOff(); refreshSheet(); }
+  function renderPrinter() {
+    $('printRules').innerHTML = PR.rules.map(([t, x]) => '<div class="card"><h4>' + esc(t) + '</h4><p>' + esc(x) + '</p></div>').join('');
+    $('printSkip').textContent = PR.skip;
+    buildLog(); paintOff(); paintParts(); paintLogSum();
+    const rows = a => a.map(([k, v]) => '<div><b>' + esc(k) + '</b><p>' + esc(v) + '</p></div>').join('');
+    const sb = PR.standbyW * 24 * 30 / 1000 * FOOT.rate;
+    $('printHabits').innerHTML = rows(PR.habits.map(([k, v]) => [k, v.replace('STANDBY', usd(sb))]));
+    $('printScrap').innerHTML = rows(PR.scrap);
+    $('printNot').textContent = PR.notCounted;
+    $('printSrc').innerHTML = 'Sources: ' + PR.src.map(x => '<a href="' + esc(x[1]) + '" target="_blank" rel="noopener">' + esc(x[0]) + '</a>').join(' · ');
+  }
+  function paintOff() {
+    const pt = podTotals(), t = printTotals();
+    const net = pt.plantings * (PSET.yc - PSET.plug) + t.covers * PR.capEach - t.cost;
+    const saved = pt.plantings * PR.netPerPlanting, pct = Math.round(pt.seats / 60 * 100);
+    let h = '<div class="or-head"><div class="or-bar" role="img" aria-label="' + pt.seats + ' of 60 seats in printed pods"><i style="width:' + pct + '%"></i></div><p class="small" style="margin:0"><b class="num">' + pt.seats + '</b> of 60 seats in printed pods' + (pt.seats ? ' (salad ' + pt.S + ', fruiting ' + pt.F + ')' : ': every plant is still in a yCube') + '</p></div>';
+    h += '<div class="stats"><div><span class="k">Plantings</span><span class="v">' + pt.plantings + ' <small>yCubes not bought</small></span></div><div><span class="k">Money</span><span class="v">' + usd(net) + ' <small>after printing</small></span></div><div><span class="k">Trash</span><span class="v">' + Math.round(pt.plantings * (PSET.casing + PSET.wool)) + ' g <small>kept out</small></span></div></div>';
+    if (!PRINTS.length && pt.plantings) {
+      h += '<p class="small" style="margin:0"><b>Carbon:</b> these plantings have saved about ' + carbon(saved) + '. Log the prints that made the pods, and this weighs their carbon against it.</p>';
+    } else if (!t.co2 && !pt.plantings) {
+      const pod = PR.parts[0];
+      h += '<p class="small" style="margin:0"><b>Carbon:</b> a virgin-PETG pod starts about ' + carbon(partCarbon(pod, PR.ef.petg)) + ' of carbon in debt, plastic plus print power, and pays back about ' + carbon(PR.netPerPlanting) + ' each time it replaces a yCube. Recycled PETG halves the debt.</p>';
+    } else {
+      const left = Math.max(0, Math.ceil((t.co2 - saved) / PR.netPerPlanting)), cp = t.co2 ? Math.min(100, Math.round(saved / t.co2 * 100)) : 100;
+      h += '<div class="cbal"><div class="or-bar c" role="img" aria-label="Carbon paid back: ' + cp + ' percent"><i style="width:' + cp + '%"></i></div><p class="small" style="margin:0"><b>Carbon:</b> printing so far ≈ ' + carbon(t.co2) + '; plantings have saved ≈ ' + carbon(saved) + '. ' + (left ? 'Paid back after about ' + left + ' more ' + (left === 1 ? 'planting' : 'plantings') + ' in printed pods.' : 'Paid back.') + (t.unknown ? ' Prints in “something else” aren’t counted.' : '') + '</p></div>';
+    }
+    h += '<p class="small muted" style="margin:0">Mark a seat when a printed pod goes in, from the Pods view on the map or any pod’s page, and tap Replanted each time it takes a new plant.</p>';
+    $('offRock').innerHTML = h;
+  }
+  function paintParts() {
+    $('printParts').innerHTML = PR.parts.map(p => '<div class="part"><div class="rowtop"><b>' + esc(p.name) + '</b><span class="chip ' + p.verdict[0] + '">' + esc(p.verdict[1]) + '</span></div><p>' + esc(p.what) + '</p><p class="pay">' + esc(partPayback(p)) + '</p><div class="facts"><span>About <b class="num">' + p.g + ' g</b></span><span><b class="num">' + p.min + ' min</b></span>' + (p.model ? '<span><a href="' + esc(p.model[1]) + '" target="_blank" rel="noopener">' + esc(p.model[0]) + '</a></span>' : '<span>' + (p.id === 'dipstick' ? 'No model needed' : 'No free model: the pod brief below') + '</span>') + '</div><p class="small how">' + esc(p.how) + '</p><div class="btnrow"><button class="btn small ghost" data-act="plogFor" data-part="' + p.id + '">Log a print of this</button></div></div>').join('');
+  }
+  function buildLog() {
+    const el = $('printLog'); if (el.dataset.ready) return; el.dataset.ready = '1';
+    const opt = (v, l) => '<option value="' + v + '">' + esc(l) + '</option>';
+    el.innerHTML = '<div id="logSum" class="stack"></div><div class="btnrow"><button class="btn small primary" data-act="plogOpen">Log a print</button></div>' +
+      '<div class="plform" id="plForm" hidden><div class="fields">' +
+      '<label for="plPart">What<select id="plPart">' + PR.parts.map(p => opt(p.id, p.name)).join('') + opt('custom', 'Something else') + '</select></label>' +
+      '<label for="plName" id="plNameL" hidden>Name it<input id="plName" type="text" maxlength="60" autocomplete="off"></label>' +
+      '<label for="plN">How many<input id="plN" type="number" min="1" max="200" step="1" inputmode="numeric" value="1"></label>' +
+      '<label for="plG">Grams each<input id="plG" type="number" min="0.1" max="2000" step="0.1" inputmode="decimal"></label>' +
+      '<label for="plMin">Minutes each<input id="plMin" type="number" min="1" max="6000" step="1" inputmode="numeric"></label>' +
+      '<label for="plMat">Filament<select id="plMat">' + PR.mats.map(([k, l]) => opt(k, l)).join('') + '</select></label>' +
+      '<label for="plOk">How it went<select id="plOk">' + opt('1', 'Printed fine') + opt('0', 'Failed: into the scrap jar') + '</select></label>' +
+      '</div><p class="small" style="margin:0">Use the grams and minutes your slicer shows before you print.</p><div class="btnrow"><button class="btn small primary" data-act="plogAdd">Add to the log</button><button class="btn small ghost" data-act="plogCancel">Cancel</button></div></div>' +
+      '<div class="list plist" id="plList"></div>' +
+      '<details class="pset"><summary>Your numbers</summary><div class="fields">' +
+      '<label for="psW">Printer watts, printing<input id="psW" type="number" min="5" max="2000" step="1" inputmode="numeric"></label>' +
+      '<label for="psKg">Filament, $ per kg<input id="psKg" type="number" min="1" max="200" step="0.01" inputmode="decimal"></label>' +
+      '<label for="psYc">yCube price<select id="psYc">' + PR.ycOptions.map(([v, l]) => opt(v, l)).join('') + '</select></label>' +
+      '<label for="psPlug">Plug in the pod<select id="psPlug">' + PR.plugOptions.map(([v, l]) => opt(v, l)).join('') + '</select></label>' +
+      '<label for="psCas">yCube casing, grams<input id="psCas" type="number" min="0" max="50" step="0.1" inputmode="decimal"></label>' +
+      '<label for="psWool">Rockwool plug, grams<input id="psWool" type="number" min="0" max="50" step="0.1" inputmode="decimal"></label>' +
+      '</div><p class="small" style="margin:0">75 W is Bambu’s own measurement for the A1 mini printing PETG, and $20 a kilogram is PETG on sale. Gardyn doesn’t publish what a yCube weighs, so 4 grams each is a guess: weigh a dry, used casing and its wool on a kitchen scale and put your numbers in. Power uses your rate from the footprint above.</p></details>';
+    $('plPart').addEventListener('change', plPrefill);
+    ['psW', 'psKg', 'psYc', 'psPlug', 'psCas', 'psWool'].forEach(i => $(i).addEventListener('input', readSet));
+    fillSet();
+  }
+  function fillSet() { $('psW').value = PSET.w; $('psKg').value = PSET.kg; $('psYc').value = String(PSET.yc); $('psPlug').value = String(PSET.plug); $('psCas').value = PSET.casing; $('psWool').value = PSET.wool; }
+  function readSet() {
+    const num = (id, d, lo, hi) => { const v = parseFloat($(id).value); return isFinite(v) ? Math.min(hi, Math.max(lo, v)) : d; };
+    PSET.w = num('psW', 75, 5, 2000); PSET.kg = num('psKg', 20, 1, 200); PSET.yc = num('psYc', 5.99, 0, 50); PSET.plug = num('psPlug', 0.21, 0, 5); PSET.casing = num('psCas', 4, 0, 50); PSET.wool = num('psWool', 4, 0, 50);
+    store.set('printer', PSET); paintOff(); paintParts(); paintLogSum(); paintFoot();
+  }
+  const MAT = {}; PR.mats.forEach(([k, l]) => { MAT[k] = l; });
+  const mins = m => m < 60 ? Math.round(m) + ' min' : (m / 60).toFixed(m < 600 ? 1 : 0).replace(/\.0$/, '') + ' h';
+  function paintLogSum() {
+    if (!$('logSum')) return;
+    const t = printTotals();
+    $('logCount').textContent = PRINTS.length ? PRINTS.length + (PRINTS.length === 1 ? ' entry' : ' entries') : '';
+    $('logSum').innerHTML = !PRINTS.length ? '<p class="small" style="margin:0">Nothing logged yet. Log each batch as it comes off the plate: the app adds up the plastic, the power and the scrap, and the Off rockwool card weighs them against what the pods replace.</p>' :
+      '<div class="stats"><div><span class="k">Printed</span><span class="v">' + t.parts + ' <small>' + (t.parts === 1 ? 'part' : 'parts') + (t.failed ? ', ' + t.failed + ' failed' : '') + '</small></span></div><div><span class="k">Filament</span><span class="v">' + Math.round(t.g) + ' g <small>' + usd(t.fil) + '</small></span></div><div><span class="k">Power</span><span class="v">' + t.kwh.toFixed(2) + ' <small>kWh, ' + usd(t.pow) + '</small></span></div></div>' +
+      (t.gBad ? '<p class="small" style="margin:0"><b>Scrap jar:</b> ' + Math.round(t.gBad) + ' g of failed prints, ' + Math.round(t.gBad / t.g * 100) + '% of the filament so far.</p>' : '');
+    $('plList').innerHTML = PRINTS.slice().reverse().map(e => '<div class="plrow' + (e.ok ? '' : ' bad') + '"><span><b>' + esc(e.name) + (e.n > 1 ? ' ×' + e.n : '') + '</b><span class="small">' + esc(fmtDate(e.d)) + ' · ' + Math.round(e.n * e.g * 10) / 10 + ' g ' + esc(MAT[e.mat] || '') + ' · ' + mins(e.n * e.min) + (e.ok ? '' : ' · failed') + '</span></span><button class="btn small ghost" data-act="plogDel" data-id="' + esc(e.id) + '">Delete</button></div>').join('');
+  }
+  function plPrefill() { const p = PR.parts.find(x => x.id === $('plPart').value); $('plNameL').hidden = !!p; if (p) { $('plG').value = p.g; $('plMin').value = p.min; } }
+  function plOpen(part) {
+    buildLog(); const f = $('plForm'); f.hidden = false;
+    if (part) $('plPart').value = part;
+    $('plN').value = 1; $('plOk').value = '1'; plPrefill();
+    const top = f.getBoundingClientRect().top + window.scrollY - 90; window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+  }
+  function plAdd() {
+    const part = $('plPart').value, p = PR.parts.find(x => x.id === part);
+    const n = Math.round(parseFloat($('plN').value)), g = parseFloat($('plG').value), m = parseFloat($('plMin').value);
+    const name = p ? p.name : ($('plName').value || '').trim();
+    if (!p && !name) { $('plName').focus(); toast('Give it a name.'); return; }
+    if (!(n >= 1 && n <= 200)) { $('plN').focus(); toast('How many: 1 to 200.'); return; }
+    if (!(g > 0 && g <= 2000)) { $('plG').focus(); toast('Grams each, from the slicer.'); return; }
+    if (!(m > 0 && m <= 6000)) { $('plMin').focus(); toast('Minutes each, from the slicer.'); return; }
+    PRINTS.push({ id: Date.now().toString(36), d: todayISO(), part, name: name.slice(0, 60), n, g: Math.round(g * 10) / 10, min: Math.round(m), mat: $('plMat').value, ok: $('plOk').value === '1' });
+    PRINTS = PRINTS.slice(-500); store.set('prints', PRINTS);
+    $('plForm').hidden = true; paintLogSum(); paintOff(); paintFoot(); toast($('plOk').value === '1' ? 'Logged.' : 'Logged, into the scrap jar.');
   }
   function stopSheet(id) {
     const s = P.trail.find(x => x.id === id); const i = P.trail.indexOf(s); const st = trailState(id);
@@ -832,6 +1026,8 @@
     else if (SHEET.kind === 'pick') pickSheet();
     else if (SHEET.kind === 'catch') catchSheet();
     else if (SHEET.kind === 'doctor') doctorSheet(SHEET.id);
+    else if (SHEET.kind === 'seat') seatSheet(SHEET.slot);
+    else if (SHEET.kind === 'forb') forbSheet(SHEET.id);
     $('sheet').scrollTop = top;
   }
 
@@ -839,11 +1035,13 @@
   let toastT; function toast(msg) { const t = $('toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('show'), 2000); }
 
   /* ----- Views ----- */
-  const VIEWS = ['towers', 'plants', 'salad', 'care', 'ideas', 'diy'];
+  const VIEWS = ['towers', 'plants', 'salad', 'care', 'ideas', 'diy', 'forbidden'];
   function showView(v, anchor) {
     if (!VIEWS.includes(v)) v = 'towers';
     VIEWS.forEach(k => { $('view-' + k).hidden = (k !== v); });
-    document.querySelectorAll('.tab').forEach(t => t.setAttribute('aria-selected', t.dataset.view === v ? 'true' : 'false'));
+    const tabV = v === 'forbidden' ? 'ideas' : v;
+    document.querySelectorAll('.tab').forEach(t => t.setAttribute('aria-selected', t.dataset.view === tabV ? 'true' : 'false'));
+    if (v === 'forbidden') renderForbidden();
     if (v === 'plants') renderPlants();
     if (v === 'care') renderCare();
     if (v === 'ideas') renderIdeas();
@@ -927,6 +1125,7 @@
       KEYS.forEach(k => { if (o.data[k] != null) store.set(k, o.data[k]); });
       DONE = store.get('done', {}); CARE = store.get('care', {}); CAMP = store.get('camp', {}); NOTES = store.get('notes', {}); TRAIL = store.get('trail', {});
       PICK = store.get('pick', {}); VERD = store.get('verdict', {}); SCOUT = store.get('scout', {}); ATE = store.get('ate', []); Object.assign(FOOT, store.get('foot', {}));
+      PRINTS = store.get('prints', []); Object.assign(PSET, store.get('printer', {})); { const pz = store.get('podseats', {}); PODS.seats = pz.seats || {}; PODS.past = pz.past || 0; } Object.assign(FGS, store.get('fgame', {})); if ($('psW')) fillSet();
       BOWL.splice(0, BOWL.length, ...store.get('bowl', []).filter(id => P.plants[id])); SAVED.splice(0, SAVED.length, ...store.get('bowls', [])); MGSEL.splice(0, MGSEL.length, ...store.get('mgsel', []));
       $('restoreBox').hidden = true; renderAll(); renderCare(); toast('Restored.');
     } catch (e) { toast('That doesn’t look like a Plant Book backup. Paste the whole thing.'); }
@@ -1006,8 +1205,21 @@
       else if (act === 'lightClose') $('lightbox').hidden = true;
       else if (act === 'photoDel') { if (!a.dataset.armed) { a.dataset.armed = '1'; a.textContent = 'Tap again to delete'; return; } phDel(+a.dataset.id).then(() => { $('lightbox').hidden = true; if (SHEET && SHEET.pid) paintPhotos(SHEET.pid); toast('Photo deleted.'); }).catch(() => toast('Couldn’t delete it.')); }
       else if (act === 'tipNext') { UI.tipShift = (UI.tipShift || 0) + 1; renderTip(); }
-      else if (act === 'tipGo') { const g = P.tips[+a.dataset.i].go || {}; if (g.doctor) doctorSheet(g.doctor); else if (g.plant) plantSheet(g.plant); else if (g.view) showView(g.view); }
-      else if (act === 'forbidden') forbiddenSheet();
+      else if (act === 'tipGo') { const g = P.tips[+a.dataset.i].go || {}; if (g.doctor) doctorSheet(g.doctor); else if (g.plant) plantSheet(g.plant); else if (g.forb) forbSheet(g.forb); else if (g.view) showView(g.view, g.anchor); }
+      else if (act === 'forbidden') showView('forbidden');
+      else if (act === 'forbItem') { forbSheet(a.dataset.id); $('sheet').scrollTop = 0; }
+      else if (act === 'fgPick') { if (FG && !FG.pick) { FG.pick = a.dataset.k; if (fgRight(FB.game[FG.q[FG.i]], FG.pick)) FG.score++; renderGame(); } }
+      else if (act === 'fgNext') { FG.i++; FG.pick = null; if (FG.i >= FG.q.length) { FGS.plays++; FGS.best = Math.max(FGS.best || 0, FG.score); store.set('fgame', FGS); } renderGame(); const g = $('fgame'); if (g.getBoundingClientRect().top < 60) window.scrollTo({ top: Math.max(0, g.getBoundingClientRect().top + window.scrollY - 70), behavior: 'smooth' }); }
+      else if (act === 'fgNew') { fgRound(); renderGame(); }
+      else if (act === 'podMark') { const sl = a.dataset.slot, cell = layout(sl[0], 'now')[sl]; PODS.seats[sl] = { since: todayISO(), n: cell && cell.pods.length ? 1 : 0 }; savePods(); podChanged(); toast('Marked: a printed pod at ' + seatName(sl, true) + '.'); }
+      else if (act === 'podReplant') { const ps = PODS.seats[a.dataset.slot]; if (ps) { ps.n = (ps.n || 0) + 1; savePods(); podChanged(); toast('Counted: one more yCube you didn’t buy.'); } }
+      else if (act === 'podUndo') { const ps = PODS.seats[a.dataset.slot]; if (ps && ps.n > 0) { ps.n--; savePods(); podChanged(); } }
+      else if (act === 'podOut') { if (!a.dataset.armed) { a.dataset.armed = '1'; a.textContent = 'Tap again to take it out'; return; } const sl = a.dataset.slot, ps = PODS.seats[sl]; if (ps) { PODS.past += ps.n || 0; delete PODS.seats[sl]; savePods(); podChanged(); toast('Taken out. Its plantings stay counted.'); } }
+      else if (act === 'plogOpen') plOpen();
+      else if (act === 'plogFor') plOpen(a.dataset.part);
+      else if (act === 'plogAdd') plAdd();
+      else if (act === 'plogCancel') $('plForm').hidden = true;
+      else if (act === 'plogDel') { if (!a.dataset.armed) { a.dataset.armed = '1'; a.textContent = 'Tap again'; return; } PRINTS = PRINTS.filter(e => e.id !== a.dataset.id); store.set('prints', PRINTS); paintLogSum(); paintOff(); paintFoot(); }
       else if (act === 'pickRound') pickSheet();
       else if (act === 'pickToggle') { const id = a.dataset.pod; setPicked([id], PICK[id] !== todayISO()); renderToday(); refreshSheet(); }
       else if (act === 'pickAll') { setPicked(pickList().map(x => x.p.id), true); renderToday(); refreshSheet(); toast('Picking round logged.'); }
