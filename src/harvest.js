@@ -25,11 +25,11 @@ P.harvest = {
   /* Days from a flower opening (or being pollinated) to ripe fruit. lo–hi is "ripe about now";
      past give, a flower that hasn't turned into fruit is counted as one that didn't set. */
   ripe: {
-    strawberry: { lo: 25, hi: 35, give: 45, say: 'about 30 days', src: 'Penn State Extension gives about 30 days from flower to ripe berry; Oklahoma State, 18 to 45 depending on variety and warmth.' },
-    'yellow-cherry-tomato': { lo: 42, hi: 56, give: 70, say: 'six to eight weeks', src: 'Cornell’s Stephen Reiners: six to eight weeks from pollination, ripening best at 70–75°F and stalling above 85.' },
-    'tam-jalapeno': { lo: 45, hi: 55, give: 75, say: '45–55 days, green; 60–70 to red', src: 'University of Georgia, via Michigan State Extension: 45–55 days from pollination to a full-size green pepper, 60–70 to red.' },
+    strawberry: { lo: 25, hi: 35, give: 45, say: 'about 30 days', src: 'Penn State Extension puts it at about 30 days from blossom to ripe fruit for later varieties; Oklahoma State gives 18 to 45 days from bloom to first harvest, depending on variety and weather.' },
+    'yellow-cherry-tomato': { lo: 42, hi: 56, give: 70, say: 'six to eight weeks', src: 'Cornell’s Stephen Reiners: six to eight weeks from pollination to full maturity, ripening best at 70–75°F and slowing or stopping above 85–90.' },
+    'tam-jalapeno': { lo: 45, hi: 55, give: 75, say: '45–55 days, green; 60–70 to red', src: 'University of Georgia, via Michigan State Extension: 45–55 days from pollination to a full-size green pepper, 60–70 to red, in warm conditions.' },
     cucumber: { lo: 8, hi: 12, give: 20, say: '8–10 days', src: 'Seminis: the first fruit is ready 8–10 days after the first fully open female flowers.' },
-    'green-beans': { lo: 7, hi: 10, give: 18, say: '7–10 days', src: 'University of Georgia, via Michigan State Extension: 7–10 days from pollination.' },
+    'green-beans': { lo: 7, hi: 10, give: 18, say: '7–10 days', src: 'University of Georgia, via Michigan State Extension: 7–10 days from pollination, in warm conditions.' },
     'ground-cherry': { sign: 'No count from the flower to go on: ripe when the husk dries papery tan and the fruit drops. Log flowers and pickings and the app learns your own timing.' },
     cucamelon: { sign: 'No count from the flower to go on: pick at about an inch, still firm. Log flowers and pickings and the app learns your own timing.' }
   },
