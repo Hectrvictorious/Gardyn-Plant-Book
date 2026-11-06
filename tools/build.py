@@ -33,8 +33,8 @@ HEAD = """<!doctype html>
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Plant Book">
 <link rel="manifest" href="manifest.json">
-<link rel="icon" type="image/png" sizes="32x32" href="favicon-v2-32.png">
-<link rel="apple-touch-icon" href="apple-touch-icon-v2.png">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-v3-32.png">
+<link rel="apple-touch-icon" href="apple-touch-icon-v3.png">
 <script>window.__STANDALONE_SITE__ = true; window.__BUILD__ = '%s';</script>
 <style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#1b3929;color:#000}img{max-width:100%%}[hidden]:not([hidden=until-found i]){display:none!important}</style>
 """ % BUILD

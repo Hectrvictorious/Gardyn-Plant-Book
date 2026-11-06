@@ -71,9 +71,12 @@ up the new build the next time the app opens. Bump `version` in `src/data.js` (a
 **A new map version** = edit `pods` (each plant's `now` and `plan` seat), `holds` and `moves` in
 `src/data.js`. Seats are tower + row + column: `S3L` is salad row 3 left, `F10C` is fruiting row 10 center.
 
-**The icon** is `site/icon-v2.svg` (full bleed, for Android's mask) and `site/icon-v2-tile.svg`
-(rounded, for desktops); the PNGs are rendered from them with `rsvg-convert`. Give new art new
-filenames so installed apps notice the change.
+**The icon** is Muse's painted open book with herbs and strawberries growing from its pages (Nov 6,
+2026): `site/icon-v3-512.png` and `icon-v3-192.png` (rounded, for desktops), `icon-v3-maskable-512.png`
+(full bleed, for Android's mask), `apple-touch-icon-v3.png` (made from the full-bleed art so iPhones
+don't show black corners), `favicon-v3-32.png`, and the four `shortcut-*-v3-96.png` long-press icons.
+The earlier drawn leaf-book icon (v2, SVG sources) is in the git history. Give new art new filenames
+so installed apps notice the change.
 
 Plant facts paraphrase Gardyn's Plant Book (Help Center plant articles) and the extension and seed
 sources linked on each page; pet safety follows the ASPCA's toxic and non-toxic plant list. Not

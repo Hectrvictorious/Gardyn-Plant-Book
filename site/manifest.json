@@ -11,14 +11,14 @@
   "theme_color": "#1b3929",
   "lang": "en-US",
   "icons": [
-    { "src": "icon-v2-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
-    { "src": "icon-v2-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
-    { "src": "icon-v2-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+    { "src": "icon-v3-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-v3-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-v3-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
   ],
   "shortcuts": [
-    { "name": "Build a salad", "short_name": "Salad", "url": "./#salad", "icons": [{ "src": "shortcut-salad-96.png", "sizes": "96x96", "type": "image/png" }] },
-    { "name": "Picking round", "short_name": "Pick", "url": "./#pick", "icons": [{ "src": "shortcut-pick-96.png", "sizes": "96x96", "type": "image/png" }] },
-    { "name": "Plant Doctor", "short_name": "Doctor", "url": "./#doctor", "icons": [{ "src": "shortcut-doctor-96.png", "sizes": "96x96", "type": "image/png" }] },
-    { "name": "Care", "short_name": "Care", "url": "./#care", "icons": [{ "src": "shortcut-care-96.png", "sizes": "96x96", "type": "image/png" }] }
+    { "name": "Build a salad", "short_name": "Salad", "url": "./#salad", "icons": [{ "src": "shortcut-salad-v3-96.png", "sizes": "96x96", "type": "image/png" }] },
+    { "name": "Picking round", "short_name": "Pick", "url": "./#pick", "icons": [{ "src": "shortcut-pick-v3-96.png", "sizes": "96x96", "type": "image/png" }] },
+    { "name": "Plant Doctor", "short_name": "Doctor", "url": "./#doctor", "icons": [{ "src": "shortcut-doctor-v3-96.png", "sizes": "96x96", "type": "image/png" }] },
+    { "name": "Care", "short_name": "Care", "url": "./#care", "icons": [{ "src": "shortcut-care-v3-96.png", "sizes": "96x96", "type": "image/png" }] }
   ]
 }

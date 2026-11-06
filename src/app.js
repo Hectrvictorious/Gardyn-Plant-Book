@@ -5,7 +5,7 @@
   const $ = id => document.getElementById(id);
   const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const APP_VERSION = P.version;
-  const NEWS = 'The Forbidden Shelf is now its own page: six shelves, 42 plants, the cat’s list, the plants Maine bans, and a Legal in Maine? game. On the Greener tab, the printer gets a ledger: log your prints, mark printed pods on the map (the new Pods view), and watch each one earn its plastic back.'; // shown once to returning users
+  const NEWS = 'A new icon: the painted open book from Muse. And from last night: the Forbidden Shelf has its own page, with a Legal in Maine? game, and the Greener tab has a printer ledger, with a Pods view on the map.'; // shown once to returning users
 
   /* ----- Storage (this phone only) ----- */
   const store = {
