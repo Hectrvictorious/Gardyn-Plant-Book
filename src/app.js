@@ -1259,7 +1259,7 @@
     const box = $('newsBox'), seen = store.get('seenVersion', null);
     const returning = Object.keys(DONE).length || Object.keys(CARE).length || Object.keys(NOTES).length;
     if (!NEWS || seen === APP_VERSION || !returning) { store.set('seenVersion', APP_VERSION); box.hidden = true; return; }
-    const due = bkLevel(bkState());
+    const st = bkState(), due = bkLevel(st) || (!LASTBK && st.dirty ? 'never' : null);   // the update note is the moment to make the first backup
     box.innerHTML = '<b>New in the Plant Book</b><div class="small">' + NEWS + (due ? (LASTBK ? ' And a backup is due.' : ' Nothing here is backed up yet, so that’s the place to start.') : '') + '</div><div class="btnrow">' + (due ? '<button class="btn small primary" data-act="bkNow">Back up now</button>' : '') + '<button class="btn small' + (due ? ' ghost' : '') + '" data-act="newsOk">Got it</button></div>';
     box.hidden = false;
   }
