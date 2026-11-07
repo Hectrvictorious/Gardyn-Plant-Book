@@ -697,3 +697,22 @@ td .small { display: block; margin-top: 2px; }
 .rule-card { display: grid; gap: 4px; padding: 12px 14px; border-radius: 14px; border: 1px solid color-mix(in srgb, var(--good) 35%, var(--line)); background: color-mix(in srgb, var(--good) 6%, var(--surface)); }
 .rule-card > b { font-family: var(--font-display); font-size: 17px; color: var(--good); }
 .rule-card .small { margin: 0; }
+
+/* ---------- Ask Muse (seed through Claude on shadowfax) ---------- */
+.muse { display: grid; gap: 10px; padding: 12px; border-radius: 14px; border: 1px solid color-mix(in srgb, var(--accent) 28%, var(--line)); background: color-mix(in srgb, var(--accent) 5%, var(--surface)); }
+.mu-h { display: grid; gap: 2px; }
+.mu-h > b { font-family: var(--font-display); font-size: 17px; }
+.mu-h .small { margin: 0; color: var(--ink-2); }
+.muse .list.sb { background: var(--surface); }
+.mu-n { font-family: var(--font-display); font-weight: 600; font-size: 16px; padding-right: 6px; }
+.mu-note { display: grid; gap: 4px; font-family: var(--font-display); font-size: 13.5px; font-weight: 600; color: var(--ink-2); }
+.mu-note .muted { font-weight: 500; }
+.mu-note input { font: inherit; font-family: var(--font-body); font-weight: 400; font-size: 16px; padding: 8px 10px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); min-width: 0; width: 100%; }
+.mu-msg { border-top: 1px dashed var(--line); padding-top: 8px; }
+.mu-msg summary { cursor: pointer; font-family: var(--font-display); font-size: 13.5px; font-weight: 600; color: var(--ink-2); }
+.mu-msg p { margin: 6px 0 0; overflow-wrap: anywhere; }
+.mu-st { margin: 0; padding: 9px 11px; border-radius: 10px; font-size: 14px; line-height: 1.45; border: 1px solid var(--line); background: var(--surface); color: var(--ink); }
+.mu-st.ok { border-color: color-mix(in srgb, var(--good) 40%, var(--line)); background: color-mix(in srgb, var(--good) 9%, var(--surface)); }
+.mu-st.warn { border-color: color-mix(in srgb, var(--warn) 40%, var(--line)); background: color-mix(in srgb, var(--warn) 9%, var(--surface)); }
+.mu-st.err { border-color: color-mix(in srgb, var(--bad) 40%, var(--line)); background: color-mix(in srgb, var(--bad) 8%, var(--surface)); }
+.mu-foot { margin: 0; }

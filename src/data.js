@@ -4,7 +4,7 @@
    (Help Center plant articles); seats and notes come from Josh's maps v4/v5 (salad) and v8/v9 (fruiting).
    Slot codes: tower letter + row + column, e.g. S3L = salad tower, row 3, left; F10C = fruiting, row 10, center. */
 window.PB = {
-version: '2026.11.06c',
+version: '2026.11.06d',
 
 /* ---------- The book ---------- */
 groups: { greens: 'Leafy green', herbs: 'Herb', flowers: 'Edible flower', fruit: 'Fruiting plant' },
@@ -653,5 +653,19 @@ why: [
   ['Algae, then gnats', 'A wet, lit surface grows algae; algae feeds gnat larvae; a wet crown with dead bits on it grows mold. Dry, dark and lifted fixes all three.'],
   ['Rockwool and the planet', '“Can’t be composted” is right. “Bad for the environment” is overstated: a plug is a few grams of carbon, non-hazardous, and Gardyn and Grodan both say it can go into garden soil. Its usual fate is still the landfill.'],
   ['Money', 'Two towers at two rotations a year use about 120 yCubes: roughly $400–720 a year. Printed pods and plugs run about $20–35 a year after a one-time $20 of filament.']
-]
+],
+
+/* ---------- Ask Muse (Nov 6, 2026): Josh buys seed, not yCubes, since he's moving to printed pods ----------
+   Every plant's page can ask Muse (Meta's shopping agent) to buy seed, through Claude on shadowfax.
+   A few plants don't come true from seed, so their request is for live plants instead. */
+buy: {
+  live: {
+    'chocolate-mint': { unit: ['live plant', 'live plants'], n: 1, why: `Chocolate mint doesn’t come true from seed, so this asks for a live plant.` },
+    'strawberry': { unit: ['bare-root plant', 'bare-root plants'], n: 10, why: `Albion is grown from bare-root crowns; seed won’t give you Albion. Sellers often pack them in 10s or 25s.` }
+  },
+  micro: { unit: ['small bag of untreated microgreen seed', 'small bags of untreated microgreen seed'], n: 1 },
+  seed: { unit: ['packet', 'packets'], n: 1 },
+  maxItems: 5,
+  src: [['Meta: Introducing Muse', 'https://about.fb.com/news/2026/09/introducing-muse-personal-ai-agent/']]
+}
 };

@@ -28,7 +28,7 @@ Plant Doctor and Care. On iPhone: Share → Add to Home Screen.
   earns a plant that doesn't keep giving its seat),
   taste and texture, pairings, your verdict, growing basics, harvest, care, origin, your notes, a
   journal with photos, a seed box (yCubes or seed pads on hand, packets with source and year,
-  flagged when low or getting old), sources.
+  flagged when low or getting old) with **Ask Muse to buy seeds**, sources.
 - **Salad**: build tonight's bowl from what's growing (flavor balance, texture, heads-ups, a matched
   dressing, what it's missing), save it, share it as a picture, count it; six house salads, island plates, taste
   tests, Gardyn's microgreens with a finish-together planner, and the cautions.
@@ -40,7 +40,7 @@ Plant Doctor and Care. On iPhone: Share → Add to Home Screen.
   to try, 24 of them researched for this round (Gardyn's catalog plus ice plant, oyster leaf and
   miner's lettuce), with filters (including *Keeps giving*) and a starred shortlist; gear, open
   questions, the watch list; **the seed box** (what's on hand, and a to-buy list from low packets
-  and the shortlist, ready to share); and the door to the Forbidden Shelf.
+  and the shortlist, ready to share or to hand to Muse in one request); and the door to the Forbidden Shelf.
 - **The Forbidden Shelf** (`#forbidden`): 42 plants on six shelves (controlled plants, legal ones
   with a reputation, the dark side of the plants already on the towers, a poison cabinet with the
   cat in mind, what Maine and the USDA ban, and plants that were once banned), each with the law,
@@ -57,11 +57,27 @@ Plant Doctor and Care. On iPhone: Share → Add to Home Screen.
   pod), seed saving and plants that keep giving.
 
 Everything you log (ticks, dates, picks, the harvest log, flowers, verdicts, stars, bowls, notes,
-seeds, printed-pod seats, the print log) is stored on the phone, with photos in its IndexedDB.
+seeds, Muse requests, printed-pod seats, the print log) is stored on the phone, with photos in its IndexedDB.
 **Care → Your data** backs it all up as one file, photos included, through the phone's share sheet
 (Drive, Gmail, Files), and restores it from a file, with an undo. A reminder appears on the Towers
 tab when there's something new and no backup for a week, and turns firmer after two. The app also
 asks Chrome to mark its storage as persistent. Copy-as-text and paste remain under *Other ways*.
+
+**Ask Muse** (Nov 6, 2026): every plant's seed box can ask Muse, Meta's shopping agent, to buy its
+seed, and the Ideas seed box can ask for its whole To buy list (up to five plants a request). Seeds
+only, since Josh is moving off yCubes to printed pods; the chocolate mint and the Albion strawberries
+ask for live plants, because neither comes true from seed (`buy` in `src/data.js`). The request is
+written in Josh's voice: the plant and its Latin name, how many, where the last packet came from,
+an optional note, and "show me the seller, price and shipping, and wait for my OK."
+*Send to Claude* posts it to the phone remote listener on shadowfax (`/api/plantbook/ask`, through
+Tailscale, with the phone key), which opens Claude there with the prompt in the Nexus Kit's
+`engine\plantbook.json` and presses Enter; Claude passes it to Muse at muse.ai and never approves or
+pays, and Muse checks with Josh before it buys. The app polls the request and says when Enter was
+pressed (or that the PC is locked, or that Claude wasn't in front). If the phone can't reach the
+listener directly, it offers *Send through the Nexus app* (`plantbook.html` on the remote's own
+address), and *Share it* sends the same text anywhere. The connection comes from the QR code that
+`Connect Plant Book.cmd` in the Nexus Kit shows; it's kept on the phone (`pb:nexus`) and never goes
+into a backup file. What was asked, and when, is in `pb:asks`.
 
 **Links into the app**: `#seat-S9R` opens that seat (S salad or F fruiting, row, column); `#p-borage`
 opens a plant page; `#pick` the picking round; `#doctor` the Plant Doctor; `#forbidden` the Forbidden

@@ -5,7 +5,7 @@
   const $ = id => document.getElementById(id);
   const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const APP_VERSION = P.version;
-  const NEWS = 'Every plant now says how it gives: keeps giving, for a while, or one harvest, with your rule at the top of the Ideas tab. The cucumbers stay, and the one bean’s seat is yours to pick. From earlier today: one-tap backups with photos, a harvest log that says when fruit should ripen, harvest against the power bill, a picture of tonight to send, and a seed box.'; // shown once to returning users
+  const NEWS = 'New tonight: Ask Muse. Every plant’s page can ask Muse to buy its seeds (live plants for the chocolate mint and the Albion strawberries), and the seed box can ask for its whole To buy list. Claude, on shadowfax, passes the request to Muse, and Muse checks with you before it pays. To connect, double-click Connect Plant Book in the Nexus Kit folder on the PC and scan the code with your Fold.'; // shown once to returning users
 
   /* ----- Storage (this phone only) ----- */
   const store = {
@@ -13,7 +13,7 @@
     set(k, v) { try { localStorage.setItem('pb:' + k, JSON.stringify(v)); } catch (e) { /* storage off: the page still works */ } if (TRACKED.has(k)) touched(); },
     raw(k, v) { try { if (v == null) localStorage.removeItem('pb:' + k); else localStorage.setItem('pb:' + k, JSON.stringify(v)); } catch (e) {} }
   };
-  const KEYS = ['done', 'care', 'camp', 'notes', 'trail', 'ui', 'seenVersion', 'installLater', 'bowl', 'bowls', 'mgsel', 'pick', 'verdict', 'scout', 'ate', 'foot', 'podseats', 'prints', 'printer', 'fgame', 'harv', 'hamt', 'flow', 'hprice', 'seeds'];
+  const KEYS = ['done', 'care', 'camp', 'notes', 'trail', 'ui', 'seenVersion', 'installLater', 'bowl', 'bowls', 'mgsel', 'pick', 'verdict', 'scout', 'ate', 'foot', 'podseats', 'prints', 'printer', 'fgame', 'harv', 'hamt', 'flow', 'hprice', 'seeds', 'asks'];
   /* What counts as something worth backing up: everything but view settings and the game score. */
   const TRACKED = new Set(KEYS.filter(k => !['ui', 'seenVersion', 'installLater', 'bowl', 'mgsel', 'fgame'].includes(k)));
   function touched() { const d = store.get('dirty', null) || { n: 0, since: todayISO() }; d.n++; store.raw('dirty', d); }
@@ -1197,6 +1197,7 @@
   function hideSheet(fromPop) {
     const s = $('sheet'), b = $('sheetBack');
     s.classList.remove('show'); b.classList.remove('show'); SHEET = null;
+    if (MU.open && MU.open !== 'box') { MU.open = null; MU.busy = false; }
     setTimeout(() => { if (!SHEET) { s.hidden = true; b.hidden = true; $('sheetIn').innerHTML = ''; phFree(); } }, 230);
     $('lightbox').hidden = true;
     if (!fromPop && history.state && history.state.sheet) { try { history.back(); } catch (e) {} }
@@ -1214,7 +1215,7 @@
   }
 
   /* ----- Toast ----- */
-  let toastT; function toast(msg) { const t = $('toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('show'), 2000); }
+  let toastT; function toast(msg, ms) { const t = $('toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('show'), ms || 2000); }
 
   /* ----- Views ----- */
   const VIEWS = ['towers', 'plants', 'salad', 'care', 'ideas', 'diy', 'forbidden'];
@@ -1609,7 +1610,8 @@
     if (hasCubes(pid)) h += '<div class="sb-row"><span><b>' + esc(/^y/.test(w[1]) ? w[1] : w[1].replace(/^./, x => x.toUpperCase())) + '</b><span class="small">' + (c && c.n > 1 ? 'on hand' : c && c.n === 1 ? 'the last one' : 'none on hand') + '</span></span>' + stepper('cube', pid, c ? c.n : 0, '', w[1] + ' on hand') + '</div>';
     packs.forEach(s => { h += '<div class="sb-row"><span><b>Seed packet</b><span class="small">' + esc([s.src, s.yr ? 'packed for ' + s.yr : ''].filter(Boolean).join(', ') || 'no details') + (seedOld(s) ? ' · <span class="nudge">getting old</span>' : '') + '</span></span><span class="btnrow"><span class="seg sm" role="group" aria-label="How much is left">' + [['ok', 'Plenty'], ['low', 'Low'], ['out', 'Out']].map(([k, l]) => '<button data-act="packSt" data-id="' + s.id + '" data-st="' + k + '" aria-pressed="' + (s.st === k) + '">' + l + '</button>').join('') + '</span><button class="btn small ghost" data-act="packDel" data-id="' + s.id + '">Remove</button></span></div>'; });
     h += '</div><div class="sb-add stack calc" id="packForm" hidden><div class="fields"><label for="pkSrc">From<input id="pkSrc" type="text" maxlength="40" placeholder="Baker Creek, saved seed, a friend" autocomplete="off"></label><label for="pkYr">Packed for<input id="pkYr" type="number" min="1990" max="2100" step="1" inputmode="numeric" value="' + todayISO().slice(0, 4) + '"></label></div><div class="btnrow"><button class="btn small primary" data-act="packAdd" data-pid="' + pid + '">Add the packet</button><button class="btn small ghost" data-act="packCancel">Cancel</button></div></div>';
-    h += '<div class="btnrow"><button class="btn small ghost" data-act="packOpen">Add a seed packet</button></div>';
+    h += '<div class="btnrow">' + (MU.open === pid ? '' : museBtn(pid)) + '<button class="btn small ghost" data-act="packOpen">Add a seed packet</button></div>';
+    if (MU.open === pid) h += musePanel(); else h += askNote(pid);
     if (KEEP[pid]) h += '<p class="small muted" style="margin:0">' + esc(KEEP[pid].say) + '</p>';
     return h + '</div>';
   }
@@ -1626,7 +1628,11 @@
     $('seedCount').textContent = pids.length ? pids.length + ' on hand' : '';
     const row = (pid, subHTML) => '<button class="prow" data-open="plant" data-pid="' + pid + '" data-seeds="1"><span class="gwrap">' + plantGlyph(P.plants[pid]) + '</span><span style="min-width:0"><span class="nm">' + esc(P.plants[pid].name) + '</span><span class="wh" style="display:block">' + subHTML + '</span></span></button>';
     let h = pids.length ? '<div class="stack">' + pids.map(pid => row(pid, seedsOf(pid).filter(s => !seedOut(s)).map(seedLine).join(' · '))).join('') + '</div>' : '<p class="small" style="margin:0">Nothing logged yet. Every plant’s page has a seed box: yCubes and seed pads by count, packets with where they came from and the year.</p>';
-    if (buy.length) h += '<div class="sb-buy"><h4>To buy</h4><div class="stack">' + buy.map(([pid, why]) => row(pid, why === 'on your shortlist' ? esc(why) : '<span class="nudge">' + esc(why) + '</span>')).join('') + '</div><div class="btnrow"><button class="btn small" data-act="seedShare">Share the list</button></div></div>';
+    if (buy.length) {
+      const more = buy.length > BUYX.maxItems ? 'Muse gets the first ' + BUYX.maxItems + ' of these; ask for the rest after.' : '';
+      h += '<div class="sb-buy"><h4>To buy</h4><div class="stack">' + buy.map(([pid, why]) => { const a = lastAsk(pid); return row(pid, (why === 'on your shortlist' ? esc(why) : '<span class="nudge">' + esc(why) + '</span>') + (a ? ' · ' + esc(askWord(a)) : '')); }).join('') + '</div>' +
+        (MU.open === 'box' ? musePanel(more) : '<div class="btnrow"><button class="btn small" data-act="museBox">Ask Muse for these</button><button class="btn small ghost" data-act="seedShare">Share the list</button></div>') + '</div>';
+    }
     const opts = Object.keys(P.plants).filter(id => ['tower', 'micro', 'idea', 'dome', 'planned'].includes(P.plants[id].status)).sort((a, b) => P.plants[a].name.localeCompare(P.plants[b].name));
     h += '<label class="last sb-pick">Add seeds for <select id="sbPick"><option value="">a plant…</option>' + opts.map(id => '<option value="' + id + '">' + esc(P.plants[id].name) + '</option>').join('') + '</select></label>';
     el.innerHTML = h;
@@ -1639,11 +1645,145 @@
   }
   function seedsChanged() { refreshSheet(); if (!$('view-ideas').hidden) renderSeedBox(); }
 
+  /* ----- Ask Muse: seed bought by Muse (Meta's agent), handed over by Claude on shadowfax -----
+     The Plant Book writes the request; the phone remote listener on shadowfax opens Claude with it;
+     Claude passes it to Muse at muse.ai; Muse checks with Josh before it pays. No yCubes: Josh is
+     moving to printed pods. The connection ({ u, k, pc }) comes from the Connect Plant Book QR code
+     and is kept out of backup files. */
+  const BUYX = P.buy;
+  let NEXUS = store.get('nexus', null);
+  let ASKS = store.get('asks', []);
+  const MU = { open: null, items: [], note: '', busy: false, msg: '', kind: '', fallback: false, done: false, poll: 0 };
+  const buyKind = pid => BUYX.live[pid] ? 'live' : P.plants[pid].status === 'micro' ? 'micro' : 'seed';
+  const buyRule = pid => { const k = buyKind(pid); return k === 'live' ? BUYX.live[pid] : BUYX[k]; };
+  const buyUnit = (pid, n) => { const u = buyRule(pid).unit; return plural(n, u[0], u[1]); };
+  const askLabel = pid => buyKind(pid) === 'live' ? 'Ask Muse to buy plants' : 'Ask Muse to buy seeds';
+  const lastSrc = pid => { const ps = SEEDS.filter(s => s.p === pid && s.kind === 'pack' && s.src); return ps.length ? ps[ps.length - 1].src : ''; };
+  const lastAsk = pid => { for (let i = ASKS.length - 1; i >= 0; i--) if ((ASKS[i].items || []).some(x => x.p === pid)) return ASKS[i]; return null; };
+  const askWord = a => (a.via === 'share' ? 'shared with Muse ' : 'asked Muse ') + fmtDate(a.d);
+  const clockNow = () => new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+  const pcName = () => (NEXUS && NEXUS.pc ? NEXUS.pc : 'shadowfax').toLowerCase();
+  const muLive = () => MU.items.filter(i => i.n > 0);
+  /* What Muse reads, in Josh's voice. Straight apostrophes: it travels in a link with a length limit. */
+  function museText(items, note) {
+    const live = items.some(i => buyKind(i.p) === 'live');
+    const line = i => { const pl = P.plants[i.p], s = lastSrc(i.p); return pl.name + ' (' + pl.latin + '), ' + buyUnit(i.p, i.n) + (s ? ', from ' + s + ' last time' : ''); };
+    const kind = live ? '' : 'seeds ';
+    const head = items.length === 1 ? 'Please buy ' + kind + 'for me: ' + line(items[0]) + '.' : 'Please buy these ' + kind + 'for me, from one seller if you can: ' + items.map(line).join('; ') + '.';
+    const n = String(note || '').replace(/\s+/g, ' ').trim();
+    return [head, "They're for my indoor hydroponic towers (Gardyn). Get the exact variety named; ask me before swapping.", n ? 'Note: ' + n.replace(/([^.!?])$/, '$1.') : '', 'Ship to my usual address. Before you pay, show me the seller, price and shipping, and wait for my OK. Thanks!'].filter(Boolean).join(' ');
+  }
+  function museOpen(where, pids) {
+    clearTimeout(MU.poll);
+    Object.assign(MU, { open: where, items: pids.slice(0, BUYX.maxItems).map(p => ({ p, n: buyRule(p).n })), note: '', busy: false, msg: '', kind: '', fallback: false, done: false });
+  }
+  function museRefresh() { if (!$('view-ideas').hidden) renderSeedBox(); if (SHEET && SHEET.kind === 'plant') refreshSheet(); }
+  function museBtn(pid) { return '<button class="btn small" data-act="museOpen" data-pid="' + pid + '">' + askLabel(pid) + '</button>'; }
+  function askNote(pid) { const a = lastAsk(pid); return a ? '<p class="small muted" style="margin:0">' + esc(askWord(a).replace(/^./, c => c.toUpperCase())) + '.</p>' : ''; }
+  function musePanel(extra) {
+    const site = isSite(), conn = !!NEXUS && site, live = MU.items.some(i => buyKind(i.p) === 'live'), seeds = MU.items.some(i => buyKind(i.p) !== 'live');
+    let h = '<div class="muse" id="musePanel"><div class="mu-h"><b>' + (live && !seeds ? 'Ask Muse to buy plants' : 'Ask Muse to buy seeds') + '</b><span class="small">Claude, on ' + esc(pcName()) + ', passes it to Muse. Muse checks with you before it pays.</span></div>';
+    h += '<div class="list sb">' + MU.items.map(i => '<div class="sb-row"><span><b>' + esc(P.plants[i.p].name) + '</b><span class="small">' + esc(buyRule(i.p).unit[1]) + '</span></span>' + (MU.done ? '<span class="num mu-n">' + i.n + '</span>' : stepper('mu', i.p, i.n, '', buyRule(i.p).unit[1])) + '</div>').join('') + '</div>';
+    MU.items.forEach(i => { const L = BUYX.live[i.p]; if (L && L.why) h += '<p class="small" style="margin:0">' + esc(L.why) + '</p>'; });
+    if (extra) h += '<p class="small muted" style="margin:0">' + esc(extra) + '</p>';
+    if (!MU.done) h += '<label class="mu-note" for="muNote"><span>A note for Muse <span class="muted">(optional)</span></span><input id="muNote" type="text" maxlength="100" placeholder="Organic if they have it" autocomplete="off" value="' + esc(MU.note) + '"></label>';
+    const items = muLive();
+    h += '<details class="mu-msg"><summary>What Muse will read</summary><p class="small" id="muText">' + esc(items.length ? museText(items, MU.note) : 'Nothing yet: every count is zero.') + '</p></details>';
+    if (MU.msg) h += '<p class="mu-st' + (MU.kind ? ' ' + MU.kind : '') + '" role="status">' + esc(MU.msg) + '</p>';
+    h += '<div class="btnrow">';
+    if (MU.done) h += '<button class="btn small primary" data-act="museDone">Done</button>';
+    else {
+      if (conn) h += '<button class="btn small primary" data-act="museSend"' + (MU.busy || !items.length ? ' disabled' : '') + '>' + (MU.busy ? 'Sending…' : 'Send to Claude') + '</button>';
+      if (conn && MU.fallback) h += '<button class="btn small" data-act="museNexus">Send through the Nexus app</button>';
+      h += '<button class="btn small' + (conn ? ' ghost' : '') + '" data-act="museShare"' + (items.length ? '' : ' disabled') + '>' + (site ? (conn ? 'Share it instead' : 'Share it') : 'Copy it') + '</button><button class="btn small ghost" data-act="museCancel">Cancel</button>';
+    }
+    h += '</div>';
+    if (!site) h += '<p class="small muted mu-foot">Sending it through Claude works in the Plant Book on your phone. Here, copy it and paste it into Muse.</p>';
+    else if (!NEXUS) h += '<p class="small muted mu-foot">To send it through Claude, connect once: on shadowfax, double-click <b>Connect Plant Book</b> in the Nexus Kit folder and scan the code with your Fold. Until then, share it to the Muse app or WhatsApp.</p>';
+    else if (!MU.done) h += '<p class="small muted mu-foot">Connected to ' + esc(pcName()) + ' since ' + esc(fmtDate(NEXUS.at)) + ' · <button class="linkish" data-act="nexusForget">Disconnect</button></p>';
+    return h + '</div>';
+  }
+  async function nexusCall(method, path, body) {
+    const c = NEXUS; if (!c) throw new Error('not connected');
+    const ctl = new AbortController(), tm = setTimeout(() => ctl.abort(), 9000);
+    try {
+      const headers = { 'X-Nexus-Key': c.k }; if (body) headers['Content-Type'] = 'application/json';
+      const res = await fetch(c.u + path, { method, headers, body: body ? JSON.stringify(body) : undefined, cache: 'no-store', credentials: 'omit', signal: ctl.signal });
+      let data = {}; try { data = await res.json(); } catch (e) { data = {}; }
+      return { status: res.status, data: data || {} };
+    } finally { clearTimeout(tm); }
+  }
+  function logAsk(items, via) { ASKS.push({ d: todayISO(), at: Date.now(), items: items.map(i => ({ p: i.p, n: i.n })), note: String(MU.note || '').slice(0, 100), via }); ASKS = ASKS.slice(-60); store.set('asks', ASKS); }
+  const muWhat = items => listWords(items.map(i => P.plants[i.p].name)).slice(0, 150);
+  async function museSend() {
+    const items = muLive(); if (MU.busy || !items.length || !NEXUS) return;
+    MU.busy = true; MU.msg = 'Sending to ' + pcName() + '…'; MU.kind = ''; MU.fallback = false; museRefresh();
+    let r = null;
+    try { r = await nexusCall('POST', 'api/plantbook/ask', { text: museText(items, MU.note), what: muWhat(items), items: items.map(i => ({ p: i.p, n: i.n, k: buyKind(i.p) })), v: APP_VERSION }); } catch (e) { r = null; }
+    MU.busy = false;
+    if (!r) { MU.msg = 'Couldn’t reach ' + pcName() + ' from here. If Tailscale is on (on this phone) and the PC is awake, send it through the Nexus app instead, or share it.'; MU.kind = 'err'; MU.fallback = true; museRefresh(); return; }
+    if (r.status === 401) { MU.msg = pcName().replace(/^./, c => c.toUpperCase()) + ' didn’t take this phone’s key (it may have been replaced). Connect again: double-click Connect Plant Book on the PC and scan the code.'; MU.kind = 'err'; museRefresh(); return; }
+    if (r.status !== 200 || !r.data.ok) { MU.msg = r.data.error || pcName().replace(/^./, c => c.toUpperCase()) + ' answered, but didn’t take the request.'; MU.kind = 'err'; MU.fallback = r.status >= 500; museRefresh(); return; }
+    if (!r.data.skipped) logAsk(items, 'claude');
+    MU.done = true; MU.kind = r.data.warning ? 'warn' : 'ok';
+    MU.msg = [r.data.skipped ? 'That request went to Claude a moment ago.' : 'Sent at ' + clockNow() + '. Claude is opening on ' + pcName() + ' to pass it to Muse.', r.data.warning || ''].filter(Boolean).join(' ');
+    museRefresh(); toast('Sent to ' + pcName() + '.');
+    if (r.data.id) musePoll(r.data.id);
+  }
+  function musePoll(id) {
+    clearTimeout(MU.poll); const open = MU.open; let tries = 0, gone = 0;
+    const tick = async () => {
+      tries++; let r = null;
+      try { r = await nexusCall('GET', 'api/plantbook/ask?id=' + encodeURIComponent(id)); } catch (e) { r = null; }
+      if (r && r.status === 404 && ++gone >= 3) return;
+      const st = r && r.status === 200 && r.data ? r.data.state : '';
+      const fin = { sent: 'ok', 'needs-enter': 'warn', locked: 'warn', typed: 'warn', failed: 'err' }[st];
+      if (fin) {
+        if (MU.open === open && MU.done) { MU.msg = r.data.detail || MU.msg; MU.kind = fin; museRefresh(); }
+        toast(st === 'sent' ? 'Claude has your request.' : st === 'failed' ? pcName().replace(/^./, c => c.toUpperCase()) + ' couldn’t open Claude.' : 'Claude is waiting for Enter on ' + pcName() + '.', 3200);
+        return;
+      }
+      if (tries < 25) MU.poll = setTimeout(tick, 2000);
+    };
+    MU.poll = setTimeout(tick, 2000);
+  }
+  const b64url = s => { const by = new TextEncoder().encode(s); let bin = ''; by.forEach(b => { bin += String.fromCharCode(b); }); return btoa(bin).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, ''); };
+  const unb64url = s => { const b = s.replace(/-/g, '+').replace(/_/g, '/'), bin = atob(b + '==='.slice((b.length + 3) % 4)); return new TextDecoder().decode(Uint8Array.from(bin, x => x.charCodeAt(0))); };
+  function museNexus() {
+    const items = muLive(); if (!items.length || !NEXUS) return;
+    const pay = { text: museText(items, MU.note), what: muWhat(items), items: items.map(i => ({ p: i.p, n: i.n })), k: NEXUS.k, b: MU.open === 'box' ? '#ideas' : '#p-' + MU.open };
+    logAsk(items, 'nexus');
+    location.href = NEXUS.u + 'plantbook.html#ask=' + b64url(JSON.stringify(pay));
+  }
+  function museShare() {
+    const items = muLive(); if (!items.length) return;
+    const text = museText(items, MU.note), copied = () => toast('Copied. Paste it into Muse.', 3000);
+    if (isSite() && navigator.share) navigator.share({ title: 'For Muse', text }).then(() => { logAsk(items, 'share'); MU.done = true; MU.kind = 'ok'; MU.msg = 'Shared. Muse takes it from there, and checks with you before it pays.'; museRefresh(); }).catch(e => { if (!e || e.name !== 'AbortError') copyText(text, copied, () => toast(text)); });
+    else copyText(text, copied, () => toast('Couldn’t copy it here.'));
+  }
+  /* The Connect Plant Book QR code opens the app with #nexus=<this PC's Tailscale address and phone key>. */
+  function nexusFromHash() {
+    const m = /(?:^#|&)nexus=([A-Za-z0-9_-]+)/.exec(location.hash || ''); if (!m) return false;
+    let c = null; try { c = JSON.parse(unb64url(m[1])); } catch (e) { c = null; }
+    try { history.replaceState(null, '', location.pathname + location.search); } catch (e) {}
+    const local = /^(127\.0\.0\.1|localhost)$/.test(location.hostname);
+    const okUrl = c && typeof c.u === 'string' && (/^https:\/\/[a-z0-9-]+(\.[a-z0-9-]+)*\.ts\.net\/$/i.test(c.u) || (local && /^http:\/\/(127\.0\.0\.1|localhost):\d+\/$/.test(c.u)));
+    if (!okUrl || !/^[0-9a-f]{32,128}$/i.test(String(c.k || ''))) { toast('That connect code didn’t look right. Run Connect Plant Book on the PC again.', 4000); return true; }
+    NEXUS = { u: c.u, k: String(c.k).toLowerCase(), pc: String(c.pc || 'shadowfax').slice(0, 40), at: todayISO() };
+    store.raw('nexus', NEXUS);
+    nexusCall('GET', 'api/plantbook/ping')
+      .then(r => toast(r.status === 200 && r.data.keyOk ? 'Connected to ' + pcName() + '. Ask Muse can reach it now.' : 'Saved, but ' + pcName() + ' didn’t accept the key yet. Run Connect Plant Book again.', 4500))
+      .catch(() => toast('Saved. ' + pcName().replace(/^./, x => x.toUpperCase()) + ' didn’t answer yet; check that Tailscale is on.', 4500));
+    if (SHEET && SHEET.kind === 'plant') refreshSheet();
+    return true;
+  }
+
   /* ----- Wire up ----- */
   function openPod(podId) { const pod = POD[podId]; plantSheet(pod.p, podId); }
   function init() {
     if (!LASTBK && hasData()) { const d = store.get('dirty', null), e = earliestDate(); if (!d || e < d.since) store.raw('dirty', { n: (d && d.n) || 1, since: e }); }
     renderDate(); setupBoxes(); renderNews(); askPersist();
+    nexusFromHash();
     const start = (location.hash || '').slice(1);
     showView(VIEWS.includes(start) ? start : 'towers');
     if (/^p-/.test(start) && P.plants[start.slice(2)]) { showView('plants'); plantSheet(start.slice(2)); }
@@ -1651,7 +1791,7 @@
     if (start === 'pick') { showView('towers'); pickSheet(); }
     if (start === 'doctor') showView('care', 'doctorSec');
     setupWorker();
-    window.addEventListener('hashchange', () => { const h = location.hash.slice(1); if (VIEWS.includes(h)) { if (sheetOpen()) hideSheet(true); showView(h); } else if (h === 'pick') { if (sheetOpen()) hideSheet(true); showView('towers'); pickSheet(); } else if (h === 'doctor') { if (sheetOpen()) hideSheet(true); showView('care', 'doctorSec'); } else if (/^p-/.test(h) && P.plants[h.slice(2)]) { if (sheetOpen()) hideSheet(true); showView('plants'); plantSheet(h.slice(2)); } else { const sm2 = /^seat-([SF](?:10|[1-9])[LCR])$/.exec(h); if (sm2) { if (sheetOpen()) hideSheet(true); openSeat(sm2[1]); } } });
+    window.addEventListener('hashchange', () => { if (/(?:^#|&)nexus=/.test(location.hash)) { nexusFromHash(); return; } const h = location.hash.slice(1); if (VIEWS.includes(h)) { if (sheetOpen()) hideSheet(true); showView(h); } else if (h === 'pick') { if (sheetOpen()) hideSheet(true); showView('towers'); pickSheet(); } else if (h === 'doctor') { if (sheetOpen()) hideSheet(true); showView('care', 'doctorSec'); } else if (/^p-/.test(h) && P.plants[h.slice(2)]) { if (sheetOpen()) hideSheet(true); showView('plants'); plantSheet(h.slice(2)); } else { const sm2 = /^seat-([SF](?:10|[1-9])[LCR])$/.exec(h); if (sm2) { if (sheetOpen()) hideSheet(true); openSeat(sm2[1]); } } });
     window.addEventListener('popstate', () => { if (sheetOpen()) hideSheet(true); });
     document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => { if (sheetOpen()) hideSheet(); showView(t.dataset.view); }));
     $('sheetBack').addEventListener('click', () => hideSheet());
@@ -1659,6 +1799,7 @@
     document.addEventListener('keydown', e => { if (e.key === 'Escape') { if (!$('lightbox').hidden) { $('lightbox').hidden = true; return; } if (sheetOpen()) hideSheet(); } });
     $('lightbox').addEventListener('click', e => { if (e.target === $('lightbox')) $('lightbox').hidden = true; });
     $('q').addEventListener('input', renderPlants);
+    document.addEventListener('input', e => { if (e.target && e.target.id === 'muNote') { MU.note = e.target.value.slice(0, 100); const p = $('muText'), items = muLive(); if (p) p.textContent = items.length ? museText(items, MU.note) : 'Nothing yet: every count is zero.'; } });
     let rz; window.addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(() => { if (!$('view-diy').hidden) renderTrail(); }, 150); });
     document.addEventListener('change', e => {
       const rs = e.target.closest && e.target.closest('input[data-restore]');
@@ -1729,6 +1870,14 @@
       else if (act === 'packSt') { const s = SEEDS.find(x => x.id === a.dataset.id); if (s) { s.st = a.dataset.st; saveSeeds(); seedsChanged(); } }
       else if (act === 'packDel') { if (!a.dataset.armed) { a.dataset.armed = '1'; a.textContent = 'Tap again'; return; } SEEDS = SEEDS.filter(x => x.id !== a.dataset.id); saveSeeds(); seedsChanged(); }
       else if (act === 'seedShare') seedShare();
+      else if (act === 'museOpen') { museOpen(a.dataset.pid, [a.dataset.pid]); refreshSheet(); setTimeout(() => { const m = $('musePanel'); if (m && SHEET) $('sheet').scrollTop = Math.max(0, m.offsetTop - 60); }, 30); }
+      else if (act === 'museBox') { museOpen('box', seedBuyList().map(b => b[0])); renderSeedBox(); }
+      else if (act === 'muAdd' || act === 'muDel') { const it = MU.items.find(x => x.p === a.dataset.pid); if (it && !MU.done && !MU.busy) { it.n = Math.max(0, Math.min(50, it.n + (act === 'muAdd' ? 1 : -1))); museRefresh(); } }
+      else if (act === 'museSend') museSend();
+      else if (act === 'museNexus') museNexus();
+      else if (act === 'museShare') museShare();
+      else if (act === 'museCancel' || act === 'museDone') { MU.open = null; MU.busy = false; museRefresh(); }
+      else if (act === 'nexusForget') { if (!a.dataset.armed) { a.dataset.armed = '1'; a.textContent = 'Tap again to disconnect'; return; } NEXUS = null; store.raw('nexus', null); museRefresh(); toast('Disconnected from shadowfax.'); }
       else if (act === 'scoutStar') { const id = a.dataset.pid; if (SCOUT[id]) delete SCOUT[id]; else SCOUT[id] = todayISO(); store.set('scout', SCOUT); if (!$('view-ideas').hidden) renderIdeas(); if (SHEET) refreshSheet(); toast(SCOUT[id] ? 'On the shortlist.' : 'Off the shortlist.'); }
       else if (act === 'doctor') doctorSheet(a.dataset.id);
       else if (act === 'photoOpen') openLight(+a.dataset.id, a.dataset.src, a.dataset.d);
