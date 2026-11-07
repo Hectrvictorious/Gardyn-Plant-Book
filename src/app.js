@@ -5,7 +5,7 @@
   const $ = id => document.getElementById(id);
   const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const APP_VERSION = P.version;
-  const NEWS = 'New tonight: Ask Muse. Every plant’s page can ask Muse to buy its seeds (live plants for the chocolate mint and the Albion strawberries), and the seed box can ask for its whole To buy list. Claude, on shadowfax, passes the request to Muse, and Muse checks with you before it pays. To connect, double-click Connect Plant Book in the Nexus Kit folder on the PC and scan the code with your Fold.'; // shown once to returning users
+  const NEWS = 'Eleven new ideas from outside Gardyn’s catalog, each checked against Gardyn’s own plant list, Maine’s banned-plant list and the cat: minutina, Vietnamese coriander, Catalogna chicory, spigarello, Magenta and Rex lettuce, Lemon Gem marigold, African blue basil, spilanthes, land cress and the Mascotte bean. Find them on the Ideas tab under Outside Gardyn, and Ask Muse can buy any of them.'; // shown once to returning users
 
   /* ----- Storage (this phone only) ----- */
   const store = {
@@ -599,7 +599,7 @@
     return '<div class="idea' + (on ? ' starred' : '') + '"><button class="idea-main" data-open="plant" data-pid="' + id + '"><span class="gwrap">' + plantGlyph(pl) + '</span><span style="min-width:0"><h4>' + esc(pl.name) + (pl.notGardyn ? ' <span class="og">outside Gardyn</span>' : '') + '</h4>' +
       (fv ? '<span class="fw">' + esc(fv.flavor.join(', ')) + (fv.texture && fv.texture[0] ? ' · ' + esc(fv.texture[0]) : '') + '</span>' : '') + '<p>' + esc(pl.why || '') + '</p><span class="chips">' +
       (() => { const gv = givesOf(id); return gv ? '<span class="chip gv-' + gv.k + '">' + HV.givesWord[gv.k] + '</span>' : ''; })() + (g.zone ? '<span class="chip z-' + g.zone + '">' + ZONE[g.zone] + '</span>' : '') + (/\d/.test(g.mature || '') ? '<span class="chip">' + esc(g.mature) + ' days</span>' : '') + (g.size && g.size !== '—' ? '<span class="chip">' + esc(g.size) + '</span>' : '') +
-      (pet ? '<span class="chip ' + (pet.toxic ? 'wait' : 'ok') + '">' + (pet.toxic ? 'cat: careful' : 'cat-safe') + '</span>' : '') + '</span></span></button>' +
+      (pet ? '<span class="chip' + (pet.toxic ? ' wait' : pet.unlisted ? '' : ' ok') + '">' + (pet.toxic ? 'cat: careful' : pet.unlisted ? 'cat: not listed' : 'cat-safe') + '</span>' : '') + '</span></span></button>' +
       '<button class="star" data-act="scoutStar" data-pid="' + id + '" aria-pressed="' + on + '" aria-label="' + (on ? 'Take ' + esc(pl.name) + ' off the shortlist' : 'Add ' + esc(pl.name) + ' to the shortlist') + '">' + (on ? '★' : '☆') + '</button></div>';
   }
   function renderIdeas() {
@@ -1667,7 +1667,7 @@
   /* What Muse reads, in Josh's voice. Straight apostrophes: it travels in a link with a length limit. */
   function museText(items, note) {
     const live = items.some(i => buyKind(i.p) === 'live');
-    const line = i => { const pl = P.plants[i.p], s = lastSrc(i.p); return pl.name + ' (' + pl.latin + '), ' + buyUnit(i.p, i.n) + (s ? ', from ' + s + ' last time' : ''); };
+    const line = i => { const pl = P.plants[i.p], s = lastSrc(i.p); return pl.name + ' (' + pl.latin + '), ' + buyUnit(i.p, i.n) + (s ? ', from ' + s + ' last time' : BUYX.from && BUYX.from[i.p] ? ', from ' + BUYX.from[i.p] + ' if they have it' : ''); };
     const kind = live ? '' : 'seeds ';
     const head = items.length === 1 ? 'Please buy ' + kind + 'for me: ' + line(items[0]) + '.' : 'Please buy these ' + kind + 'for me, from one seller if you can: ' + items.map(line).join('; ') + '.';
     const n = String(note || '').replace(/\s+/g, ' ').trim();

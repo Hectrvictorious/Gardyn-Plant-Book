@@ -4,7 +4,7 @@
    (Help Center plant articles); seats and notes come from Josh's maps v4/v5 (salad) and v8/v9 (fruiting).
    Slot codes: tower letter + row + column, e.g. S3L = salad tower, row 3, left; F10C = fruiting, row 10, center. */
 window.PB = {
-version: '2026.11.06d',
+version: '2026.11.07a',
 
 /* ---------- The book ---------- */
 groups: { greens: 'Leafy green', herbs: 'Herb', flowers: 'Edible flower', fruit: 'Fruiting plant' },
@@ -661,8 +661,13 @@ why: [
 buy: {
   live: {
     'chocolate-mint': { unit: ['live plant', 'live plants'], n: 1, why: `Chocolate mint doesn’t come true from seed, so this asks for a live plant.` },
-    'strawberry': { unit: ['bare-root plant', 'bare-root plants'], n: 10, why: `Albion is grown from bare-root crowns; seed won’t give you Albion. Sellers often pack them in 10s or 25s.` }
+    'strawberry': { unit: ['bare-root plant', 'bare-root plants'], n: 10, why: `Albion is grown from bare-root crowns; seed won’t give you Albion. Sellers often pack them in 10s or 25s.` },
+    'vietnamese-coriander': { unit: ['live plant', 'live plants'], n: 1, why: `Vietnamese coriander is grown from cuttings, so this asks for a live plant. Once you have one, a cutting roots in days.` },
+    'african-blue-basil': { unit: ['live plant', 'live plants'], n: 1, why: `African blue basil is sterile and makes no seed, so this asks for a live plant.` }
   },
+  /* Where to look first when the seed box has no packet on record (Muse can't shop Amazon). */
+  from: { minutina: 'Kitchen Garden Seeds', catalogna: 'Johnny’s Selected Seeds', 'magenta-lettuce': 'Johnny’s Selected Seeds', 'rex-lettuce': 'Johnny’s Selected Seeds',
+    'signet-marigold': 'Fedco Seeds', spilanthes: 'Fedco Seeds', spigarello: 'Restoration Seeds', 'mascotte-bean': 'True Leaf Market', 'vietnamese-coriander': 'The Growers Exchange' },
   micro: { unit: ['small bag of untreated microgreen seed', 'small bags of untreated microgreen seed'], n: 1 },
   seed: { unit: ['packet', 'packets'], n: 1 },
   maxItems: 5,

@@ -38,11 +38,11 @@ P.harvest = {
   /* How long seed keeps at room temperature, by the University of Delaware's 2025 ratings. */
   keep: {
     short: { say: 'Short-lived seed: a year or two at room temperature. Past that, sprout a few on a damp paper towel before trusting a packet.', yrs: 2,
-      ids: ['buttercrunch', 'butterhead', 'romaine', 'green-salanova', 'lollo-rossa', 'flashy-trout-back', 'pink-celery', 'dill', 'tam-jalapeno', 'shishito', 'lemon-pepper', 'italian-parsley', 'bunching-onions'] },
+      ids: ['buttercrunch', 'butterhead', 'romaine', 'green-salanova', 'lollo-rossa', 'flashy-trout-back', 'pink-celery', 'dill', 'tam-jalapeno', 'shishito', 'lemon-pepper', 'italian-parsley', 'bunching-onions', 'magenta-lettuce', 'rex-lettuce'] },
     long: { say: 'Long-lived seed: five years or more, kept cool, dry and dark.', yrs: 5,
       ids: ['bulls-blood', 'perpetual-spinach', 'yellow-cherry-tomato', 'peas', 'lime-basil', 'thai-basil'] },
     mid: { say: 'Seed that keeps a few years, cool, dry and dark.', yrs: 4,
-      ids: ['cucumber', 'green-beans', 'fairytale-eggplant'] }
+      ids: ['cucumber', 'green-beans', 'fairytale-eggplant', 'mascotte-bean'] }
   },
 
   /* How each plant gives. Josh's rule (Nov 6, 2026): grow what keeps giving; one-harvest crops are better
@@ -83,7 +83,10 @@ P.harvest = {
       strawberry: 'Day-neutral: it keeps flowering and fruiting, flush after flush.', 'yellow-mini-strawberry': 'Keeps flowering and fruiting through the year.',
       'yellow-cherry-tomato': 'Keeps setting trusses for months while it’s picked.', 'tam-jalapeno': 'Keeps setting peppers for months; picking pushes more.',
       'lemon-pepper': '', shishito: '', 'banana-pepper': '', 'fairytale-eggplant': '',
-      'ground-cherry': 'Fruits over a long season, dropping each one as it ripens.', cucamelon: 'Fruits all season; a perennial with tuberous roots.'
+      'ground-cherry': 'Fruits over a long season, dropping each one as it ripens.', cucamelon: 'Fruits all season; a perennial with tuberous roots.',
+      'vietnamese-coriander': 'A perennial: cut stems back and it bushes out, and a cutting roots in days.', catalogna: 'A perennial chicory: cut it and it regrows, as long as it stays cool.',
+      spigarello: 'Cut-and-come-again leaves, then little flower shoots.', 'magenta-lettuce': '', 'rex-lettuce': '',
+      'signet-marigold': 'Blooms early and keeps going; a light shearing keeps it at it.', 'african-blue-basil': 'A perennial basil that can’t set seed, so it never stops.'
     },
     while: {
       borage: ['An annual whose flowers come in a run of several weeks, then it’s spent: growers sow it every four weeks to keep flowers coming. The big leaves are bristly and not for salads.', 'the flowers, as a garnish. If you aren’t using them, the seat would do more with something that keeps giving.', 'worth its seat if you use the flowers'],
@@ -92,7 +95,11 @@ P.harvest = {
       arugula: ['A few cuttings, then it bolts.'], chervil: ['Best young; it bolts once it flowers.'], cilantro: ['A few cuttings before it bolts.'],
       'miners-lettuce': ['Regrows up to three times.'], peas: ['Weeks of picking every few days, then it’s done.'], wheatgrass: ['Grows back after a cut, a couple of times.'],
       cornflower: ['An annual: weeks of flowers if you deadhead it.', 'the flowers, as a garnish.'], 'purple-bok-choy': ['Outer leaves for a few weeks before it bolts, or the whole head at once.'],
-      sunflower: ['Deadheading brings more buds for a while.', 'the flowers.']
+      sunflower: ['Deadheading brings more buds for a while.', 'the flowers.'],
+      minutina: ['Regrows after each cut for several harvests; growers sow a little more every few weeks for the best blades.', 'a nutty, salty crunch nothing else on the towers has.'],
+      spilanthes: ['Flowers for months indoors, where frost can’t reach it; a cutting starts the next one.', 'the buzz buttons, as a party trick and a garnish.'],
+      'land-cress': ['Leaves until it flowers; then they turn tough and bitter.'],
+      'mascotte-bean': ['Weeks of picking every few days; sow another every few weeks.']
     },
     once: {
       'mini-broccoli': ['One small head, then a few side shoots. Here it never headed.']

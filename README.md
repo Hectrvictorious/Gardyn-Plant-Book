@@ -23,7 +23,7 @@ Plant Doctor and Care. On iPhone: Share → Add to Home Screen.
   your towers' own timing. *Share tonight's picture* draws the bowl, what was picked and what's
   ready as an image to send.
 - **Plants**: a Gardyn-style page for every plant on the towers, the microgreens, the planned
-  plants, the ideas and the retired ones: a tasting note, "Before you eat it", a cat check (ASPCA),
+  plants, the ideas and the retired ones: a tasting note, "Before you eat it", a cat check (ASPCA: careful, safe, or *not listed* when the ASPCA doesn't rate it either way),
   how it gives (*keeps giving*, *for a while*, *one harvest*, or a microgreen's *quick cut*, and what
   earns a plant that doesn't keep giving its seat),
   taste and texture, pairings, your verdict, growing basics, harvest, care, origin, your notes, a
@@ -36,9 +36,11 @@ Plant Doctor and Care. On iPhone: Share → Add to Home Screen.
   the next steps, a **Plant Doctor** (what you see → what Gardyn says it usually is and what to do),
   and your fixes.
 - **Ideas**: the house rule at the top (grow what keeps giving; one-harvest crops are better bought
-  unless they earn a seat another way, and which plants on the towers are the exceptions); 32 plants
-  to try, 24 of them researched for this round (Gardyn's catalog plus ice plant, oyster leaf and
-  miner's lettuce), with filters (including *Keeps giving*) and a starred shortlist; gear, open
+  unless they earn a seat another way, and which plants on the towers are the exceptions); 43 plants
+  to try: Gardyn's catalog, plus 14 from outside it (ice plant, oyster leaf and miner's lettuce, then
+  on Nov 7 minutina, Vietnamese coriander, Catalogna chicory, spigarello, Magenta and Rex lettuce, Lemon
+  Gem marigold, African blue basil, spilanthes, land cress and the Mascotte bean, each checked against
+  Gardyn's help-center plant list, Maine's Do Not Sell list and the ASPCA), with filters (including *Keeps giving*) and a starred shortlist; gear, open
   questions, the watch list; **the seed box** (what's on hand, and a to-buy list from low packets
   and the shortlist, ready to share or to hand to Muse in one request); and the door to the Forbidden Shelf.
 - **The Forbidden Shelf** (`#forbidden`): 42 plants on six shelves (controlled plants, legal ones

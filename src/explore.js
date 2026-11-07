@@ -243,6 +243,124 @@ S('miners-lettuce', { name: 'Miner’s Lettuce', latin: 'Claytonia perfoliata', 
   src: [['West Coast Seeds: Miner’s Lettuce', 'https://www.westcoastseeds.com/collections/pea-seed-companions/products/miners-lettuce-claytonia'], ['Johnny’s: Claytonia', 'https://www.johnnyseeds.com/vegetables/greens/specialty-greens/claytonia-specialty-green-seed-388.11.html']],
   flav: { flavor: ['sweet', 'mild'], w: { sweet: 1, cool: 2 }, texture: ['succulent'], roles: ['base', 'crunch'], eat: 'Raw.', pairs: ['red-sorrel', 'borage', 'yellow-cherry-tomato'], kitchen: 'Salads and sandwiches.' } });
 
+/* ---------- Outside the catalog, round two (Nov 7, 2026) ----------
+   Checked against Gardyn's own plant list (help center: 52 greens, 26 herbs, 30 fruiting plants, 32 flowers)
+   and Maine's Do Not Sell list. Picked by Josh's rules: keeps giving (or earns a seat as a garnish), salad first,
+   and the cat. Full write-up in the project: "Beyond Gardyn's Catalog". */
+const KGS = 'https://www.kitchengardenseeds.com/';
+S('minutina', { name: 'Minutina', latin: 'Plantago coronopus', group: 'greens', glyph: 'blades', tint: 'leaf', fit: ['salad'], notGardyn: true,
+  gb: { sprout: '2–15', mature: '50', zone: 'medium', size: 'Under 1 ft', care: 'Untested', thin: '1 per pod', note: 'Not in Gardyn’s catalog. Also sold as erba stella or buck’s-horn plantain. Sow a quarter inch deep; it sprouts at 45–70°F.' },
+  about: 'Narrow, serrated, grass-like blades, shaped a little like a skinny mizuna, with a crunchy texture and a mild taste Kitchen Garden Seeds calls “a sweet, complex taste of nuts and salt.” A cold-hardy Italian salad green.',
+  harvest: ['Cut the blades at about 5 inches long; it regrows after cutting.', 'For the best blades, Kitchen Garden Seeds sows a little more every few weeks.'],
+  care: ['Thin to one plant per pod.', 'It takes cool rooms in stride and doesn’t turn bitter in warm ones.'],
+  why: 'Crunch from a green: nutty and a little salty, a texture nothing on the towers has, and it grows back after a cut.',
+  src: [['Kitchen Garden Seeds: Erba Stella Minutina', KGS + 'erba-stella-minutina.html'], ['Wikipedia: Plantago coronopus', 'https://en.wikipedia.org/wiki/Plantago_coronopus']],
+  flav: { flavor: ['nutty', 'salty-sweet'], w: { sweet: 1, earthy: 1, cool: 1 }, texture: ['crunchy', 'blades'], roles: ['crunch', 'base'], eat: 'Raw: young blades whole, or a handful chopped into the bowl.', pairs: ['butterhead', 'yellow-cherry-tomato', 'red-sorrel'], kitchen: 'Salads.' } });
+
+S('vietnamese-coriander', { name: 'Vietnamese Coriander', latin: 'Persicaria odorata', group: 'herbs', glyph: 'mint', tint: 'beet', fit: ['herb', 'salad'], notGardyn: true,
+  gb: { sprout: '3–5 (a cutting roots)', mature: '—', zone: 'medium', size: 'Trails 1–3 ft', care: 'Untested', thin: '1 cutting per pod', note: 'Not in Gardyn’s catalog. Rau răm. Grown from cuttings or a nursery plant; it rarely flowers in cool climates. Legal in Maine: the Do Not Sell list’s one Persicaria is mile-a-minute, a different plant.' },
+  about: 'A short-lived perennial with a hot, peppery, refreshing taste and a coriander aroma (PFAF). It likes its roots wet, even in shallow water, and struggles below about 45°F.',
+  origin: 'Southeast Asia, where it’s rau răm in Vietnam and daun kesum in Malaysia.',
+  harvest: ['Young leaves and tips, raw; older, redder leaves get too peppery.', 'Cut stems back and it bushes out.'],
+  care: ['Root a tip cutting with four to six leaf joints, about 3–4 inches long, in water or a Rapid Rooter: it roots in 3–5 days when warm.', 'Pinch the tips to keep it bushy and inside the light; left alone it trails.', 'Plants in pots stop producing once they outgrow them (The Growers Exchange). A pod on the Column shouldn’t have that problem, but trim the roots at the monthly root check.'],
+  why: 'Cilantro flavor that never bolts. Gardyn’s cilantro gives a few cuttings and quits; this one is a perennial that likes wet roots, which a Column has plenty of.',
+  src: [['PFAF: Persicaria odorata', 'https://pfaf.org/user/Plant.aspx?LatinName=Persicaria+odorata'], ['The Growers Exchange: Vietnamese Coriander (live plant)', 'https://thegrowers-exchange.com/products/her-cor01']],
+  flav: { flavor: ['peppery', 'cilantro-like'], w: { herbal: 2, pepper: 1, cool: 1 }, texture: ['tender'], roles: ['herb'], eat: 'Young leaves raw, torn into the bowl at the end.', pairs: ['cucumber', 'mint', 'romaine'], kitchen: 'Vietnamese chicken salad, summer rolls, laksa.' } });
+
+S('catalogna', { name: 'Catalogna Chicory', latin: 'Cichorium intybus', group: 'greens', glyph: 'frill', tint: 'lime', fit: ['salad'], notGardyn: true,
+  gb: { sprout: '5–12', mature: '60–65', zone: 'medium', size: 'Up to 1 ft', care: 'Untested', thin: '1 per pod', note: 'Not in Gardyn’s catalog: Gardyn sells radicchio and endive, which make one head each. Sold as Italian dandelion; Johnny’s Italiko Red is the red-ribbed sister. Sprouts best at 45–60°F.' },
+  about: 'Long, deeply cut, frilly bright-green leaves on an upright plant up to a foot tall, “pleasantly bitter,” the way Italians like their salad greens (Kitchen Garden Seeds).',
+  harvest: ['Cut the whole plant near the base and it regrows (chicory is a perennial), or pick outer leaves.', 'Pick young for the mildest leaves.'],
+  care: ['Fast growth and steady moisture keep it mild.', 'Heat makes it bolt and turn harsh, so it suits a cool room.'],
+  why: 'The bitter note your bowl doesn’t have yet, to set off sweet tomatoes and cucumbers, from a chicory that regrows after you cut it.',
+  src: [['Kitchen Garden Seeds: Catalogna dandelion greens', KGS + 'dandelion-greens-catalogna.html'], ['Johnny’s: Italiko Red Italian Dandelion', 'https://www.johnnyseeds.com/vegetables/chicory/italian-dandelion/italiko-red-italian-dandelion-seed-3358.html']],
+  flav: { flavor: ['bitter', 'green'], w: { earthy: 2, herbal: 1 }, texture: ['crisp', 'frilly'], roles: ['pepper', 'base'], eat: 'Raw, sliced thin with a lemony dressing, or wilted a minute in olive oil.', pairs: ['yellow-cherry-tomato', 'perpetual-spinach', 'romaine'], kitchen: 'Italian salads, quick sautés, soups.', warn: ['Bitter by design: young leaves are the mildest.'] } });
+
+S('spigarello', { name: 'Spigarello', latin: 'Brassica oleracea', group: 'greens', glyph: 'broccoli', tint: 'sage', fit: ['salad'], notGardyn: true,
+  gb: { sprout: '—', mature: '45–70', zone: 'high', size: 'Up to 2½ ft', care: 'Untested', thin: '1 per pod', note: 'Not in Gardyn’s catalog. Leaf broccoli (Spigariello Liscia). It can reach about 30 inches, so it needs a top pod, a Cap, or steady picking.' },
+  about: 'An Italian heirloom grown for its leaves, the ancestor of broccoli raab. Blue-green leaves with a crisp, tender texture and a full, subtly sweet broccoli flavor, slightly peppery and nutty.',
+  harvest: ['Cut-and-come-again: pick leaves from the bottom up, again and again. The little flower shoots are good too.'],
+  care: ['Pick often to keep it short and inside the light.', 'Cool-season: it takes a chilly room happily.'],
+  why: 'Broccoli flavor without waiting for a head: you eat the leaves, again and again. Your mini broccoli never headed; this one doesn’t have to.',
+  src: [['Specialty Produce: Spigarello', 'https://specialtyproduce.com/produce/Broccoli_Spigarello_4117.php'], ['Friends School Plant Sale: Spigariello Liscia', 'https://friendsschoolplantsale.com/variety/8499'], ['Restoration Seeds: Spigariello Liscia', 'https://restorationseeds.com/products/spigariello-liscia-broccoli']],
+  flav: { flavor: ['broccoli', 'sweet'], w: { sweet: 1, earthy: 1, pepper: 1 }, texture: ['crisp', 'tender'], roles: ['base'], eat: 'Raw, sliced thin into the bowl, or a quick sauté.', pairs: ['yellow-cherry-tomato', 'romaine', 'pink-celery'], kitchen: 'Pasta with garlic and chili, soups, grain bowls.' } });
+
+S('magenta-lettuce', { name: 'Magenta Lettuce', latin: 'Lactuca sativa', group: 'greens', glyph: 'head', tint: 'red', fit: ['salad'], notGardyn: true,
+  gb: { sprout: '—', mature: '—', zone: 'medium', size: 'Under 1 ft', care: 'Untested', thin: '1 per pod', note: 'Not in Gardyn’s catalog, though the type is: Muir is a summer crisp too. Johnny’s Cherokee is the same look in a much darker red.' },
+  about: 'A red summer crisp (Batavian) lettuce from Johnny’s: shiny, slightly puckered, red-tinged leaves around a crispy green heart. Johnny’s tags it slow-bolting and tipburn-resistant, with resistance to downy mildew and lettuce mosaic virus.',
+  harvest: ['Outer leaves, like your other lettuces, or the whole crisp heart at the end.'],
+  care: ['Slow to bolt, so it holds in a warm spot better than most.'],
+  why: 'Muir’s crunch in red: summer crisps are the crunchiest leaf lettuces, and this one shrugs off tipburn.',
+  src: [['Johnny’s: Magenta lettuce', 'https://www.johnnyseeds.com/vegetables/lettuce/summer-crisp-lettuce-batavia/magenta-lettuce-seed-2382.html'], ['Johnny’s: Cherokee lettuce', 'https://www.johnnyseeds.com/vegetables/lettuce/summer-crisp-lettuce-batavia/cherokee-lettuce-seed-2741.html']],
+  flav: { flavor: ['sweet', 'mild'], w: { sweet: 1, cool: 2 }, texture: ['crisp', 'crunchy'], roles: ['base', 'crunch', 'color'], eat: 'Raw.', pairs: ['cucumber', 'yellow-cherry-tomato', 'red-sorrel'], kitchen: 'Salads, wraps.' } });
+
+S('rex-lettuce', { name: 'Rex Lettuce', latin: 'Lactuca sativa', group: 'greens', glyph: 'head', tint: 'lime', fit: ['salad'], notGardyn: true,
+  gb: { sprout: '—', mature: '—', zone: 'medium', size: 'Under 1 ft', care: 'Untested', thin: '1 per pod', note: 'Not in Gardyn’s catalog. Johnny’s sells it pelleted, which makes one-seed-per-pod sowing easy.' },
+  about: 'A green butterhead that Johnny’s calls “the standard for hydroponic growing”: slow to bolt and tolerant of tipburn, the calcium problem that browns leaf edges.',
+  harvest: ['Outer leaves, or the whole head.'],
+  care: ['A good test of a new pod: if Rex sulks, it isn’t the lettuce.'],
+  why: 'The butterhead hydroponic growers rely on. If your butterheads keep bolting, this is the one bred not to.',
+  src: [['Johnny’s: Rex pelleted lettuce', 'https://www.johnnyseeds.com/vegetables/lettuce/butterhead-lettuce-boston/rex-pelleted-lettuce-seed-2967JP.html']],
+  flav: { flavor: ['buttery', 'mild'], w: { sweet: 1, cool: 2 }, texture: ['tender'], roles: ['base'], eat: 'Raw.', pairs: ['cucumber', 'salad-burnet', 'red-sorrel'], kitchen: 'Salads, lettuce cups.' } });
+
+S('signet-marigold', { name: 'Lemon Gem Marigold', latin: 'Tagetes tenuifolia', group: 'flowers', glyph: 'star', tint: 'yellow', fit: ['flower'], notGardyn: true,
+  gb: { sprout: '—', mature: '68', zone: 'high', size: '10–12 in', care: 'Untested', thin: '1 per pod', note: 'Not in Gardyn’s catalog: Gardyn’s marigold is Red Marietta, a French marigold grown for looks. Signet marigolds are the edible kind.' },
+  about: 'A compact, mounded signet marigold with ferny leaves and masses of small lemon-yellow single flowers, edible, with a citrusy fragrance. It blooms early and keeps going (Fedco).',
+  harvest: ['Pick flowers as they open; pull the petals and scatter them.'],
+  care: ['A light shearing now and then keeps it blooming.'],
+  why: 'Citrus-scented confetti for the bowl from a small plant that blooms for months: a garnish that earns its seat.',
+  src: [['Fedco Seeds: Lemon Gem Signet Marigold', 'https://fedcoseeds.com/seeds/lemon-gem-signet-marigold-5243'], ['Gardyn Help: Marietta Marigold', GH(1782849)]],
+  flav: { flavor: ['citrusy'], w: { tang: 1, herbal: 1 }, texture: ['petals'], roles: ['color', 'tang'], eat: 'Petals scattered over the bowl.', pairs: ['butterhead', 'cucumber', 'bulls-blood'], kitchen: 'Salads and garnishes.' } });
+
+S('african-blue-basil', { name: 'African Blue Basil', latin: 'Ocimum kilimandscharicum × basilicum', group: 'herbs', glyph: 'sprig', tint: 'purple', fit: ['herb', 'flower'], notGardyn: true,
+  gb: { sprout: '—', mature: '—', zone: 'high', size: '1–3 ft', care: 'Untested', thin: '1 cutting per pod', note: 'Not in Gardyn’s catalog. A sterile hybrid, so it comes only as a cutting or a nursery plant, never as seed.' },
+  about: 'A cross of camphor basil and ‘Dark Opal’ basil that can’t make seed, so it blooms nonstop and lives on as a perennial. All of it is edible, purple flower spikes included. The flavor is basil with a camphor note (about a fifth of its aroma) that some people don’t care for.',
+  harvest: ['Leaves and flower spikes, any time.'],
+  care: ['No need to pinch it to stop it flowering, as with other basils; trim it to keep it under the light.', 'Root a tip in water to start the next one.'],
+  why: 'A basil that never goes to seed, so it never quits. Taste a leaf before you commit: it’s camphor-tinged, not Genovese.',
+  src: [['UF/IFAS Santa Rosa County: African Blue Basil', 'https://sfyl.ifas.ufl.edu/media/sfylifasufledu/santa-rosa/docs/pdfs/demo-garden/African-Blue-Basil.pdf'], ['Wikipedia: African blue basil', 'https://en.wikipedia.org/wiki/African_blue_basil']],
+  flav: { flavor: ['basil', 'camphor'], w: { herbal: 3, cool: 1 }, texture: ['tender'], roles: ['herb', 'color'], eat: 'A few leaves, or the flower spikes, torn over the bowl.', pairs: ['yellow-cherry-tomato', 'strawberry', 'cucumber'], kitchen: 'Fruit teas and cocktails; with tomatoes.', warn: ['The camphor note is strong: taste first.'] } });
+
+S('spilanthes', { name: 'Spilanthes', latin: 'Acmella oleracea', group: 'flowers', glyph: 'round', tint: 'gold', fit: ['flower', 'fun'], notGardyn: true,
+  gb: { sprout: '—', mature: '—', zone: 'high', size: '1–1½ ft', care: 'Untested', thin: '1 per pod', note: 'Not in Gardyn’s catalog. Buzz buttons, toothache plant. Grown from seed or cuttings; highly frost-tender, which doesn’t matter indoors.' },
+  about: 'Yellow flower buttons with red-orange centers on bronzy leaves. The leaves add a sharp, peppery taste to salads; the flowers make your mouth tingle, water and then go numb for a while (NC State).',
+  harvest: ['Pick buttons as they open, and young leaves any time.'],
+  care: ['Keep it in a warm, bright seat.'],
+  why: 'Buzz buttons: a flower that makes your mouth tingle. Pure fun for guests, and the leaves give a salad some pepper.',
+  src: [['NC State Extension: Acmella oleracea', 'https://plants.ces.ncsu.edu/plants/acmella-oleracea/'], ['Fedco Seeds: Spilanthes', 'https://fedcoseeds.com/seeds/spilanthes-4682']],
+  flav: { flavor: ['peppery', 'tingling'], w: { pepper: 2 }, texture: ['tingling'], roles: ['pepper', 'color'], eat: 'A few leaves in the bowl; a button, sparingly, as a party trick.', pairs: ['cucumber', 'butterhead'], kitchen: 'Salads, cocktails.', warn: ['The flowers numb your mouth for a while: one at a time.'], flag: 'tingles' } });
+
+S('land-cress', { name: 'Land Cress', latin: 'Barbarea verna', group: 'greens', glyph: 'spoon', tint: 'leaf', fit: ['salad'], notGardyn: true,
+  gb: { sprout: '—', mature: '49–56', zone: 'medium', size: 'Under 1 ft', care: 'Untested', thin: '1 per pod', note: 'Not in Gardyn’s catalog (Gardyn sells watercress). Also called upland cress.' },
+  about: 'Looks and tastes very much like watercress, with a stronger pepper (Gardening Know How). Small, somewhat square, slightly toothed leaves.',
+  harvest: ['Start at about 4 inches tall, seven to eight weeks from sowing.', 'Pick leaves and leave the crown: cutting brings more growth.', 'Harvest before it flowers; after that the leaves turn tough and bitter.'],
+  care: ['Likes it cool and evenly moist; heat makes it bolt.'],
+  why: 'Watercress pepper without the watercress: easier, and not on the ASPCA’s toxic list for cats, which watercress is.',
+  src: [['Gardening Know How: Growing upland cress', 'https://www.gardeningknowhow.com/edible/vegetables/cress/growing-upland-cress.htm']],
+  flav: { flavor: ['peppery'], w: { pepper: 2, cool: 1 }, texture: ['tender'], roles: ['pepper'], eat: 'Raw: a handful in the bowl, like watercress.', pairs: ['butterhead', 'yellow-cherry-tomato', 'buttercrunch'], kitchen: 'Salads and sandwiches, or cooked like kale.' } });
+
+S('mascotte-bean', { name: 'Mascotte Bean', latin: 'Phaseolus vulgaris', group: 'fruit', glyph: 'pod', tint: 'leaf', fit: ['fruit'], notGardyn: true,
+  gb: { sprout: '—', mature: '50–55', zone: 'high', size: '16–18 in', care: 'Untested', thin: '1 per pod', note: 'Not in Gardyn’s catalog: Gardyn sells green, yellow, purple and dragon beans, but not this compact bush bean. 2014 All-America Selections winner.' },
+  about: 'A compact, upright bush bean bred for containers: about 16–18 inches tall and 8–10 wide, with bundles of slim, stringless 5–6 inch filet pods held above the leaves (Horticulture).',
+  harvest: ['Pick the pods slim and crisp, every few days.'],
+  care: ['Fruiting tower. Sow another every few weeks for a steady supply.', 'Pods held up above the leaves are easy to see and pick.'],
+  why: 'Beans back in your salads, bred for small spaces: a bush bean that keeps its pods up where you can find them.',
+  src: [['Horticulture: Mascotte bush bean', 'https://www.hortmag.com/plants-we-love-2/mascotte-bush-bean-is-perfect-for-containers-and-small-gardens'], ['True Leaf Market: Mascotte', 'https://trueleafmarket.com/products/bean-bush-mascotte']],
+  flav: { flavor: ['sweet', 'green'], w: { sweet: 1, cool: 1 }, texture: ['crunchy', 'snappy'], roles: ['crunch'], eat: 'Blanched a minute and chilled, then into the bowl.', pairs: ['yellow-cherry-tomato', 'cucumber', 'dill'], kitchen: 'Niçoise salads, quick pickles, sautéed with garlic.' } });
+
+/* Cat checks for the new ideas. "Unlisted" means the ASPCA's lists don't include the plant either way. */
+Object.assign(P.pets, {
+  minutina: { unlisted: true, text: 'Not on the ASPCA’s lists for cats either way.', src: ASPCA_CATS },
+  'vietnamese-coriander': { unlisted: true, text: 'Not on the ASPCA’s lists for cats either way.', src: ASPCA_CATS },
+  catalogna: { unlisted: true, text: 'Chicory isn’t on the ASPCA’s toxic list for cats.', src: ASPCA_CATS },
+  spigarello: { unlisted: true, text: 'Not on the ASPCA’s lists for cats either way.', src: ASPCA_CATS },
+  'signet-marigold': { unlisted: true, text: 'Marigolds aren’t on the ASPCA’s toxic list for cats.', src: ASPCA_CATS },
+  'african-blue-basil': { unlisted: true, text: 'The ASPCA lists basil as non-toxic; this hybrid’s other parent, camphor basil, isn’t listed either way.', src: ASPCA + 'basil' },
+  spilanthes: { unlisted: true, text: 'Not on the ASPCA’s lists for cats either way.', src: ASPCA_CATS },
+  'land-cress': { unlisted: true, text: 'Not on the ASPCA’s lists for cats, unlike watercress, which is on its toxic list.', src: ASPCA_CATS },
+  watercress: { toxic: true, text: 'The ASPCA’s toxic list for cats includes watercress (Nasturtium officinale, filed as “Nasturtium (Watercress)”). Garden nasturtium is a different plant, and safe.', src: ASPCA_CATS }
+});
+
 /* The older ideas get scout tags too, so the filters work on the whole list */
 const FIT = { arugula: ['salad'], 'wasabi-greens': ['salad'], breen: ['salad'], watercress: ['salad'], cilantro: ['salad', 'herb'], chervil: ['salad', 'herb'], catnip: ['herb', 'fun'], 'lemon-balm': ['herb'] };
 Object.keys(FIT).forEach(id => { if (P.plants[id]) P.plants[id].fit = FIT[id]; });
