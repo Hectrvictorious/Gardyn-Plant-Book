@@ -23,7 +23,8 @@ Plant Doctor and Care. On iPhone: Share → Add to Home Screen.
   your towers' own timing. *Share tonight's picture* draws the bowl, what was picked and what's
   ready as an image to send.
 - **Plants**: a Gardyn-style page for every plant on the towers, the microgreens, the planned
-  plants, the ideas and the retired ones: a tasting note, "Before you eat it", a cat check (ASPCA: careful, safe, or *not listed* when the ASPCA doesn't rate it either way),
+  plants, the ideas and the retired ones: **a photo of what ready looks like and a cut-size ruler**
+  (below), a tasting note, "Before you eat it", a cat check (ASPCA: careful, safe, or *not listed* when the ASPCA doesn't rate it either way),
   how it gives (*keeps giving*, *for a while*, *one harvest*, or a microgreen's *quick cut*, and what
   earns a plant that doesn't keep giving its seat),
   taste and texture, pairings, your verdict, growing basics, harvest, care, origin, your notes, a
@@ -64,6 +65,21 @@ seeds, Muse requests, printed-pod seats, the print log) is stored on the phone, 
 (Drive, Gmail, Files), and restores it from a file, with an undo. A reminder appears on the Towers
 tab when there's something new and no backup for a week, and turns firmer after two. The app also
 asks Chrome to mark its storage as persistent. Copy-as-text and paste remain under *Other ways*.
+
+**Photos and the cut-size guide** (Nov 12, 2026): every plant has a freely licensed photo from
+Wikimedia Commons or Flickr, chosen to show it at the stage you'd cut or pick it, cropped to 4:3
+(`site/img/<id>.webp`, 1024 wide) with a square thumbnail for the lists (`site/img/t/`). Each photo
+is credited under it (photographer, source, license, "cropped"); where the exact variety had no free
+photo, a close stand-in is labeled *Shown:* (pink celery appears as green leaf celery). `src/photos.json`
+holds the credits and a version per photo; About this app lists them all. Under each photo,
+`src/cut.js` gives the size to cut or pick at, from Gardyn's plant articles (or the seller, for plants
+outside its catalog), drawn as a ruler with the range marked and an everyday thing drawn to the same scale
+(quarter, AA battery, credit card, dollar bill, new pencil, printer paper); plants judged by color or
+by eye (strawberries, mint, the flowers, the microgreens) get the cue instead. The photos load from
+the site and the service worker keeps them in their own cache, filled once in the background, so the
+whole book works with no signal. The offline copy reads them from `site/img` beside it.
+To add or swap one: `python3 tools/photo.py <plant-id> "File:<Commons file name>"` (credit fetched
+from Commons), or an image URL with `--by`, `--lic` and `--page`; then rebuild.
 
 **Ask Muse** (Nov 6, 2026): every plant's seed box can ask Muse, Meta's shopping agent, to buy its
 seed, and the Ideas seed box can ask for its whole To buy list (up to five plants a request). Seeds

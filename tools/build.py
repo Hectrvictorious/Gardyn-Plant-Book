@@ -6,7 +6,7 @@
                                       and artifact/plant-book-offline.html (a whole document to open from a folder)
 
 src/body.html holds the page; its /*@@CSS@@*/, /*@@DATA@@*/ and /*@@APP@@*/ markers are filled from
-src/style.css, src/data.js + taste.js + explore.js + forbidden.js + printer.js + harvest.js, and src/app.js. Every build gets a new BUILD stamp, which is how installed
+src/style.css, src/data.js + taste.js + explore.js + forbidden.js + printer.js + harvest.js + cut.js (+ photos.json), and src/app.js. Every build gets a new BUILD stamp, which is how installed
 phones notice an update (see src/sw.js)."""
 import datetime, os, sys
 
@@ -15,9 +15,15 @@ src = lambda n: open(os.path.join(ROOT, 'src', n), encoding='utf-8').read()
 BUILD = os.environ.get('BUILD') or datetime.datetime.now(datetime.timezone.utc).strftime('%Y%m%dT%H%M')
 
 page = src('body.html')
-for marker, names in (('/*@@CSS@@*/', ['style.css']), ('/*@@DATA@@*/', ['data.js', 'taste.js', 'explore.js', 'forbidden.js', 'printer.js', 'harvest.js']), ('/*@@APP@@*/', ['app.js'])):
+# Plant photos: src/photos.json (credits and a version per photo, written by tools/photos.py) rides along as
+# PB.photos, and its file list goes to the service worker so the photos can be cached for offline use.
+import json
+PH = json.load(open(os.path.join(ROOT, 'src', 'photos.json'), encoding='utf-8')) if os.path.exists(os.path.join(ROOT, 'src', 'photos.json')) else {}
+PICS = [('img/%s%s.webp?v=%s' % (t, k, v['v'])) for t in ('t/', '') for k, v in sorted(PH.items())]
+photos_js = 'window.PB.photos = ' + json.dumps(PH, ensure_ascii=False, separators=(',', ':')) + ';'
+for marker, names in (('/*@@CSS@@*/', ['style.css']), ('/*@@DATA@@*/', ['data.js', 'taste.js', 'explore.js', 'forbidden.js', 'printer.js', 'harvest.js', 'cut.js']), ('/*@@APP@@*/', ['app.js'])):
     assert page.count(marker) == 1, marker
-    page = page.replace(marker, '\n'.join(src(n).strip() for n in names))
+    page = page.replace(marker, '\n'.join(src(n).strip() for n in names) + ('\n' + photos_js if marker == '/*@@DATA@@*/' else ''))
 
 split = page.index('<header class="mast">')
 head_part, body_part = page[:split].strip(), page[split:].strip()
@@ -44,7 +50,7 @@ site = os.path.join(ROOT, 'site')
 with open(os.path.join(site, 'index.html'), 'w', encoding='utf-8') as fh:
     fh.write(HEAD + head_part + '\n</head>\n<body>\n' + body_part + '\n</body>\n</html>\n')
 with open(os.path.join(site, 'sw.js'), 'w', encoding='utf-8') as fh:
-    fh.write(src('sw.js').replace('@@BUILD@@', BUILD))
+    fh.write(src('sw.js').replace('@@BUILD@@', BUILD).replace('@@PICS@@', json.dumps(PICS)))
 
 if '--artifact' in sys.argv:
     os.makedirs(os.path.join(ROOT, 'artifact'), exist_ok=True)
@@ -63,7 +69,10 @@ if '--artifact' in sys.argv:
 <link rel="icon" type="image/png" sizes="32x32" href="https://hectrvictorious.github.io/Gardyn-Plant-Book/favicon-v3-32.png">
 <style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#1b3929;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style>
 """
+    # Its photos load from the site folder beside it (site/img), without the version query file links don't take.
+    offline = stamped.replace("window.__BUILD__ = '%s';" % BUILD, "window.__BUILD__ = '%s'; window.__IMG_BASE__ = 'site/';" % BUILD, 1)
     with open(os.path.join(ROOT, 'artifact', 'plant-book-offline.html'), 'w', encoding='utf-8') as fh:
-        fh.write(OFFLINE + stamped[:s2].strip() + '\n</head>\n<body>\n' + stamped[s2:].strip() + '\n</body>\n</html>\n')
+        s3 = offline.index('<header class="mast">')
+        fh.write(OFFLINE + offline[:s3].strip() + '\n</head>\n<body>\n' + offline[s3:].strip() + '\n</body>\n</html>\n')
 
 print('built', BUILD, '(%d KB)' % (len(page.encode('utf-8')) // 1024))

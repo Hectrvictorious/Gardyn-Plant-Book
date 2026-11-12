@@ -5,7 +5,7 @@
   const $ = id => document.getElementById(id);
   const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const APP_VERSION = P.version;
-  const NEWS = 'Eleven new ideas from outside Gardyn’s catalog, each checked against Gardyn’s own plant list, Maine’s banned-plant list and the cat: minutina, Vietnamese coriander, Catalogna chicory, spigarello, Magenta and Rex lettuce, Lemon Gem marigold, African blue basil, spilanthes, land cress and the Mascotte bean. Find them on the Ideas tab under Outside Gardyn, and Ask Muse can buy any of them.'; // shown once to returning users
+  const NEWS = 'Every plant now has a photo of what ready looks like, and a ruler marked at the size Gardyn says to cut or pick it, with a credit card or a dollar bill drawn to the same scale. Open any plant to see it; the lists show the photos too.'; // shown once to returning users
 
   /* ----- Storage (this phone only) ----- */
   const store = {
@@ -330,6 +330,7 @@
     const pl = P.plants[pid]; if (!pl) return;
     const pods = P.pods.filter(p => p.p === pid);
     let h = '<div class="ph"><div class="gwrap">' + plantGlyph(pl) + '</div><div><div class="eyebrow">' + esc(P.groups[pl.group]) + (pl.notGardyn ? ' · not in Gardyn’s catalog' : ' · Gardyn Plant Book') + statusWord(pl) + '</div><h2 id="sheetTitle">' + esc(pl.name) + (tagStr(pl) ? ' <span class="muted" style="font-size:18px">' + tagStr(pl) + '</span>' : '') + '</h2><div class="latin">' + esc(pl.latin) + '</div>' + (pl.flav ? '<div class="tnote">' + esc(pl.flav.flavor.join(', ').replace(/^./, c => c.toUpperCase())) + (pl.flav.texture && pl.flav.texture[0] ? ' · ' + esc(pl.flav.texture[0]) : '') + '</div>' : '') + '</div></div>';
+    h += readyBlock(pid, pl);
     const fv = pl.flav;
     if (fv && fv.warn && fv.warn.length) h += '<div class="warn"><b>Before you eat it</b><ul>' + fv.warn.map(x => '<li>' + esc(x) + '</li>').join('') + '</ul></div>';
     const pet = P.pets[pid]; if (pet && pet.toxic) h += '<div class="petnote"><b>For the cat.</b> ' + esc(pet.text) + ' <a href="' + esc(pet.src) + '" target="_blank" rel="noopener">Source</a></div>';
@@ -416,6 +417,102 @@
     return '<div class="block journal"><h3>Your journal</h3><textarea id="jText" placeholder="First harvest, a root trim, a pest sighting…" aria-label="Add a note"></textarea><div class="btnrow"><button class="btn small primary" data-act="addNote" data-pid="' + pid + '">Add note</button>' + (PH.ok ? '<label class="btn small">Add a photo<input type="file" accept="image/*" data-photo="' + pid + '" hidden></label>' : '') + '</div><div class="photos" id="photos"></div>' +
       (list.length ? '<ul class="jlist">' + list.slice().reverse().map((n, i) => '<li><div><div class="d">' + esc(fmtDate(n.d)) + '</div>' + esc(n.t) + '</div><button data-act="delNote" data-pid="' + pid + '" data-i="' + (list.length - 1 - i) + '" aria-label="Delete note">Delete</button></li>').join('') + '</ul>' : '') + '</div>';
   }
+  /* ----- Reference photos and the cut-size guide (photos.js, cut.js) -----
+     Every plant gets a freely licensed photo at harvest size, credited under it, and a ruler marked with
+     the size Gardyn says to cut or pick at, with an everyday thing drawn to the same scale. */
+  const IMGBASE = window.__IMG_BASE__ || '';
+  const PHOTO = P.photos || {};
+  const picURL = (id, small) => IMGBASE + 'img/' + (small ? 't/' : '') + id + '.webp' + (IMGBASE ? '' : '?v=' + PHOTO[id].v);
+  function plantPic(id) {
+    const pl = P.plants[id];
+    if (!PHOTO[id]) return plantGlyph(pl);
+    return '<img class="pt" src="' + picURL(id, true) + '" alt="" loading="lazy" decoding="async" data-g="' + esc(pl.glyph || '') + '" data-t="' + esc(pl.tint || '') + '">';
+  }
+  const FRAC = { 0.25: '¼', 0.5: '½', 0.75: '¾' };
+  function inch(n) { const w = Math.floor(n), f = Math.round((n - w) * 100) / 100; return (w || !FRAC[f] ? String(w) : '') + (FRAC[f] || ''); }
+  const inches = n => inch(n) + (n === 1 ? ' inch' : ' inches');
+  const pickVerb = pl => (pl.group === 'fruit' || pl.group === 'flowers') ? 'Pick' : 'Cut';
+  function cutHead(pl, c) {
+    if (c.head) return c.head;
+    const v = pickVerb(pl);
+    if (c.r) return v + ' at ' + inch(c.r[0]) + '–' + inch(c.r[1]) + ' inches';
+    if (c.from) return v + ' from ' + inches(c.from);
+    if (c.about) return v + ' at about ' + inches(c.about);
+    return 'When it’s ready';
+  }
+  function cutSay(c) {
+    if (c.say) return c.say;
+    if (!c.of) return '';
+    const d = c.dim ? ' ' + c.dim : '';
+    if (c.r) return c.of + ', ' + inch(c.r[0]) + '–' + inch(c.r[1]) + ' inches' + d + '.';
+    if (c.from) return c.of + ', ' + inches(c.from) + d + ' or more.';
+    if (c.about) return c.of + ', about ' + inches(c.about) + d + '.';
+    return '';
+  }
+  function rulerSVG(c) {
+    const o = c.obj && P.objs[c.obj];
+    const hi = c.r ? c.r[1] * 1.12 : c.from ? c.from * 1.5 : c.about * 1.25;
+    const R = [2, 3, 4, 5, 6, 8, 10, 12].find(x => x >= Math.max(hi, o ? o.len * 1.1 : 0)) || 12;
+    const W = 320, L = 12, Rx = W - 12, sc = (Rx - L) / R, X = n => +(L + n * sc).toFixed(1);
+    const step = R <= 6 ? 0.25 : 0.5, every = R >= 10 ? 2 : 1;
+    const oname = o ? o.name.replace(/^an? /, '') : '';
+    const what = c.r ? inch(c.r[0]) + ' to ' + inch(c.r[1]) + ' inches' : c.from ? inch(c.from) + ' inches and up' : 'about ' + inches(c.about);
+    let s = '<svg class="ruler" viewBox="0 0 ' + W + ' ' + (o ? 66 : 46) + '" role="img" aria-label="Ruler marked at ' + esc(what) + (o ? ', with ' + esc(o.name) + ' drawn to the same scale' : '') + '">';
+    if (c.from) s += '<defs><linearGradient id="rlFade" x1="0" x2="1" y1="0" y2="0"><stop offset="0" class="rl-s0"/><stop offset="1" class="rl-s1"/></linearGradient></defs>';
+    s += '<rect class="rl-body" x="' + (L - 7) + '" y="16" width="' + (Rx - L + 14) + '" height="24" rx="4"/>';
+    if (c.r) s += '<rect class="rl-band" x="' + X(c.r[0]) + '" y="16" width="' + (X(c.r[1]) - X(c.r[0])).toFixed(1) + '" height="24"/>';
+    if (c.from) s += '<rect x="' + X(c.from) + '" y="16" width="' + (X(R) - X(c.from)).toFixed(1) + '" height="24" fill="url(#rlFade)"/>';
+    for (let t = 0; t <= R + 1e-9; t += step) {
+      const whole = Math.abs(t - Math.round(t)) < 1e-9, half = Math.abs(t * 2 - Math.round(t * 2)) < 1e-9;
+      s += '<line class="rl-tk" x1="' + X(t) + '" x2="' + X(t) + '" y1="16" y2="' + (16 + (whole ? 10 : half ? 6.5 : 4)) + '"/>';
+      if (whole && Math.round(t) % every === 0) s += '<text class="rl-n" x="' + X(t) + '" y="36.5" text-anchor="middle">' + Math.round(t) + '</text>';
+    }
+    const lab = c.r ? inch(c.r[0]) + '–' + inch(c.r[1]) + ' in' : c.from ? inch(c.from) + ' in and up' : 'about ' + inch(c.about) + ' in';
+    const ends = c.r ? [c.r[0], c.r[1]] : [c.from || c.about];
+    ends.forEach(e => { s += '<line class="rl-edge" x1="' + X(e) + '" x2="' + X(e) + '" y1="13" y2="28.5"/>'; });
+    if (c.about) s += '<circle class="rl-dot" cx="' + X(c.about) + '" cy="13" r="2.6"/>';
+    const mid = c.r ? (X(c.r[0]) + X(c.r[1])) / 2 : X(ends[0]);
+    const anchor = c.from ? 'start' : 'middle';
+    const lx = c.from ? Math.min(X(c.from) + 3, W - 70) : Math.max(28, Math.min(W - 28, mid));
+    s += '<text class="rl-lab" x="' + lx + '" y="10" text-anchor="' + anchor + '">' + esc(lab) + '</text>';
+    if (o) {
+      const ow = X(o.len) - X(0);
+      s += '<rect class="rl-obj" x="' + X(0) + '" y="48" width="' + ow.toFixed(1) + '" height="14" rx="3.5"/>';
+      s += '<text class="rl-ot" x="' + (X(0) + ow / 2).toFixed(1) + '" y="58.3" text-anchor="middle">' + esc(oname) + '</text>';
+    }
+    return s + '</svg>';
+  }
+  function cutGuide(pl, c) {
+    const sized = !!(c.r || c.from || c.about), say = cutSay(c);
+    const sw = c.sw ? '<i class="cut-sw" style="background:' + esc(c.sw) + '" aria-hidden="true"></i>' : '';
+    let h = '<div class="cutg"><div class="cutg-h">' + esc(cutHead(pl, c)) + '</div>';
+    if (sized) h += '<p>' + esc(say) + (c.like ? ' ' + esc(c.like) : '') + '</p>' + rulerSVG(c);
+    if (c.cue) h += '<p class="cut-cue">' + sw + '<span>' + esc(c.cue) + '</span></p>';
+    if (c.tip) h += '<p class="small">' + esc(c.tip) + '</p>';
+    return h + '</div>';
+  }
+  function credit(ph) {
+    return 'Photo: <a href="' + esc(ph.page) + '" target="_blank" rel="noopener">' + esc(ph.by || 'unknown') + ', ' + esc(ph.at) + '</a> · ' + (ph.licurl ? '<a href="' + esc(ph.licurl) + '" target="_blank" rel="noopener">' + esc(ph.lic) + '</a>' : esc(ph.lic)) + ' · cropped';
+  }
+  function readyBlock(id, pl) {
+    const ph = PHOTO[id], c = P.cut && P.cut[id];
+    if (!ph && !c) return '';
+    let h = '<div class="ready">';
+    if (ph) h += '<figure class="pp"><div class="pp-img"><img src="' + picURL(id) + '" alt="' + esc(pl.name + (ph.alt ? ': ' + ph.alt : '')) + '" width="1024" height="768" decoding="async"><span class="pp-tag">' + esc(ph.tag || ('Ready to ' + pickVerb(pl).toLowerCase())) + '</span></div><figcaption class="pp-cr">' + (ph.stand ? '<b>Shown:</b> ' + esc(ph.stand) + '<br>' : '') + credit(ph) + '</figcaption></figure>';
+    if (c) h += cutGuide(pl, c);
+    return h + '</div>';
+  }
+  function creditsSheet() {
+    const ids = Object.keys(PHOTO).filter(id => P.plants[id]).sort((a, b) => P.plants[a].name.localeCompare(P.plants[b].name));
+    const h = '<div><div class="eyebrow">About this app</div><h2 id="sheetTitle">Photo credits</h2><div class="small">Every plant photo is freely licensed, from Wikimedia Commons or Flickr, and cropped and resized for this book. Tap a name for its plant page, or a photographer for the original.</div></div>' +
+      '<div class="card"><ul class="credits">' + ids.map(id => { const ph = PHOTO[id]; return '<li><button class="linkish" data-open="plant" data-pid="' + id + '">' + esc(P.plants[id].name) + '</button><span class="small">' + (ph.title ? '“' + esc(ph.title) + '” · ' : '') + credit(ph).replace(/^Photo: /, '') + '</span></li>'; }).join('') + '</ul></div>';
+    showSheet(h, { kind: 'credits' });
+  }
+  document.addEventListener('error', e => {
+    const t = e.target; if (!t || t.tagName !== 'IMG') return;
+    if (t.classList.contains('pt')) { const g = document.createElement('span'); g.innerHTML = glyph(t.dataset.g, t.dataset.t); t.replaceWith(g.firstChild); }
+    else if (t.closest && t.closest('.pp')) t.closest('.pp').hidden = true;
+  }, true);
   function seatSheet(slot) {
     const mode = UI.mode, L = layout(parse(slot).t, mode), cell = L[slot], z = zoneOf(slot);
     let h = '<div><div class="eyebrow">' + (mode === 'plan' ? 'Next' : 'Now') + '</div><h2 id="sheetTitle">' + esc(seatTitle(slot)) + '</h2></div>';
@@ -459,7 +556,7 @@
     const list = ids.filter(id => (q ? true : inFilter(P.plants[id], UI.filter)) && match(id));
     const order = { tower: 0, micro: 1, dome: 2, planned: 2, idea: 3, retired: 4 };
     list.sort((a, b) => (order[P.plants[a].status] - order[P.plants[b].status]) || P.plants[a].name.localeCompare(P.plants[b].name));
-    $('plist').innerHTML = list.length ? list.map(id => { const pl = P.plants[id]; const g = pl.gb || {}; const where = plantWhere(id); return '<button class="prow" data-open="plant" data-pid="' + id + '"><span class="gwrap">' + plantGlyph(pl) + '</span><span style="min-width:0"><span class="nm">' + esc(pl.name) + (tagStr(pl) ? ' <span class="muted" style="font-size:13px">' + tagStr(pl) + '</span>' : '') + (() => { const gv = pl.status === 'micro' ? null : givesOf(id); return gv && gv.k !== 'keeps' ? ' ' + givesPill(gv) : ''; })() + '</span>' + (pl.flav ? '<span class="fw" style="display:block">' + esc(pl.flav.flavor.join(', ')) + (pl.flav.texture && pl.flav.texture[0] ? ' · ' + esc(pl.flav.texture[0]) : '') + '</span>' : '<span class="lt" style="display:block">' + esc(pl.latin) + '</span>') + (where ? '<span class="wh" style="display:block">' + esc(where) + '</span>' : pl.status === 'micro' ? '<span class="wh" style="display:block">Microgreens Kit · Sprout Nursery</span>' : pl.why ? '<span class="wh" style="display:block">An idea to try</span>' : pl.gone ? '<span class="wh" style="display:block">Retired</span>' : '') + '</span><span class="rt">' + (g.zone ? '<span class="chip z-' + g.zone + '">' + g.zone + '</span>' : '') + (/\d/.test(g.mature || '') ? '<span class="days">' + esc(g.mature) + ' days</span>' : '') + (pl.flav && pl.flav.flag ? '<span class="flag">' + esc(pl.flav.flag) + '</span>' : '') + (VERD[id] ? '<span class="vd vd-' + VERD[id].v + '">' + VNAME[VERD[id].v] + '</span>' : '') + '</span></button>'; }).join('') : '<div class="card small">No plant matches “' + esc(q) + '”. Try a pest, a light zone, or part of a name.</div>';
+    $('plist').innerHTML = list.length ? list.map(id => { const pl = P.plants[id]; const g = pl.gb || {}; const where = plantWhere(id); return '<button class="prow" data-open="plant" data-pid="' + id + '"><span class="gwrap">' + plantPic(id) + '</span><span style="min-width:0"><span class="nm">' + esc(pl.name) + (tagStr(pl) ? ' <span class="muted" style="font-size:13px">' + tagStr(pl) + '</span>' : '') + (() => { const gv = pl.status === 'micro' ? null : givesOf(id); return gv && gv.k !== 'keeps' ? ' ' + givesPill(gv) : ''; })() + '</span>' + (pl.flav ? '<span class="fw" style="display:block">' + esc(pl.flav.flavor.join(', ')) + (pl.flav.texture && pl.flav.texture[0] ? ' · ' + esc(pl.flav.texture[0]) : '') + '</span>' : '<span class="lt" style="display:block">' + esc(pl.latin) + '</span>') + (where ? '<span class="wh" style="display:block">' + esc(where) + '</span>' : pl.status === 'micro' ? '<span class="wh" style="display:block">Microgreens Kit · Sprout Nursery</span>' : pl.why ? '<span class="wh" style="display:block">An idea to try</span>' : pl.gone ? '<span class="wh" style="display:block">Retired</span>' : '') + '</span><span class="rt">' + (g.zone ? '<span class="chip z-' + g.zone + '">' + g.zone + '</span>' : '') + (/\d/.test(g.mature || '') ? '<span class="days">' + esc(g.mature) + ' days</span>' : '') + (pl.flav && pl.flav.flag ? '<span class="flag">' + esc(pl.flav.flag) + '</span>' : '') + (VERD[id] ? '<span class="vd vd-' + VERD[id].v + '">' + VNAME[VERD[id].v] + '</span>' : '') + '</span></button>'; }).join('') : '<div class="card small">No plant matches “' + esc(q) + '”. Try a pest, a light zone, or part of a name.</div>';
   }
 
   /* ----- Care ----- */
@@ -596,7 +693,7 @@
   const inScout = (id, pl, f) => f === 'all' ? true : f === 'short' ? !!SCOUT[id] : f === 'outside' ? !!pl.notGardyn : f === 'keeps' ? (givesOf(id) || {}).k === 'keeps' : (pl.fit || []).includes(f);
   function ideaCard(id, pl) {
     const g = pl.gb || {}, on = !!SCOUT[id], pet = P.pets[id], fv = pl.flav;
-    return '<div class="idea' + (on ? ' starred' : '') + '"><button class="idea-main" data-open="plant" data-pid="' + id + '"><span class="gwrap">' + plantGlyph(pl) + '</span><span style="min-width:0"><h4>' + esc(pl.name) + (pl.notGardyn ? ' <span class="og">outside Gardyn</span>' : '') + '</h4>' +
+    return '<div class="idea' + (on ? ' starred' : '') + '"><button class="idea-main" data-open="plant" data-pid="' + id + '"><span class="gwrap">' + plantPic(id) + '</span><span style="min-width:0"><h4>' + esc(pl.name) + (pl.notGardyn ? ' <span class="og">outside Gardyn</span>' : '') + '</h4>' +
       (fv ? '<span class="fw">' + esc(fv.flavor.join(', ')) + (fv.texture && fv.texture[0] ? ' · ' + esc(fv.texture[0]) : '') + '</span>' : '') + '<p>' + esc(pl.why || '') + '</p><span class="chips">' +
       (() => { const gv = givesOf(id); return gv ? '<span class="chip gv-' + gv.k + '">' + HV.givesWord[gv.k] + '</span>' : ''; })() + (g.zone ? '<span class="chip z-' + g.zone + '">' + ZONE[g.zone] + '</span>' : '') + (/\d/.test(g.mature || '') ? '<span class="chip">' + esc(g.mature) + ' days</span>' : '') + (g.size && g.size !== '—' ? '<span class="chip">' + esc(g.size) + '</span>' : '') +
       (pet ? '<span class="chip' + (pet.toxic ? ' wait' : pet.unlisted ? '' : ' ok') + '">' + (pet.toxic ? 'cat: careful' : pet.unlisted ? 'cat: not listed' : 'cat-safe') + '</span>' : '') + '</span></span></button>' +
@@ -1002,7 +1099,7 @@
     const mgs = Object.keys(P.plants).filter(id => P.plants[id].status === 'micro');
     const heat = id => { const w = P.plants[id].flav.w || {}; return (w.pepper || 0) >= 2 ? 'hot' : (w.herbal || 0) >= 1 && !w.pepper ? 'aroma' : 'mild'; };
     const auditionOf = id => Object.keys(P.audition).find(k => P.audition[k] === id);
-    const row = id => { const pl = P.plants[id], au = auditionOf(id); return '<button class="prow" data-open="plant" data-pid="' + id + '"><span class="gwrap">' + plantGlyph(pl) + '</span><span style="min-width:0"><span class="nm">' + esc(pl.name) + '</span><span class="fw" style="display:block">' + esc(pl.flav.flavor.join(', ')) + '</span><span class="wh" style="display:block">' + esc(pl.flav.kitchen) + (au && P.plants[au] ? ' <b class="aud">Audition for ' + esc(P.plants[au].name) + '</b>' : '') + '</span></span><span class="rt"><span class="days">' + esc(pl.gb.mature) + ' days</span></span></button>'; };
+    const row = id => { const pl = P.plants[id], au = auditionOf(id); return '<button class="prow" data-open="plant" data-pid="' + id + '"><span class="gwrap">' + plantPic(id) + '</span><span style="min-width:0"><span class="nm">' + esc(pl.name) + '</span><span class="fw" style="display:block">' + esc(pl.flav.flavor.join(', ')) + '</span><span class="wh" style="display:block">' + esc(pl.flav.kitchen) + (au && P.plants[au] ? ' <b class="aud">Audition for ' + esc(P.plants[au].name) + '</b>' : '') + '</span></span><span class="rt"><span class="days">' + esc(pl.gb.mature) + ' days</span></span></button>'; };
     $('mgList').innerHTML = [['hot', 'Hot and peppery'], ['mild', 'Mild'], ['aroma', 'Aromatic']].map(([g, l]) => { const ids = mgs.filter(id => heat(id) === g); return ids.length ? '<h4 class="mg-h">' + l + '</h4>' + ids.map(row).join('') : ''; }).join('');
   }
   function renderCautions() {
@@ -1127,7 +1224,7 @@
   }
   function fruitRow(pid) {
     const pl = P.plants[pid], m = fruitModel(pid);
-    return '<div class="fr"><button class="fr-n" data-open="plant" data-pid="' + pid + '"><span class="gwrap">' + plantGlyph(pl) + '</span><span class="fr-t"><b>' + esc(pl.name) + '</b><span class="small' + (m.now.length ? ' ripe' : '') + '">' + esc(fruitStatus(m)) + '</span></span></button>' +
+    return '<div class="fr"><button class="fr-n" data-open="plant" data-pid="' + pid + '"><span class="gwrap">' + plantPic(pid) + '</span><span class="fr-t"><b>' + esc(pl.name) + '</b><span class="small' + (m.now.length ? ' ripe' : '') + '">' + esc(fruitStatus(m)) + '</span></span></button>' +
       '<span class="fr-b">' + stepper('flower', pid, todayN(FLOW, pid), 'Flowers') + stepper('fruit', pid, todayN(HARV, pid, 'fruit'), 'Picked') + '</span></div>';
   }
   function fruitBlock(pid) {
@@ -1157,7 +1254,7 @@
     if (ripe.length) h += '<div class="callout ripe"><b>Should be ripe now:</b> ' + esc(ripe.map(m => m.now.length + ' ' + fw(m.pid, m.now.length)).join(', ')) + ', going by the flowers you logged. Color and feel decide.</div>';
     ['S', 'F'].forEach(t => {
       const rows = L.filter(x => parse(cur(x.p)).t === t); if (!rows.length) return;
-      h += '<div class="block"><h3>' + esc(P.towers[t].name) + '</h3><div class="list picks">' + rows.map(x => { const pl = P.plants[x.p.p], done = x.last === today; return '<div class="pk' + (x.days !== null && x.days >= PICK_EVERY ? ' due' : '') + '"><span class="gwrap">' + plantGlyph(pl) + '</span><span class="pk-t"><b>' + esc(x.p.label) + '</b><span class="small">' + esc(seatName(cur(x.p))) + ' · ' + (done ? 'picked today' : x.last ? 'picked ' + (x.days === 1 ? 'yesterday' : x.days + ' days ago') : 'not logged') + '</span></span><button class="tick" data-act="pickToggle" data-pod="' + x.p.id + '" aria-pressed="' + done + '" aria-label="Picked ' + esc(x.p.label) + ' today"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></button></div>'; }).join('') + '</div></div>';
+      h += '<div class="block"><h3>' + esc(P.towers[t].name) + '</h3><div class="list picks">' + rows.map(x => { const pl = P.plants[x.p.p], done = x.last === today; return '<div class="pk' + (x.days !== null && x.days >= PICK_EVERY ? ' due' : '') + '"><span class="gwrap">' + plantPic(x.p.p) + '</span><span class="pk-t"><b>' + esc(x.p.label) + '</b><span class="small">' + esc(seatName(cur(x.p))) + ' · ' + (done ? 'picked today' : x.last ? 'picked ' + (x.days === 1 ? 'yesterday' : x.days + ' days ago') : 'not logged') + '</span></span><button class="tick" data-act="pickToggle" data-pod="' + x.p.id + '" aria-pressed="' + done + '" aria-label="Picked ' + esc(x.p.label) + ' today"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></button></div>'; }).join('') + '</div></div>';
     });
     h += L.length ? '<div class="btnrow"><button class="btn primary" data-act="pickAll">Picked them all today</button></div>' + sizeBlock() : '<div class="card small">Nothing leafy on the towers right now.</div>';
     if (fps.length) h += '<div class="block" id="fruitSec"><h3>Flowers and fruit</h3><p class="small">Count flowers as they open (the pollinating round is a good time) and fruit as you pick it. The app works out when each should be ripe, and learns your towers’ own timing.</p><div class="list fruits">' + fps.map(fruitRow).join('') + '</div></div>';
@@ -1626,7 +1723,7 @@
     const pids = [...new Set(SEEDS.filter(s => !seedOut(s)).map(s => s.p))].filter(id => P.plants[id]).sort((a, b) => P.plants[a].name.localeCompare(P.plants[b].name));
     const buy = seedBuyList();
     $('seedCount').textContent = pids.length ? pids.length + ' on hand' : '';
-    const row = (pid, subHTML) => '<button class="prow" data-open="plant" data-pid="' + pid + '" data-seeds="1"><span class="gwrap">' + plantGlyph(P.plants[pid]) + '</span><span style="min-width:0"><span class="nm">' + esc(P.plants[pid].name) + '</span><span class="wh" style="display:block">' + subHTML + '</span></span></button>';
+    const row = (pid, subHTML) => '<button class="prow" data-open="plant" data-pid="' + pid + '" data-seeds="1"><span class="gwrap">' + plantPic(pid) + '</span><span style="min-width:0"><span class="nm">' + esc(P.plants[pid].name) + '</span><span class="wh" style="display:block">' + subHTML + '</span></span></button>';
     let h = pids.length ? '<div class="stack">' + pids.map(pid => row(pid, seedsOf(pid).filter(s => !seedOut(s)).map(seedLine).join(' · '))).join('') + '</div>' : '<p class="small" style="margin:0">Nothing logged yet. Every plant’s page has a seed box: yCubes and seed pads by count, packets with where they came from and the year.</p>';
     if (buy.length) {
       const more = buy.length > BUYX.maxItems ? 'Muse gets the first ' + BUYX.maxItems + ' of these; ask for the rest after.' : '';
@@ -1882,6 +1979,7 @@
       else if (act === 'doctor') doctorSheet(a.dataset.id);
       else if (act === 'photoOpen') openLight(+a.dataset.id, a.dataset.src, a.dataset.d);
       else if (act === 'lightClose') $('lightbox').hidden = true;
+      else if (act === 'photoCredits') creditsSheet();
       else if (act === 'photoDel') { if (!a.dataset.armed) { a.dataset.armed = '1'; a.textContent = 'Tap again to delete'; return; } phDel(+a.dataset.id).then(() => { $('lightbox').hidden = true; if (SHEET && SHEET.pid) paintPhotos(SHEET.pid); toast('Photo deleted.'); }).catch(() => toast('Couldn’t delete it.')); }
       else if (act === 'tipNext') { UI.tipShift = (UI.tipShift || 0) + 1; renderTip(); }
       else if (act === 'tipGo') { const g = P.tips[+a.dataset.i].go || {}; if (g.doctor) doctorSheet(g.doctor); else if (g.plant) plantSheet(g.plant); else if (g.forb) forbSheet(g.forb); else if (g.view) showView(g.view, g.anchor); }

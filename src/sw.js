@@ -6,6 +6,26 @@
 const BUILD = '@@BUILD@@';
 const VERSION = 'plantbook-' + BUILD;
 const SHELL = ['./', './index.html', './manifest.json', './icon-v3-192.png', './apple-touch-icon-v3.png', './favicon-v3-32.png'];
+/* Plant photos live in their own cache, which outlasts app updates: each file is fetched once, then kept
+   until the build's photo list (PICS) drops it. A page saying hello starts a quiet background fill, so the
+   whole book works with no signal. */
+const PHOTOS = 'plantbook-photos-v1';
+const PICS = @@PICS@@;
+const PIC_SET = () => new Set(PICS.map(u => new URL(u, self.registration.scope).href));
+let warming = null;
+function warm() {
+  if (warming) return warming;
+  warming = (async () => {
+    const c = await caches.open(PHOTOS);
+    const have = new Set((await c.keys()).map(r => r.url));
+    for (const u of PICS) {
+      const abs = new URL(u, self.registration.scope).href;
+      if (have.has(abs)) continue;
+      try { const res = await fetch(abs); if (res.ok) await c.put(abs, res); } catch (err) { break; }
+    }
+  })().finally(() => { warming = null; });
+  return warming;
+}
 let isUpdate = false;
 const acked = new Set();
 
@@ -28,7 +48,9 @@ self.addEventListener('install', e => {
 self.addEventListener('activate', e => {
   e.waitUntil((async () => {
     const keys = await caches.keys();
-    await Promise.all(keys.filter(k => k !== VERSION && k.startsWith('plantbook-')).map(k => caches.delete(k)));
+    await Promise.all(keys.filter(k => k !== VERSION && k !== PHOTOS && k.startsWith('plantbook-')).map(k => caches.delete(k)));
+    const pc = await caches.open(PHOTOS), keep = PIC_SET();
+    await Promise.all((await pc.keys()).filter(r => !keep.has(r.url)).map(r => pc.delete(r)));
     await self.clients.claim();
   })().then(() => { if (isUpdate) setTimeout(nudge, 50); }));
 });
@@ -44,6 +66,7 @@ self.addEventListener('message', e => {
   const d = e.data || {};
   if (d.type === 'pb-ack' && e.source) acked.add(e.source.id);
   if (d.type === 'pb-hello' && e.source) { try { e.source.postMessage({ type: 'pb-version', version: VERSION }); } catch (err) {} }
+  if (d.type === 'pb-hello' && !(self.navigator.connection && self.navigator.connection.saveData)) e.waitUntil(warm());
 });
 
 self.addEventListener('fetch', e => {
@@ -55,6 +78,8 @@ self.addEventListener('fetch', e => {
   if (isShell) {
     const key = req.mode === 'navigate' ? './' : req;
     e.respondWith(caches.match(key, { ignoreSearch: true }).then(hit => hit || fetch(req).then(res => { if (res.ok && req.mode !== 'navigate') { const copy = res.clone(); caches.open(VERSION).then(c => c.put(req, copy)); } return res; })).catch(() => caches.match('./')));
+  } else if (same && /\/img\/.+\.webp$/.test(url.pathname)) {
+    e.respondWith(caches.open(PHOTOS).then(c => c.match(req).then(hit => hit || fetch(req).then(res => { if (res.ok) c.put(req, res.clone()); return res; }))));
   } else if (/fonts\.(googleapis|gstatic)\.com/.test(url.hostname)) {
     e.respondWith(caches.match(req).then(hit => hit || fetch(req).then(res => { const copy = res.clone(); caches.open(VERSION).then(c => c.put(req, copy)); return res; })));
   }
