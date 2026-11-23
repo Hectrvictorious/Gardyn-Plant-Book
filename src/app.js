@@ -5,7 +5,7 @@
   const $ = id => document.getElementById(id);
   const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const APP_VERSION = P.version;
-  const NEWS = 'Every plant now has a photo of what ready looks like, and a ruler marked at the size Gardyn says to cut or pick it, with a credit card or a dollar bill drawn to the same scale. Open any plant to see it; the lists show the photos too.'; // shown once to returning users
+  const NEWS = 'Purslane now says when to make the first cut: let a stem reach 5–6 inches with four to six leaf joints, then cut just above the second or third pair from the base. It’s on the purslane page, its cut-size ruler and the tip of the day.'; // shown once to returning users
 
   /* ----- Storage (this phone only) ----- */
   const store = {

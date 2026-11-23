@@ -489,6 +489,7 @@ P.tips = [
   { t: 'Fuzzy white roots are root hairs, not mold. Gardyn calls them a sign of vigor.', go: { doctor: 'fuzz' } },
   { t: 'Never germinate yCubes on a tower with Plant Food in the Tank: Plant Food stops seeds from sprouting.', go: { doctor: 'nosprout' } },
   { t: 'Harvest outer leaves and leave a third of the plant, and it keeps producing.' },
+  { t: 'Purslane: first cut at 5–6 inches, just above the second or third leaf pair. Topped younger, it sulks for a week or two.', go: { plant: 'purslane' } },
   { t: 'Cut flower stems the moment they appear; it slows bolting.', go: { doctor: 'bolt' } },
   { t: 'Little blisters under pepper, tomato or tatsoi leaves are edema, not a disease. More light and a fan on low help.', go: { doctor: 'blisters' } },
   { t: 'Small, regular root trims are gentler than big, rare ones.', go: { doctor: 'rot' } },

@@ -71,7 +71,7 @@ P.harvest = {
       'hon-tsai-tai': 'Outer leaves, then flower shoots, again and again.',
       'perpetual-spinach': 'Months of outer leaves: it’s in the name.',
       'pink-celery': 'Take the big outer stalks and leave a third; new ones keep coming from the middle.',
-      purslane: 'Pinch it often and it stays compact and keeps coming.',
+      purslane: 'First cut at 5–6 inches, above the second or third leaf pair; then pinch it often and it stays compact and keeps coming.',
       'red-sorrel': 'A perennial: outer leaves for months, even years.',
       mint: 'A perennial: cut it back and it comes back harder.', 'chocolate-mint': 'A perennial: cut it back and it comes back harder.',
       'salad-burnet': 'A perennial: tender new leaves, again and again.',

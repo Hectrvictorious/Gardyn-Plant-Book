@@ -34,7 +34,7 @@ P.cut = {
   'romaine': LEAF4,
   'flashy-trout-back': LEAF4,
   'red-sorrel': { from: 4, of: 'Outer leaves', dim: 'tall', obj: 'card', like: 'A bit longer than a credit card.', tip: 'Cut about an inch above the base, never more than a third at once.' },
-  'purslane': { head: 'Harvest often', cue: 'No set size. Pinch leaves or cut above a node, a third of its height at a time, so it stays compact.' },
+  'purslane': { head: 'First cut at 5–6 inches', r: [5, 6], of: 'Stems', dim: 'tall', obj: 'bill', like: 'A little shorter than a dollar bill, with four to six leaf joints.', cue: 'Cut just above the second or third leaf pair from the base; the tips are your first taste. After that, the top third above a leaf pair, every week or two, so it stays compact.', tip: 'Topped too young, it sulks for a week or two: nearly all its leaves are at the tips, so an early cut takes most of them.' },
   'salad-burnet': { head: 'Pick young leaves, often', cue: 'No set size: the tender new leaves are the ones you want.' },
   'dill': { head: 'Take it from the top down', cue: 'Smaller fronds as you need them. Once it’s mature, cut back the top third every couple of months.' },
   'mint': MINT,

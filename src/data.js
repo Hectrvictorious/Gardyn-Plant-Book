@@ -4,7 +4,7 @@
    (Help Center plant articles); seats and notes come from Josh's maps v4/v5 (salad) and v8/v9 (fruiting).
    Slot codes: tower letter + row + column, e.g. S3L = salad tower, row 3, left; F10C = fruiting, row 10, center. */
 window.PB = {
-version: '2026.11.12a',
+version: '2026.11.23a',
 
 /* ---------- The book ---------- */
 groups: { greens: 'Leafy green', herbs: 'Herb', flowers: 'Edible flower', fruit: 'Fruiting plant' },
@@ -200,9 +200,9 @@ plants: {
   about: `A succulent "weed" eaten all over the world: juicy leaves on red-tinted stems, lemony and salty with an arugula-like bite. Gardyn notes it's unusually high in omega-3s and beta-carotene.`,
   taste: `Raw in salads, cooked like spinach, stirred into soups and stews, or made into pesto. Stems, leaves, buds and seeds are all edible.`,
   origin: `From Southeast Asia to southeastern Europe; nicknamed little hogweed and pigweed.`,
-  harvest: [`Harvest often so it stays compact: pinch leaves or cut above a node, a third at a time.`],
+  harvest: [`First cut: let a stem reach 5–6 inches with four to six leaf joints, then cut just above the second or third pair from the base. The plant keeps enough leaves to power the branches, and the tips you remove are your first taste.`, `After that, take the top third above a leaf pair every week or two. Cutting is what keeps it branching and tender; a purslane that's never cut tries to flower and goes stemmy.`, `Purslane carries nearly all its leaves at the stem tips, so topping a young stem takes most of its leaf area and the buds below have to regrow on almost nothing. Early and low makes a bushier plant but a slow one; later and higher bounces back faster but taller.`],
   care: [`Remove leaves with brown spots.`, `Monthly root check.`],
-  yours: [`You bought "golden purslane," which is the right plant (Portulaca oleracea, small yellow flowers), not the ornamental moss rose.`, `At row 10 center since the Nov 2 re-seating, its own low-light zone.`],
+  yours: [`You bought "golden purslane," which is the right plant (Portulaca oleracea, small yellow flowers), not the ornamental moss rose. The stems came in red and the leaves plain green, so the packet may have been standard green purslane: the same plant, with the stronger tang.`, `At row 10 center since the Nov 2 re-seating, its own low-light zone.`, `Nov 23: you topped the healthiest of the three stems while it was still small, leaving only tiny leaves, and it stalled while the two untouched ones kept growing. Side branches come from the leaf joints below the cut, 5–10 days out. A stem that's dying goes soft and translucent from the cut down; a firm, dark-red one is only sulking.`],
   src: [['Gardyn Help: Purslane', 'https://help.mygardyn.com/en/articles/1797633']] },
 
 'tam-jalapeno': { name: 'TAM Jalapeño', latin: 'Capsicum annuum', group: 'fruit', glyph: 'pepper', tint: 'leaf', status: 'tower', tags: [], notGardyn: true,
